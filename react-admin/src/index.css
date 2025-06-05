@@ -176,3 +176,7 @@ label {
     overflow: hidden !important;
     pointer-events: none !important;
 }
+
+.ant-layout-sider {
+    z-index: 1000 !important;
+}

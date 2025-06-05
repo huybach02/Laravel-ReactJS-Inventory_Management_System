@@ -1,7 +1,19 @@
 <?php
 
 return [
-  [
+    [
+    "name" => "loai-khach-hang",
+    "actions" => [
+      "index" => true,
+      "create" => true,
+      "show" => true,
+      "edit" => true,
+      "delete" => true,
+      "export" => true,
+      "showMenu" => true
+    ]
+  ],
+[
   "name" => "cau-hinh-chung",
   "actions" => [
   "index" => true,

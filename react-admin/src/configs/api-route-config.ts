@@ -15,6 +15,8 @@ export const API_ROUTE_CONFIG = {
     VAI_TRO: "/vai-tro",
     VAI_TRO_OPTIONS: "/vai-tro/options",
     DANH_SACH_PHAN_QUYEN: "/danh-sach-phan-quyen",
+
+    LOAI_KHACH_HANG: "/loai-khach-hang",
 };
 export const URL_CONSTANTS = {
     LOGIN: "/admin",
@@ -26,4 +28,6 @@ export const URL_CONSTANTS = {
     THOI_GIAN_LAM_VIEC: "/admin/thiet-lap-he-thong/thoi-gian-lam-viec",
     VERIFY_OTP: "/admin/verify-otp",
     PROFILE: "/admin/profile",
+
+    LOAI_KHACH_HANG: "/admin/quan-ly-khach-hang/loai-khach-hang",
 };

@@ -7,9 +7,9 @@ export const formatter = (value: number | string | undefined): string => {
     if (!value) return "";
 
     const stringValue = typeof value === "string" ? value : value.toString();
-    const stringValue1 = stringValue.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    const stringValue1 = stringValue.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 
-    if (stringValue1.includes(".") && stringValue1.endsWith("00")) {
+    if (stringValue1.includes(",") && stringValue1.endsWith("00")) {
         return stringValue1.slice(0, -3);
     } else return stringValue1;
 };
@@ -18,7 +18,7 @@ export const parser = (value: string | undefined): any => {
     if (!value) {
         return undefined;
     }
-    const parsedValue = value.replace(/(,*)/g, "");
+    const parsedValue = value.replace(/(\.+)/g, "");
     if (isNaN(Number(parsedValue))) {
         return undefined;
     }
@@ -188,7 +188,7 @@ export function mergeArrays(arr1: any, arr2: any) {
 
 export const numberWithCommas = (x: number | string | undefined): any => {
     if (!x) return undefined;
-    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 };
 
 export const ordinalSuffix = (i: number) => {
@@ -223,4 +223,11 @@ export const camelCasePathUrl = (text: string, capitalizeFirst = true) => {
             return word.charAt(0).toUpperCase() + word.slice(1);
         })
         .join("");
+};
+
+export const formatVietnameseCurrency = (
+    x: number | string | undefined
+): any => {
+    if (!x) return undefined;
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + " VNĐ";
 };

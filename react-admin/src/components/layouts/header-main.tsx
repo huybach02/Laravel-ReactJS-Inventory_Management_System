@@ -87,6 +87,7 @@ const HeaderMain = ({
                             maxHeight: 400,
                             maxWidth: 280,
                             overflow: "auto",
+                            boxShadow: "0 2px 8px rgba(0,20,41,.25)",
                         }}
                     >
                         <Button

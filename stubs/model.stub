@@ -16,7 +16,7 @@ class {{ class }} extends Model
 
     protected $guarded = [];
 
-    protected static function boot()Add commentMore actions
+    protected static function boot()
     {
       parent::boot();
 

@@ -64,4 +64,13 @@ Route::group([
     Route::delete('/{id}', [\App\Modules\NguoiDung\NguoiDungController::class, 'destroy']);
     Route::patch('/ngoai-gio/{id}', [\App\Modules\NguoiDung\NguoiDungController::class, 'changeStatusNgoaiGio']);
   });
+
+  // LoaiKhachHang
+  Route::prefix('loai-khach-hang')->group(function () {
+    Route::get('/', [\App\Modules\LoaiKhachHang\LoaiKhachHangController::class, 'index']);
+    Route::post('/', [\App\Modules\LoaiKhachHang\LoaiKhachHangController::class, 'store']);
+    Route::get('/{id}', [\App\Modules\LoaiKhachHang\LoaiKhachHangController::class, 'show']);
+    Route::put('/{id}', [\App\Modules\LoaiKhachHang\LoaiKhachHangController::class, 'update']);
+    Route::delete('/{id}', [\App\Modules\LoaiKhachHang\LoaiKhachHangController::class, 'destroy']);
+  });
 });

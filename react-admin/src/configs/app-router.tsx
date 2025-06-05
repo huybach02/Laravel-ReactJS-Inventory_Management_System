@@ -12,6 +12,7 @@ import CauHinhChung from "../pages/cau-hinh-chung/CauHinhChung";
 import VerifyOTP from "../pages/VerifyOTP";
 import VaiTro from "../pages/vai-tro/VaiTro";
 import Profile from "../pages/Profile";
+import LoaiKhachHang from "../pages/loai-khach-hang/LoaiKhachHang";
 
 export const router = createBrowserRouter([
     {
@@ -109,6 +110,16 @@ export const router = createBrowserRouter([
                         children: [
                             { index: true, element: <ThoiGianLamViec /> },
                         ],
+                    },
+                ],
+            },
+            {
+                path: "quan-ly-khach-hang",
+                children: [
+                    {
+                        path: "loai-khach-hang",
+                        element: <MainLayout />,
+                        children: [{ index: true, element: <LoaiKhachHang /> }],
                     },
                 ],
             },
