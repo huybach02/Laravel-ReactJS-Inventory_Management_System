@@ -44,6 +44,10 @@ php artisan schedule:list
 
 php artisan schedule:work
 
+## - TẠO FILE CẤU HÌNH NỘI DUNG IMPORT
+
+php artisan make:import [TenMoDule]Import
+
 # **_ Đối với src FRONTEND _**
 
 ## - CÀI THƯ VIỆN TỪ NPM

@@ -146,6 +146,7 @@ class MakeModuleCommand extends Command
       "    Route::get('/{id}', [{$controllerClass}::class, 'show']);\n" .
       "    Route::put('/{id}', [{$controllerClass}::class, 'update']);\n" .
       "    Route::delete('/{id}', [{$controllerClass}::class, 'destroy']);\n" .
+      "    Route::post('/import-excel', [{$controllerClass}::class, 'importExcel']);\n" .
       "  });";
   }
 
@@ -165,6 +166,9 @@ use App\Modules\\{$moduleName}\\Validates\\Update{$moduleName}Request;
 use App\Class\CustomResponse;
 use App\Class\Helper;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\\{$moduleName}Import;
+use Illuminate\Support\Str;
 
 class {$moduleName}Controller extends Controller
 {
@@ -229,6 +233,31 @@ class {$moduleName}Controller extends Controller
         \$result = \$this->{$variableName}Service->delete(\$id);
         return CustomResponse::success([], 'Xóa thành công');
     }
+
+    public function importExcel(Request \$request)
+    {
+      \$request->validate([
+        'file' => 'required|file|mimes:xlsx,xls,csv',
+      ]);
+
+      try {
+        \$data = \$request->file('file');
+        \$filename = Str::random(10) . '.' . \$data->getClientOriginalExtension();
+        \$path = \$data->move(public_path('excel'), \$filename);
+
+        Excel::import(new {$moduleName}Import(), \$path);
+
+        // Xóa file sau khi import
+        if (file_exists(\$path)) {
+          unlink(\$path);
+        }
+      }
+
+      return CustomResponse::success([], 'Import thành công');
+    } catch (\Exception \$e) {
+      return CustomResponse::error('Lỗi import: ' . \$e->getMessage(), 500);
+    }
+  }
 }
 ";
   }

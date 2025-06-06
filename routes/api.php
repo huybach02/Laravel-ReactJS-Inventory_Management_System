@@ -72,5 +72,6 @@ Route::group([
     Route::get('/{id}', [\App\Modules\LoaiKhachHang\LoaiKhachHangController::class, 'show']);
     Route::put('/{id}', [\App\Modules\LoaiKhachHang\LoaiKhachHangController::class, 'update']);
     Route::delete('/{id}', [\App\Modules\LoaiKhachHang\LoaiKhachHangController::class, 'destroy']);
+    Route::post('/import-excel', [\App\Modules\LoaiKhachHang\LoaiKhachHangController::class, 'importExcel']);
   });
 });

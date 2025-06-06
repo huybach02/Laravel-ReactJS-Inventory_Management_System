@@ -1,12 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useEffect, useRef, useState, type CSSProperties } from "react";
-import { useDownloadExcel } from "react-export-table-to-excel";
-import { v4 as uuidv4 } from "uuid";
+import React, { useEffect, useState, type CSSProperties } from "react";
 import { camelCasePathUrl } from "../utils/utils";
 import { getListData } from "../services/getData.api";
 import { toast } from "../utils/toast";
 import { Button } from "antd";
 import excelIcon from "../assets/excel.svg";
+import * as XLSX from "xlsx";
 
 interface Column {
     title: string;
@@ -14,6 +13,7 @@ interface Column {
     align?: "left" | "right" | "center";
     width?: string;
     render?: (value: any, record: any, index: number) => React.ReactNode;
+    exportTitle?: string;
 }
 
 interface TableProps {
@@ -34,115 +34,70 @@ const ExportTableToExcel: React.FC<TableProps> = ({
     columns = columns.filter(
         (item) => item.title?.toLowerCase() !== "thao tác" && item.title
     );
-    const tableRef = useRef<any>(null);
     const [dataExport, setDataExport] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [shouldExport, setShouldExport] = useState(false);
 
-    const { onDownload } = useDownloadExcel({
-        currentTableRef: tableRef.current,
-        filename: fileName ? fileName : camelCasePathUrl(path),
-        sheet: "Sheet1",
-    });
+    const exportToRealExcel = () => {
+        // Tạo workbook mới
+        const workbook = XLSX.utils.book_new();
+
+        // Tạo header row - sử dụng exportTitle nếu có, không thì dùng title
+        const headers = columns.map((col) => col.exportTitle || col.title);
+
+        // Tạo data rows - xử lý cả trường hợp không có dữ liệu
+        const rows = dataExport.map((record) =>
+            columns.map((column) => {
+                const { dataIndex } = column;
+                // Chỉ lấy dữ liệu gốc từ API, bỏ qua render function
+                return dataIndex ? record[dataIndex] : "";
+            })
+        );
+
+        // Kết hợp header và data - luôn có ít nhất header
+        const worksheet = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+
+        // Thêm worksheet vào workbook
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+
+        // Export file Excel binary thật sự
+        XLSX.writeFile(workbook, `${fileName || camelCasePathUrl(path)}.xlsx`);
+    };
 
     const exportTable = async () => {
         try {
             setIsLoading(true);
             const danhSach = await getListData(path, { ...params, limit: -1 });
             setDataExport(danhSach.data);
+            setShouldExport(true);
         } catch {
-            toast.error("Có lỗi xảy ra vui lòng thử lại sau");
+            toast.error("Có lỗi xảy ra vui lòng thử lại sau");
         } finally {
             setIsLoading(false);
         }
     };
 
     useEffect(() => {
-        if (dataExport?.length > 0) {
-            onDownload();
+        if (shouldExport) {
+            exportToRealExcel();
             setDataExport([]);
+            setShouldExport(false);
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [dataExport]);
+    }, [shouldExport, dataExport]);
 
     return (
-        <>
-            <Button
-                icon={
-                    <img
-                        src={excelIcon}
-                        alt="excel"
-                        style={{ width: "35px", height: "35px" }}
-                    />
-                }
-                onClick={exportTable}
-                style={style ? style : { float: "right", border: "none" }}
-                loading={isLoading}
-            />
-
-            <div
-                style={{
-                    display: "none",
-                    width: "100%",
-                    height: "50vh",
-                    overflowX: "auto",
-                    overflowY: "auto",
-                    border: "1px solid #ccc",
-                }}
-            >
-                <table
-                    border={1}
-                    ref={tableRef}
-                    style={{ width: "100%", borderCollapse: "collapse" }}
-                >
-                    <thead>
-                        <tr>
-                            {columns.map((column) => (
-                                <th
-                                    key={uuidv4()}
-                                    align="center"
-                                    style={{
-                                        width: column.width || "auto",
-                                        padding: "10px",
-                                    }}
-                                >
-                                    {column.title}
-                                </th>
-                            ))}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {dataExport.map((record, rowIndex) => (
-                            <tr key={rowIndex}>
-                                {columns.map((column) => {
-                                    const { dataIndex, render } = column;
-                                    const value = dataIndex
-                                        ? record[dataIndex]
-                                        : record;
-                                    return (
-                                        <td
-                                            key={uuidv4()}
-                                            style={{
-                                                textAlign:
-                                                    column.align || "left",
-                                                padding: "10px",
-                                            }}
-                                        >
-                                            {render
-                                                ? render(
-                                                      value,
-                                                      record,
-                                                      rowIndex
-                                                  )
-                                                : value}
-                                        </td>
-                                    );
-                                })}
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-        </>
+        <Button
+            icon={
+                <img
+                    src={excelIcon}
+                    alt="excel"
+                    style={{ width: "35px", height: "35px" }}
+                />
+            }
+            onClick={exportTable}
+            style={style ? style : { float: "right", border: "none" }}
+            loading={isLoading}
+        />
     );
 };
 

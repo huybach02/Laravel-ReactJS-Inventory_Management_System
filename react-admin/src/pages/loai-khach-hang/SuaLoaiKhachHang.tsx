@@ -3,11 +3,10 @@ import { useState } from "react";
 import FormLoaiKhachHang from "./FormLoaiKhachHang";
 import { Button, Form, Modal } from "antd";
 import { useDispatch } from "react-redux";
-import {
-    getDataById,
-} from "../../services/getData.api";
+import { getDataById } from "../../services/getData.api";
 import { setReload } from "../../redux/slices/main.slice";
 import { putData } from "../../services/updateData";
+import type { ILoaiKhachHang } from "../../types/main.type";
 
 const SuaLoaiKhachHang = ({
     path,
@@ -25,31 +24,31 @@ const SuaLoaiKhachHang = ({
     const dispatch = useDispatch();
 
     const showModal = async () => {
-      setIsModalOpen(true);
-      setIsLoading(true);
-      const data = await getDataById(id, path);
-      form.setFieldsValue({
-          ...data,
-      });
-      setIsLoading(false);
+        setIsModalOpen(true);
+        setIsLoading(true);
+        const data = await getDataById(id, path);
+        form.setFieldsValue({
+            ...data,
+        });
+        setIsLoading(false);
     };
 
     const handleCancel = () => {
-      form.resetFields();
-      setIsModalOpen(false);
+        form.resetFields();
+        setIsModalOpen(false);
     };
 
-    const onUpdate = async (values: any) => {
-      setIsSubmitting(true);
-      const closeModel = () => {
-        handleCancel();
-        dispatch(setReload());
-      };
-      await putData(path, id, values, closeModel);
-      setIsSubmitting(false);
+    const onUpdate = async (values: ILoaiKhachHang) => {
+        setIsSubmitting(true);
+        const closeModel = () => {
+            handleCancel();
+            dispatch(setReload());
+        };
+        await putData(path, id, values, closeModel);
+        setIsSubmitting(false);
     };
 
-  return (
+    return (
         <>
             <Button
                 onClick={showModal}
@@ -85,13 +84,11 @@ const SuaLoaiKhachHang = ({
                     layout="vertical"
                     onFinish={onUpdate}
                 >
-                    <FormLoaiKhachHang
-                        form={form}
-                    />
+                    <FormLoaiKhachHang form={form} />
                 </Form>
             </Modal>
         </>
-  );
+    );
 };
 
 export default SuaLoaiKhachHang;

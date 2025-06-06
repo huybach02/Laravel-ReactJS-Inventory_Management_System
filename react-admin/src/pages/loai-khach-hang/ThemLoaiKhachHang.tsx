@@ -5,8 +5,15 @@ import { Button, Form, Modal, Row } from "antd";
 import FormLoaiKhachHang from "./FormLoaiKhachHang";
 import { useDispatch } from "react-redux";
 import { setReload } from "../../redux/slices/main.slice";
+import type { ILoaiKhachHang } from "../../types/main.type";
 
-const ThemLoaiKhachHang = ({ path, title }: { path: string; title: string }) => {
+const ThemLoaiKhachHang = ({
+    path,
+    title,
+}: {
+    path: string;
+    title: string;
+}) => {
     const dispatch = useDispatch();
 
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -14,26 +21,26 @@ const ThemLoaiKhachHang = ({ path, title }: { path: string; title: string }) => 
     const [form] = Form.useForm();
 
     const showModal = async () => {
-      setIsModalOpen(true);
+        setIsModalOpen(true);
     };
 
     const handleCancel = () => {
-      setIsModalOpen(false);
-      form.resetFields();
+        setIsModalOpen(false);
+        form.resetFields();
     };
 
-    const onCreate = async (values: any) => {
-      setIsLoading(true);
-      const closeModel = () => {
-        handleCancel();
-        dispatch(setReload());
-      };
-      await postData(path, values, closeModel);
-      setIsLoading(false);
+    const onCreate = async (values: ILoaiKhachHang) => {
+        setIsLoading(true);
+        const closeModel = () => {
+            handleCancel();
+            dispatch(setReload());
+        };
+        await postData(path, values, closeModel);
+        setIsLoading(false);
     };
 
-  return (
-    <>
+    return (
+        <>
             <Button
                 onClick={showModal}
                 type="primary"
@@ -70,13 +77,11 @@ const ThemLoaiKhachHang = ({ path, title }: { path: string; title: string }) => 
                     layout="vertical"
                     onFinish={onCreate}
                 >
-                    <FormLoaiKhachHang
-                        form={form}
-                    />
+                    <FormLoaiKhachHang form={form} />
                 </Form>
             </Modal>
         </>
-  );
+    );
 };
 
 export default ThemLoaiKhachHang;

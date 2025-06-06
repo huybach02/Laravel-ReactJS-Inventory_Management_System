@@ -19,6 +19,7 @@ import type { Actions } from "../../types/main.type";
 import ExportTableToExcel from "../../components/ExportTableToExcel";
 import { OPTIONS_STATUS } from "../../utils/constant";
 import dayjs from "dayjs";
+import ImportExcel from "../../components/ImportExcel";
 
 const DanhSachLoaiKhachHang = ({
     path,
@@ -129,6 +130,7 @@ const DanhSachLoaiKhachHang = ({
                 nameColumn: "Trạng thái",
                 options: OPTIONS_STATUS,
             }),
+            exportTitle: "Trạng thái (1: Hoạt động, 0: Không hoạt động)",
         },
         {
             title: "Ngày tạo",
@@ -161,9 +163,20 @@ const DanhSachLoaiKhachHang = ({
     return (
         <Row>
             <Col span={24}>
-                <Row justify="end">
+                <Row
+                    justify="end"
+                    align="middle"
+                    style={{ marginBottom: 5, gap: 10 }}
+                >
                     {permission.export && (
                         <ExportTableToExcel
+                            columns={defaultColumns}
+                            path={path}
+                            params={{}}
+                        />
+                    )}
+                    {permission.create && (
+                        <ImportExcel
                             columns={defaultColumns}
                             path={path}
                             params={{}}

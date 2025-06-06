@@ -66,3 +66,10 @@ export interface Actions {
 export interface IActions {
     [key: string]: boolean;
 }
+
+export interface ILoaiKhachHang {
+    id?: number;
+    ten_loai_khach_hang: string;
+    mo_ta?: string;
+    trang_thai: number;
+}
