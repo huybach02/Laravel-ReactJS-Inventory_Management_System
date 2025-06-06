@@ -1,0 +1,55 @@
+<?php
+
+namespace {{ namespace }};
+
+use Illuminate\Support\Collection;
+use Maatwebsite\Excel\Concerns\ToCollection;
+use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use Exception;
+
+class {{ class }} implements ToCollection, WithHeadingRow
+{
+    protected $thanh_cong = 0;
+    protected $that_bai = 0;
+
+    /**
+     * @param Collection $collection
+     */
+    public function collection(Collection $collection)
+    {
+        try {
+            foreach ($collection as $row) {
+                // Xử lý dữ liệu từ mỗi dòng
+                // $row là một mảng với các key là tên cột (từ hàng header)
+                
+                // Ví dụ:
+                // \App\Models\TenModel::create([
+                //     'ten_truong' => $row['ten_cot'],
+                // ]);
+                
+                $this->thanh_cong++;
+            }
+        } catch (Exception $e) {
+            logger()->error($e->getMessage());
+            $this->that_bai++;
+        }
+    }
+
+    /**
+     * Lấy số bản ghi thành công
+     * @return int
+     */
+    public function getThanhCong()
+    {
+        return $this->thanh_cong;
+    }
+
+    /**
+     * Lấy số bản ghi thất bại
+     * @return int
+     */
+    public function getThatBai()
+    {
+        return $this->that_bai;
+    }
+} 

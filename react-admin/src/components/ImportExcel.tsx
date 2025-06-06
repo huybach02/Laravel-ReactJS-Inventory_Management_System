@@ -6,153 +6,131 @@ import {
     Row,
     Typography,
     Upload as AntdUpload,
-    Table,
 } from "antd";
-import type { UploadProps } from "antd";
-import { Upload } from "lucide-react";
+import type { UploadFile, UploadProps } from "antd";
+import { Download, Upload } from "lucide-react";
 import { useState } from "react";
 import * as XLSX from "xlsx";
-import ExportTableToExcel from "./ExportTableToExcel";
-import { setReload } from "../redux/slices/main.slice";
-import { useDispatch } from "react-redux";
 import axios from "../configs/axios";
 import { toast } from "../utils/toast";
+import { Spreadsheet } from "react-spreadsheet";
+import { setReload } from "../redux/slices/main.slice";
+import { useDispatch } from "react-redux";
+import { apiURL } from "../configs/config";
 
-interface ExcelData {
-    [key: string]: string | number;
+interface Cell {
+    value: string;
+    readOnly: boolean;
 }
 
-// Thêm function để kiểm tra và chuyển đổi ngày tháng Excel
-const convertExcelDate = (excelDate: any): string => {
-    // Kiểm tra nếu là số và có thể là Excel date serial number
-    if (typeof excelDate === "number" && excelDate > 1) {
-        try {
-            // Chuyển đổi Excel serial number thành JavaScript Date
-            const jsDate = XLSX.SSF.parse_date_code(excelDate);
-            if (jsDate) {
-                const date = new Date(
-                    jsDate.y,
-                    jsDate.m - 1,
-                    jsDate.d,
-                    jsDate.H || 0,
-                    jsDate.M || 0,
-                    jsDate.S || 0
-                );
-                // Format theo định dạng dd/mm/yyyy hh:mm
-                return date.toLocaleString("vi-VN", {
-                    day: "2-digit",
-                    month: "2-digit",
-                    year: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                    hour12: false,
-                });
-            }
-        } catch (error) {
-            console.log("Error converting date:", error);
-        }
-    }
-    return excelDate?.toString() || "";
-};
+type Data = (Cell | undefined)[][];
 
-// Function để detect cột ngày tháng
-const isDateColumn = (columnName: string): boolean => {
-    const dateKeywords = [
-        "ngày",
-        "date",
-        "time",
-        "thời gian",
-        "tạo",
-        "cập nhật",
-        "created",
-        "updated",
-    ];
-    return dateKeywords.some((keyword) =>
-        columnName.toLowerCase().includes(keyword.toLowerCase())
-    );
-};
-
-const ImportExcel = ({
-    columns,
-    path,
-    params = {},
-}: {
-    columns: any[];
-    path: string;
-    params: any;
-}) => {
+const ImportExcel = ({ path }: { path: string }) => {
     const dispatch = useDispatch();
 
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [data, setData] = useState<ExcelData[]>([]);
-    const [isLoading, setIsLoading] = useState(false);
-    const [isImporting, setIsImporting] = useState(false);
-    const [file, setFile] = useState<File | null>(null);
+    const [data, setData] = useState<Data>([]);
+    const [fileList, setFileList] = useState<UploadFile[]>([]);
+    const [loading, setLoading] = useState(false);
 
     const handleCancel = () => {
         setIsModalOpen(false);
         setData([]);
+        setFileList([]);
     };
 
-    const handleImport: UploadProps["onChange"] = (info) => {
-        setIsLoading(true);
-        const file = (info.file.originFileObj || info.file) as File;
-        setFile(file);
+    console.log(data);
 
+    const onChange: UploadProps["onChange"] = ({ fileList: newFileList }) => {
+        const acceptedExtensions = [".xlsx", ".xls"];
+        const file = newFileList[0]?.originFileObj;
+
+        if (!file) return;
+
+        const fileExtension = getFileExtension(file.name);
+        if (!acceptedExtensions.includes(fileExtension)) {
+            return showError("Vui lòng chọn đúng định dạng file excel");
+        }
+
+        setFileList(newFileList);
+        processExcelFile(file);
+    };
+
+    const getFileExtension = (filename: string) =>
+        `.${filename.split(".").pop()?.toLowerCase()}`;
+
+    const showError = (message: string) => {
+        toast.error(message);
+    };
+
+    const processExcelFile = (file: File) => {
         const reader = new FileReader();
-        reader.readAsArrayBuffer(file);
         reader.onload = (e) => {
-            const data = e.target?.result;
-            const workbook = XLSX.read(data, { type: "buffer" });
-            const sheetName = workbook.SheetNames[0];
-            const sheet = workbook.Sheets[sheetName];
-            const json = XLSX.utils.sheet_to_json(sheet) as ExcelData[];
+            const binaryStr = e.target?.result as string;
+            const workbook = XLSX.read(binaryStr, { type: "binary" });
+            const worksheet = workbook.Sheets[workbook.SheetNames[0]];
 
-            // Xử lý chuyển đổi ngày tháng
-            const processedData = json.map((row) => {
-                const processedRow: ExcelData = {};
-                Object.keys(row).forEach((key) => {
-                    if (isDateColumn(key)) {
-                        processedRow[key] = convertExcelDate(row[key]);
-                    } else {
-                        processedRow[key] = row[key];
-                    }
-                });
-                return processedRow;
+            // Lấy dữ liệu từ Excel với header là A, B, C...
+            const sheetData = XLSX.utils.sheet_to_json(worksheet, {
+                header: "A",
             });
 
-            setData(processedData);
+            // Chuyển đổi dữ liệu để hiển thị
+            const formattedData = sheetData.map((row: any) => {
+                const rowArray = [];
+                // Chuyển đổi object thành mảng các ô
+                for (const key in row) {
+                    if (Object.prototype.hasOwnProperty.call(row, key)) {
+                        const cellValue = row[key];
+                        rowArray.push({
+                            value: cellValue.toString(),
+                            readOnly: true,
+                        });
+                    }
+                }
+                return rowArray;
+            });
+
+            setData(formattedData);
         };
-        setIsLoading(false);
+        reader.readAsBinaryString(file);
     };
 
-    const handleImportExcel = async () => {
-        setIsImporting(true);
-        const closeModel = () => {
-            handleCancel();
+    const handleImport = async () => {
+        if (fileList.length > 0) {
+            const formData = new FormData();
+            const file = fileList[0]?.originFileObj;
+            if (!file) return;
+
+            formData.append("file", file);
+            try {
+                setLoading(true);
+                const response = await axios.post(
+                    `${path}/import-excel`,
+                    formData,
+                    {
+                        headers: {
+                            "Content-Type": "multipart/form-data",
+                        },
+                    }
+                );
+                handleImportResponse(response);
+            } catch (error: any) {
+                toast.error(error.message);
+            } finally {
+                setIsModalOpen(false);
+                setLoading(false);
+            }
+        }
+    };
+
+    const handleImportResponse = (response: any) => {
+        if (response.success) {
+            toast.success(response.message);
             dispatch(setReload());
-        };
-
-        const formData = new FormData();
-        formData.append("file", file as File);
-
-        axios
-            .post(`${path}/import-excel`, formData, {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                },
-            })
-            .then((res: any) => {
-                toast.success(res.message);
-                closeModel();
-            })
-            .catch((error) => {
-                toast.error("Upload thất bại");
-                console.error(error);
-            })
-            .finally(() => {
-                setIsImporting(false);
-            });
+        } else {
+            toast.error(response.message);
+        }
     };
 
     return (
@@ -178,39 +156,45 @@ const ImportExcel = ({
                             key="submit"
                             type="primary"
                             size="large"
-                            loading={isImporting}
-                            onClick={handleImportExcel}
+                            onClick={handleImport}
+                            loading={loading}
                         >
                             Import
                         </Button>
                     </Row>,
                 ]}
             >
-                <Flex vertical gap={10}>
+                <Flex vertical gap={15}>
                     <Flex align="center" gap={10}>
                         <Typography.Title level={5}>
                             1. Tải xuống file excel mẫu:
                         </Typography.Title>
-                        <ExportTableToExcel
-                            columns={columns}
-                            path={path}
-                            params={params}
-                        />
+                        <Button
+                            type="primary"
+                            icon={<Download size={14} />}
+                            onClick={() =>
+                                window.open(
+                                    `${apiURL}${path}/download-template-excel`
+                                )
+                            }
+                        >
+                            Tải xuống file excel mẫu
+                        </Button>
                     </Flex>
+                    <Typography.Title level={5}>
+                        2. Chỉnh sửa dữ liệu trong file excel theo mẫu
+                    </Typography.Title>
                     <Flex align="center" gap={10}>
                         <Typography.Title level={5}>
-                            2. Tải lên file excel sau khi đã chỉnh sửa
+                            3. Tải lên file excel sau khi đã chỉnh sửa
                         </Typography.Title>
                         <AntdUpload
-                            onChange={handleImport}
+                            onChange={onChange}
                             beforeUpload={() => false}
-                            showUploadList={false}
+                            fileList={fileList}
+                            accept=".xlsx,.xls"
                         >
-                            <Button
-                                type="primary"
-                                icon={<Upload size={14} />}
-                                loading={isLoading}
-                            >
+                            <Button type="primary" icon={<Upload size={14} />}>
                                 Tải lên file excel
                             </Button>
                         </AntdUpload>
@@ -224,29 +208,7 @@ const ImportExcel = ({
                             >
                                 Dữ liệu preview:
                             </Typography.Title>
-                            <Table
-                                dataSource={data.map((item, index) => ({
-                                    ...item,
-                                    key: index,
-                                }))}
-                                columns={Object.keys(data[0]).map((key) => ({
-                                    title: key,
-                                    dataIndex: key,
-                                    key: key,
-                                    ellipsis: true,
-                                    render: (text: any) => (
-                                        <span title={text}>{text}</span>
-                                    ),
-                                }))}
-                                size="small"
-                                scroll={{ x: "max-content", y: 400 }}
-                                pagination={false}
-                                bordered
-                                style={{
-                                    backgroundColor: "#fafafa",
-                                    borderRadius: 8,
-                                }}
-                            />
+                            <Spreadsheet data={data} />
                         </div>
                     )}
                 </Flex>

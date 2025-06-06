@@ -76,6 +76,12 @@ class LoaiKhachHangController extends Controller
     return CustomResponse::success([], 'Xóa thành công');
   }
 
+  public function downloadTemplateExcel()
+  {
+    $path = public_path('mau-excel/LoaiKhachHang.xlsx');
+    return response()->download($path);
+  }
+
   public function importExcel(Request $request)
   {
     $request->validate([
@@ -87,14 +93,25 @@ class LoaiKhachHangController extends Controller
       $filename = Str::random(10) . '.' . $data->getClientOriginalExtension();
       $path = $data->move(public_path('excel'), $filename);
 
-      Excel::import(new LoaiKhachHangImport(), $path);
+      $import = new LoaiKhachHangImport();
+      Excel::import($import, $path);
+
+      $thanhCong = $import->getThanhCong();
+      $thatBai = $import->getThatBai();
 
       // Xóa file sau khi import
       if (file_exists($path)) {
         unlink($path);
       }
 
-      return CustomResponse::success([], 'Import thành công');
+      if ($thatBai > 0) {
+        return CustomResponse::error('Import không thành công. Có ' . $thatBai . ' bản ghi lỗi và ' . $thanhCong . ' bản ghi thành công');
+      }
+
+      return CustomResponse::success([
+        'success' => $thanhCong,
+        'fail' => $thatBai
+      ], 'Import thành công ' . $thanhCong . ' bản ghi');
     } catch (\Exception $e) {
       return CustomResponse::error('Lỗi import: ' . $e->getMessage(), 500);
     }

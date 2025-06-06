@@ -1,5 +1,4 @@
-export const apiURL =
-    import.meta.env.VITE_API_URL || "https://hometify.test/api/";
+export const apiURL = import.meta.env.VITE_API_URL || "https://ims.test/api";
 
 export const perPage = import.meta.env.VITE_PER_PAGE || 20;
 export const sortColumn = import.meta.env.VITE_COLUMN_SORT || "created_at";

@@ -73,6 +73,10 @@ class Permission
       return true;
     }
 
+    if (str_contains($path, "download-template-excel")) {
+      return true;
+    }
+
     // Kiểm tra cả route có tham số (ví dụ: thong-tin-ca-nhan/123)
     foreach ($this->excludedRoutes as $route) {
       if (strpos($path, $route) === 0) {

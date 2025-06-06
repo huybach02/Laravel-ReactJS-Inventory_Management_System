@@ -68,6 +68,7 @@ Route::group([
   // LoaiKhachHang
   Route::prefix('loai-khach-hang')->group(function () {
     Route::get('/', [\App\Modules\LoaiKhachHang\LoaiKhachHangController::class, 'index']);
+    Route::get('/download-template-excel', [\App\Modules\LoaiKhachHang\LoaiKhachHangController::class, 'downloadTemplateExcel']);
     Route::post('/', [\App\Modules\LoaiKhachHang\LoaiKhachHangController::class, 'store']);
     Route::get('/{id}', [\App\Modules\LoaiKhachHang\LoaiKhachHangController::class, 'show']);
     Route::put('/{id}', [\App\Modules\LoaiKhachHang\LoaiKhachHangController::class, 'update']);

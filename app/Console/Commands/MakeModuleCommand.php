@@ -142,6 +142,7 @@ class MakeModuleCommand extends Command
 
     return "// {$moduleName}\n  Route::prefix('{$routeName}')->group(function () {\n" .
       "    Route::get('/', [{$controllerClass}::class, 'index']);\n" .
+      "    Route::get('/download-template-excel', [{$controllerClass}::class, 'downloadTemplateExcel']);\n" .
       "    Route::post('/', [{$controllerClass}::class, 'store']);\n" .
       "    Route::get('/{id}', [{$controllerClass}::class, 'show']);\n" .
       "    Route::put('/{id}', [{$controllerClass}::class, 'update']);\n" .
@@ -234,26 +235,43 @@ class {$moduleName}Controller extends Controller
         return CustomResponse::success([], 'Xóa thành công');
     }
 
+    public function downloadTemplateExcel()
+    {
+      \$path = public_path('mau-excel/{$moduleName}.xlsx');
+      return response()->download(\$path);
+    }
+  }
+
     public function importExcel(Request \$request)
     {
       \$request->validate([
         'file' => 'required|file|mimes:xlsx,xls,csv',
       ]);
 
-      try {
-        \$data = \$request->file('file');
-        \$filename = Str::random(10) . '.' . \$data->getClientOriginalExtension();
-        \$path = \$data->move(public_path('excel'), \$filename);
+    try {
+      \$data = \$request->file('file');
+      \$filename = Str::random(10) . '.' . \$data->getClientOriginalExtension();
+      \$path = \$data->move(public_path('excel'), \$filename);
 
-        Excel::import(new {$moduleName}Import(), \$path);
+      \$import = new {$moduleName}Import();
+      Excel::import(\$import, \$path);
 
-        // Xóa file sau khi import
-        if (file_exists(\$path)) {
-          unlink(\$path);
-        }
+      \$thanhCong = \$import->getThanhCong();
+      \$thatBai = \$import->getThatBai();
+
+      // Xóa file sau khi import
+      if (file_exists(\$path)) {
+        unlink(\$path);
       }
 
-      return CustomResponse::success([], 'Import thành công');
+      if (\$thatBai > 0) {
+        return CustomResponse::error('Import không thành công. Có ' . \$thatBai . ' bản ghi lỗi và ' . \$thanhCong . ' bản ghi thành công');
+      }
+
+      return CustomResponse::success([
+        'success' => \$thanhCong,
+        'fail' => \$thatBai
+      ], 'Import thành công ' . \$thanhCong . ' bản ghi');
     } catch (\Exception \$e) {
       return CustomResponse::error('Lỗi import: ' . \$e->getMessage(), 500);
     }
