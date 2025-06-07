@@ -1,4 +1,4 @@
-export const KEY_URL_VALID = ["dashboard", "profile"];
+export const KEY_URL_VALID = ["dashboard", "profile", "lich-su-import"];
 
 export const DATA_CONSTANTS = {
     WEBSITE_NAME: "BOILERPLATE",

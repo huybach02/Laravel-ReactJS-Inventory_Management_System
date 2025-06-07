@@ -13,6 +13,7 @@ import VerifyOTP from "../pages/VerifyOTP";
 import VaiTro from "../pages/vai-tro/VaiTro";
 import Profile from "../pages/Profile";
 import LoaiKhachHang from "../pages/loai-khach-hang/LoaiKhachHang";
+import LichSuImport from "../pages/lich-su-import/LichSuImport";
 
 export const router = createBrowserRouter([
     {
@@ -70,6 +71,11 @@ export const router = createBrowserRouter([
                         element: <DashboardPage />,
                     },
                 ],
+            },
+            {
+                path: "lich-su-import",
+                element: <MainLayout />,
+                children: [{ index: true, element: <LichSuImport /> }],
             },
             {
                 path: "quan-ly-nguoi-dung",

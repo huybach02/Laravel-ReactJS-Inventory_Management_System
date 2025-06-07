@@ -77,6 +77,14 @@ class Permission
       return true;
     }
 
+    if (str_contains($path, "lich-su-import")) {
+      return true;
+    }
+
+    if (str_contains($path, "lich-su-import/download-file")) {
+      return true;
+    }
+
     // Kiểm tra cả route có tham số (ví dụ: thong-tin-ca-nhan/123)
     foreach ($this->excludedRoutes as $route) {
       if (strpos($path, $route) === 0) {

@@ -44,9 +44,9 @@ php artisan schedule:list
 
 php artisan schedule:work
 
-## - TẠO FILE CẤU HÌNH NỘI DUNG IMPORT
+## - TẠO FILE CẤU HÌNH NỘI DUNG IMPORT EXCEL
 
-php artisan make:import [TenMoDule]Import
+php artisan make:excel-import [TenMoDule]Import
 
 # **_ Đối với src FRONTEND _**
 

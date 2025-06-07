@@ -48,7 +48,6 @@ const ImageUploadSingle = () => {
                     },
                 })
                 .then((res) => {
-                    console.log(res);
                     setLoading(false);
                     dispatch(setImageSingle(res.data.url));
                     info.file.status = "done"; // Đánh dấu đã xử lý xong

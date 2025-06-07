@@ -16,6 +16,7 @@ import type { Actions } from "../../types/main.type";
 import ExportTableToExcel from "../../components/ExportTableToExcel";
 import { OPTIONS_STATUS } from "../../utils/constant";
 import dayjs from "dayjs";
+import ImportExcel from "../../components/ImportExcel";
 
 const DanhSach[ComponentName] = ({
     path,
@@ -127,18 +128,24 @@ const DanhSach[ComponentName] = ({
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isReload, filter, query]);
 
-    return (
+     return (
         <Row>
             <Col span={24}>
-                <Row justify="end">
-                    {permission.export && (
-                          <ExportTableToExcel
-                              columns={defaultColumns}
-                              path={path}
-                              params={{}}
-                          />
-                    )}
-                </Row>
+                <Flex vertical gap={10}>
+                    <Row
+                        justify="end"
+                        align="middle"
+                        style={{ marginBottom: 5, gap: 10 }}
+                    >
+                        {permission.export && (
+                            <ExportTableToExcel
+                                columns={defaultColumns}
+                                path={path}
+                                params={{}}
+                            />
+                        )}
+                        {/* {permission.create && <ImportExcel path={path} />} */}
+                    </Row>
                     <CustomTable
                         rowKey="id"
                         dataTable={danhSach?.data}
@@ -149,9 +156,9 @@ const DanhSach[ComponentName] = ({
                         handleLimitChange={handleLimitChange}
                         total={danhSach?.total}
                         loading={isLoading}
-                        hidePagination={true}
                     />
-              </Col>
+                </Flex>
+            </Col>
         </Row>
     );
 };

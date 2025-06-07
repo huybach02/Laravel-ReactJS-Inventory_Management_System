@@ -39,9 +39,13 @@ const ImportExcel = ({ path }: { path: string }) => {
         setFileList([]);
     };
 
-    console.log(data);
+    const onChange: UploadProps["onChange"] = async ({
+        fileList: newFileList,
+    }) => {
+        // Đặt lại dữ liệu và danh sách tệp
+        setData([]);
+        setFileList([]);
 
-    const onChange: UploadProps["onChange"] = ({ fileList: newFileList }) => {
         const acceptedExtensions = [".xlsx", ".xls"];
         const file = newFileList[0]?.originFileObj;
 
@@ -52,8 +56,53 @@ const ImportExcel = ({ path }: { path: string }) => {
             return showError("Vui lòng chọn đúng định dạng file excel");
         }
 
+        // Đặt danh sách tệp mới
         setFileList(newFileList);
-        processExcelFile(file);
+
+        // Đọc và xử lý tệp mới
+        return new Promise<void>((resolve) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const binaryStr = e.target?.result as string;
+                const workbook = XLSX.read(binaryStr, { type: "binary" });
+                const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+
+                // Lấy dữ liệu từ Excel với header là A, B, C...
+                const sheetData = XLSX.utils.sheet_to_json(worksheet, {
+                    header: "A",
+                });
+
+                // Xác định số lượng cột tối đa
+                let maxColumns = 0;
+                sheetData.forEach((row: any) => {
+                    const columnCount = Object.keys(row).length;
+                    maxColumns = Math.max(maxColumns, columnCount);
+                });
+
+                // Chuyển đổi dữ liệu để hiển thị
+                const formattedData = sheetData.map((row: any) => {
+                    const rowArray = [];
+                    // Đảm bảo tất cả các cột đều được xử lý đúng vị trí
+                    for (let i = 0; i < maxColumns; i++) {
+                        const columnKey = String.fromCharCode(65 + i); // A, B, C, ...
+                        const cellValue = row[columnKey];
+                        rowArray.push({
+                            value:
+                                cellValue !== undefined
+                                    ? cellValue.toString()
+                                    : "",
+                            readOnly: true,
+                        });
+                    }
+                    return rowArray;
+                });
+
+                // Cập nhật state với dữ liệu mới
+                setData(formattedData);
+                resolve();
+            };
+            reader.readAsBinaryString(file);
+        });
     };
 
     const getFileExtension = (filename: string) =>
@@ -61,39 +110,6 @@ const ImportExcel = ({ path }: { path: string }) => {
 
     const showError = (message: string) => {
         toast.error(message);
-    };
-
-    const processExcelFile = (file: File) => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const binaryStr = e.target?.result as string;
-            const workbook = XLSX.read(binaryStr, { type: "binary" });
-            const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-
-            // Lấy dữ liệu từ Excel với header là A, B, C...
-            const sheetData = XLSX.utils.sheet_to_json(worksheet, {
-                header: "A",
-            });
-
-            // Chuyển đổi dữ liệu để hiển thị
-            const formattedData = sheetData.map((row: any) => {
-                const rowArray = [];
-                // Chuyển đổi object thành mảng các ô
-                for (const key in row) {
-                    if (Object.prototype.hasOwnProperty.call(row, key)) {
-                        const cellValue = row[key];
-                        rowArray.push({
-                            value: cellValue.toString(),
-                            readOnly: true,
-                        });
-                    }
-                }
-                return rowArray;
-            });
-
-            setData(formattedData);
-        };
-        reader.readAsBinaryString(file);
     };
 
     const handleImport = async () => {
@@ -116,7 +132,7 @@ const ImportExcel = ({ path }: { path: string }) => {
                 );
                 handleImportResponse(response);
             } catch (error: any) {
-                toast.error(error.message);
+                toast.error(error.response.data.message);
             } finally {
                 setIsModalOpen(false);
                 setLoading(false);
@@ -193,6 +209,12 @@ const ImportExcel = ({ path }: { path: string }) => {
                             beforeUpload={() => false}
                             fileList={fileList}
                             accept=".xlsx,.xls"
+                            maxCount={1}
+                            onRemove={() => {
+                                setFileList([]);
+                                setData([]);
+                                return true;
+                            }}
                         >
                             <Button type="primary" icon={<Upload size={14} />}>
                                 Tải lên file excel
@@ -208,7 +230,11 @@ const ImportExcel = ({ path }: { path: string }) => {
                             >
                                 Dữ liệu preview:
                             </Typography.Title>
-                            <Spreadsheet data={data} />
+                            <div
+                                style={{ overflowX: "auto", maxWidth: "100%" }}
+                            >
+                                <Spreadsheet data={data} />
+                            </div>
                         </div>
                     )}
                 </Flex>

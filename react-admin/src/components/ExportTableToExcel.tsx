@@ -14,6 +14,7 @@ interface Column {
     width?: string;
     render?: (value: any, record: any, index: number) => React.ReactNode;
     exportTitle?: string;
+    exportData?: string | ((record: any) => any);
 }
 
 interface TableProps {
@@ -48,9 +49,15 @@ const ExportTableToExcel: React.FC<TableProps> = ({
         // Tạo data rows - xử lý cả trường hợp không có dữ liệu
         const rows = dataExport.map((record) =>
             columns.map((column) => {
-                const { dataIndex } = column;
+                const { dataIndex, exportData } = column;
                 // Chỉ lấy dữ liệu gốc từ API, bỏ qua render function
-                return dataIndex ? record[dataIndex] : "";
+                return exportData
+                    ? typeof exportData === "function"
+                        ? exportData(record)
+                        : record[exportData]
+                    : dataIndex
+                    ? record[dataIndex]
+                    : "";
             })
         );
 

@@ -9,6 +9,7 @@ import {
     ShieldUser,
     User,
     UsersRound,
+    FileUp,
 } from "lucide-react";
 
 const iconStyle = {
@@ -68,6 +69,12 @@ export const sidebarConfig = (navigate: NavigateFunction) => {
                     onClick: () => navigate(URL_CONSTANTS.THOI_GIAN_LAM_VIEC),
                 },
             ],
+        },
+        {
+            key: "lich-su-import",
+            label: "Lịch sử import",
+            icon: React.createElement(FileUp, { style: iconStyle }),
+            onClick: () => navigate(URL_CONSTANTS.LICH_SU_IMPORT),
         },
         {
             key: "quan-ly-khach-hang",

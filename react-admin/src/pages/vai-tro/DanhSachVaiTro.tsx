@@ -118,7 +118,6 @@ const DanhSachNguoiDung = ({
             title: "Ngày tạo",
             dataIndex: "created_at",
             render: (record: string): string => {
-                console.log(record);
                 return record;
             },
             ...dateSearch({ dataIndex: "created_at", nameColumn: "Ngày tạo" }),

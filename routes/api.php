@@ -3,6 +3,7 @@
 use App\Class\CustomResponse;
 use App\Http\Controllers\api\AuthController;
 use App\Http\Controllers\api\CauHinhChungController;
+use App\Http\Controllers\api\LichSuImportController;
 use App\Http\Controllers\api\ThoiGianLamViecController;
 use App\Http\Controllers\api\UploadController;
 use App\Http\Controllers\api\VaiTroController;
@@ -54,6 +55,10 @@ Route::group([
   // Thời gian làm việc
   Route::get('thoi-gian-lam-viec', [ThoiGianLamViecController::class, 'index']);
   Route::patch('thoi-gian-lam-viec/{id}', [ThoiGianLamViecController::class, 'update']);
+
+  // Lịch sử import
+  Route::get('lich-su-import', [LichSuImportController::class, 'index']);
+  Route::get('lich-su-import/download-file/{id}', [LichSuImportController::class, 'downloadFile']);
 
   // NguoiDung
   Route::prefix('nguoi-dung')->group(function () {

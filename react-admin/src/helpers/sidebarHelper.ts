@@ -3,7 +3,7 @@ export const getSidebar = (items: any, phan_quyen: any) => {
     const phanQuyen = JSON.parse(phan_quyen);
 
     const isKeyValid = (key: string): boolean => {
-        return key === "dashboard";
+        return ["dashboard", "lich-su-import"].includes(key);
     };
 
     const checkRole = items.map((item: any) => {
