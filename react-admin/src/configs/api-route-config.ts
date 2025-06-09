@@ -19,6 +19,8 @@ export const API_ROUTE_CONFIG = {
 
     LOAI_KHACH_HANG: "/loai-khach-hang",
     KHACH_HANG: "/khach-hang",
+
+    NHA_CUNG_CAP: "/nha-cung-cap",
 };
 export const URL_CONSTANTS = {
     LOGIN: "/admin",
@@ -34,4 +36,6 @@ export const URL_CONSTANTS = {
 
     LOAI_KHACH_HANG: "/admin/quan-ly-khach-hang/loai-khach-hang",
     KHACH_HANG: "/admin/quan-ly-khach-hang/khach-hang",
+
+    NHA_CUNG_CAP: "/admin/quan-ly-san-pham/nha-cung-cap",
 };

@@ -1,7 +1,19 @@
 <?php
 
 return [
-      [
+        [
+    "name" => "nha-cung-cap",
+    "actions" => [
+      "index" => true,
+      "create" => true,
+      "show" => true,
+      "edit" => true,
+      "delete" => true,
+      "export" => true,
+      "showMenu" => true
+    ]
+  ],
+[
     "name" => "khach-hang",
     "actions" => [
       "index" => true,

@@ -93,4 +93,16 @@ Route::group([
     Route::delete('/{id}', [\App\Modules\KhachHang\KhachHangController::class, 'destroy']);
     Route::post('/import-excel', [\App\Modules\KhachHang\KhachHangController::class, 'importExcel']);
   });
+
+  // NhaCungCap
+  Route::prefix('nha-cung-cap')->group(function () {
+    Route::get('/', [\App\Modules\NhaCungCap\NhaCungCapController::class, 'index']);
+    Route::get('/options', [\App\Modules\NhaCungCap\NhaCungCapController::class, 'getOptions']);
+    Route::get('/download-template-excel', [\App\Modules\NhaCungCap\NhaCungCapController::class, 'downloadTemplateExcel']);
+    Route::post('/', [\App\Modules\NhaCungCap\NhaCungCapController::class, 'store']);
+    Route::get('/{id}', [\App\Modules\NhaCungCap\NhaCungCapController::class, 'show']);
+    Route::put('/{id}', [\App\Modules\NhaCungCap\NhaCungCapController::class, 'update']);
+    Route::delete('/{id}', [\App\Modules\NhaCungCap\NhaCungCapController::class, 'destroy']);
+    Route::post('/import-excel', [\App\Modules\NhaCungCap\NhaCungCapController::class, 'importExcel']);
+  });
 });

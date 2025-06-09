@@ -197,27 +197,6 @@ function addSidebarConfig(moduleName) {
     try {
         let sidebarContent = fs.readFileSync(sidebarConfigPath).toString();
 
-        // Kiểm tra xem đã import AppstoreOutlined chưa (sẽ sử dụng làm icon mặc định)
-        if (!sidebarContent.includes("AppstoreOutlined")) {
-            // Tìm dòng import icon từ ant design
-            const importIconIndex = sidebarContent.indexOf("import {");
-            const importIconEndIndex = sidebarContent.indexOf(
-                '} from "@ant-design/icons";'
-            );
-
-            // Thêm AppstoreOutlined vào danh sách import nếu chưa có
-            const importIcons = sidebarContent
-                .substring(importIconIndex + 8, importIconEndIndex)
-                .trim();
-            if (!importIcons.includes("AppstoreOutlined")) {
-                const newImportIcons = importIcons + ",\n    AppstoreOutlined";
-                sidebarContent = sidebarContent.replace(
-                    importIcons,
-                    newImportIcons
-                );
-            }
-        }
-
         // Tìm vị trí thêm mục menu mới (trước dấu "];" cuối cùng của mảng sidebar)
         const lastItemIndex = sidebarContent.lastIndexOf("},");
         const endOfArrayIndex = sidebarContent.indexOf("];", lastItemIndex);
@@ -227,7 +206,7 @@ function addSidebarConfig(moduleName) {
         {
             key: "${paramCaseName}",
             label: "${pascalCaseName}",
-            icon: React.createElement(AppstoreOutlined, { style: iconStyle }),
+            icon: React.createElement(Menu, { style: iconStyle }),
             onClick: () => navigate(URL_CONSTANTS.${sentenceCaseName.toUpperCase()}),
         },`;
 

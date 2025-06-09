@@ -102,16 +102,11 @@ class KhachHangController extends Controller
       $filename = Str::random(10) . '.' . $data->getClientOriginalExtension();
       $path = $data->move(public_path('excel'), $filename);
 
-      $import = new KhachHangImport();
+      $import = new KhachHangImport($path);
       Excel::import($import, $path);
 
       $thanhCong = $import->getThanhCong();
       $thatBai = $import->getThatBai();
-
-      // Xóa file sau khi import
-      if (file_exists($path)) {
-        unlink($path);
-      }
 
       if ($thatBai > 0) {
         return CustomResponse::error('Import không thành công. Có ' . $thatBai . ' bản ghi lỗi và ' . $thanhCong . ' bản ghi thành công');

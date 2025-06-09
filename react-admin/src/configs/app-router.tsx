@@ -15,6 +15,7 @@ import Profile from "../pages/Profile";
 import LoaiKhachHang from "../pages/loai-khach-hang/LoaiKhachHang";
 import LichSuImport from "../pages/lich-su-import/LichSuImport";
 import KhachHang from "../pages/khach-hang/KhachHang";
+import NhaCungCap from "../pages/nha-cung-cap/NhaCungCap";
 
 export const router = createBrowserRouter([
     {
@@ -132,6 +133,16 @@ export const router = createBrowserRouter([
                         path: "khach-hang",
                         element: <MainLayout />,
                         children: [{ index: true, element: <KhachHang /> }],
+                    },
+                ],
+            },
+            {
+                path: "quan-ly-san-pham",
+                children: [
+                    {
+                        path: "nha-cung-cap",
+                        element: <MainLayout />,
+                        children: [{ index: true, element: <NhaCungCap /> }],
                     },
                 ],
             },

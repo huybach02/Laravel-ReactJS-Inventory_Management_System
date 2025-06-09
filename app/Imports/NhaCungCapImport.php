@@ -2,8 +2,8 @@
 
 namespace App\Imports;
 
-use App\Models\KhachHang;
-use App\Modules\KhachHang\Validates\CreateKhachHangRequest;
+use App\Models\NhaCungCap;
+use App\Modules\NhaCungCap\Validates\CreateNhaCungCapRequest;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Exception;
@@ -11,12 +11,12 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\LichSuImport;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 
-class KhachHangImport implements ToCollection, WithMultipleSheets
+class NhaCungCapImport implements ToCollection, WithMultipleSheets
 {
   // TODO: Config các thông tin cần thiết cho import
-  protected $muc_import = 'Khách hàng';
-  protected $model_class = KhachHang::class;
-  protected $createRequest = CreateKhachHangRequest::class;
+  protected $muc_import = 'Nhà cung cấp';
+  protected $model_class = NhaCungCap::class;
+  protected $createRequest = CreateNhaCungCapRequest::class;
 
   protected $thanh_cong = 0;
   protected $that_bai = 0;
@@ -24,13 +24,6 @@ class KhachHangImport implements ToCollection, WithMultipleSheets
   protected $validated_data = [];
   protected $filePath;
   protected $tong_so_luong = 0;
-
-  public function sheets(): array
-  {
-    return [
-      0 => $this // Chỉ đọc sheet đầu tiên (index 0)
-    ];
-  }
 
   /**
    * Validate tất cả dữ liệu
@@ -44,19 +37,23 @@ class KhachHangImport implements ToCollection, WithMultipleSheets
     $rules = $createRequest->rules();
     $messages = $createRequest->messages();
 
+    logger()->info('Data: ' . json_encode($data));
+
     foreach ($data as $index => $item) {
       try {
         // |--------------------------------------------------------|
         // TODO: THAY ĐỔI CHO PHÙ HỢP VỚI CÁC TRƯỜNG TRONG createRequest VÀ TRONG DATABASE
         $rowData = [
-          'ten_khach_hang' => $item[0],
-          'email' => $item[1],
+          'ma_nha_cung_cap' => $item[0],
+          'ten_nha_cung_cap' => $item[1],
           'so_dien_thoai' => $item[2],
-          'dia_chi' => $item[3],
-          'loai_khach_hang_id' => $item[4],
-          'cong_no' => $item[5] ?? 0,
-          'doanh_thu_tich_luy' => $item[6] ?? 0,
-          'ghi_chu' => $item[7] ?? null,
+          'email' => $item[3],
+          'dia_chi' => $item[4],
+          'ma_so_thue' => (string) $item[5],
+          'ngan_hang' => $item[6],
+          'so_tai_khoan' => (string) $item[7],
+          'ghi_chu' => $item[8],
+          'trang_thai' => $item[9] ?? 1,
         ];
 
         // |--------------------------------------------------------|
@@ -77,6 +74,13 @@ class KhachHangImport implements ToCollection, WithMultipleSheets
         $this->logAndAddFailedResult($index, $item, 'Lỗi hệ thống', [$e->getMessage()]);
       }
     }
+  }
+
+  public function sheets(): array
+  {
+    return [
+      0 => $this // Chỉ đọc sheet đầu tiên (index 0)
+    ];
   }
 
   public function __construct($filePath = null)

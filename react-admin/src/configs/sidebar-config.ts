@@ -10,6 +10,9 @@ import {
     User,
     UsersRound,
     FileUp,
+    Menu,
+    Warehouse,
+    Boxes,
 } from "lucide-react";
 
 const iconStyle = {
@@ -96,6 +99,21 @@ export const sidebarConfig = (navigate: NavigateFunction) => {
                     label: "Danh sách khách hàng",
                     icon: React.createElement(User, { style: iconStyle }),
                     onClick: () => navigate(URL_CONSTANTS.KHACH_HANG),
+                },
+            ],
+        },
+        {
+            key: "quan-ly-san-pham",
+            label: "Quản lý sản phẩm",
+            icon: React.createElement(Boxes, {
+                style: iconStyle,
+            }),
+            children: [
+                {
+                    key: "nha-cung-cap",
+                    label: "Nhà cung cấp",
+                    icon: React.createElement(Warehouse, { style: iconStyle }),
+                    onClick: () => navigate(URL_CONSTANTS.NHA_CUNG_CAP),
                 },
             ],
         },
