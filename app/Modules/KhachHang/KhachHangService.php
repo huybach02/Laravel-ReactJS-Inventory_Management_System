@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Modules\LoaiKhachHang;
+namespace App\Modules\KhachHang;
 
-use App\Models\LoaiKhachHang;
+use App\Models\KhachHang;
 use Illuminate\Support\Facades\DB;
 use Exception;
 use App\Class\CustomResponse;
 use App\Class\FilterWithPagination;
 
-class LoaiKhachHangService
+class KhachHangService
 {
   /**
    * Lấy tất cả dữ liệu
@@ -17,13 +17,13 @@ class LoaiKhachHangService
   {
     try {
       // Tạo query cơ bản
-      $query = LoaiKhachHang::query()->with('images');
+      $query = KhachHang::query()->with('images', 'loaiKhachHang:id,ten_loai_khach_hang');
 
       // Sử dụng FilterWithPagination để xử lý filter và pagination
       $result = FilterWithPagination::findWithPagination(
         $query,
         $params,
-        ['loai_khach_hangs.*'] // Columns cần select
+        ['khach_hangs.*',] // Columns cần select
       );
 
       return [
@@ -47,7 +47,7 @@ class LoaiKhachHangService
    */
   public function getById($id)
   {
-    return LoaiKhachHang::with('images')->find($id);
+    return KhachHang::with('images')->find($id);
   }
 
   /**
@@ -56,7 +56,7 @@ class LoaiKhachHangService
   public function create(array $data)
   {
     try {
-      $result = LoaiKhachHang::create($data);
+      $result = KhachHang::create($data);
 
       // TODO: Thêm ảnh vào bảng images (nếu có)
       // $result->images()->create([
@@ -75,7 +75,7 @@ class LoaiKhachHangService
   public function update($id, array $data)
   {
     try {
-      $model = LoaiKhachHang::findOrFail($id);
+      $model = KhachHang::findOrFail($id);
       $model->update($data);
 
       // TODO: Cập nhật ảnh vào bảng images (nếu có)
@@ -101,7 +101,7 @@ class LoaiKhachHangService
   public function delete($id)
   {
     try {
-      $model = LoaiKhachHang::findOrFail($id);
+      $model = KhachHang::findOrFail($id);
 
       // TODO: Xóa ảnh vào bảng images (nếu có)
       // $model->images()->get()->each(function ($image) {
@@ -119,6 +119,6 @@ class LoaiKhachHangService
    */
   public function getOptions()
   {
-    return LoaiKhachHang::select('id as value', 'ten_loai_khach_hang as label')->get();
+    return KhachHang::select('id as value', 'ten_khach_hang as label')->get();
   }
 }

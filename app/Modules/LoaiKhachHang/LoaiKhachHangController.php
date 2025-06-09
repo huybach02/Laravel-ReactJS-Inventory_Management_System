@@ -76,6 +76,12 @@ class LoaiKhachHangController extends Controller
     return CustomResponse::success([], 'Xóa thành công');
   }
 
+  public function getOptions()
+  {
+    $result = $this->loaiKhachHangService->getOptions();
+    return CustomResponse::success($result);
+  }
+
   public function downloadTemplateExcel()
   {
     $path = public_path('mau-excel/LoaiKhachHang.xlsx');

@@ -228,6 +228,6 @@ export const camelCasePathUrl = (text: string, capitalizeFirst = true) => {
 export const formatVietnameseCurrency = (
     x: number | string | undefined
 ): any => {
-    if (!x) return undefined;
+    if (!x) return "0 VNĐ";
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + " VNĐ";
 };

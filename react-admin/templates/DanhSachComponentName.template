@@ -5,7 +5,7 @@ import type { User } from "../../types/user.type";
 import useColumnSearch from "../../hooks/useColumnSearch";
 import { getListData } from "../../services/getData.api";
 import { createFilterQueryFromArray } from "../../utils/utils";
-import { Col, Row, Space, Tag } from "antd";
+import { Col, Row, Space, Tag, Flex } from "antd";
 import Sua[ComponentName] from "./Sua[ComponentName]";
 import Delete from "../../components/Delete";
 import { useDispatch, useSelector } from "react-redux";

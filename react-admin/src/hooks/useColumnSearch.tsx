@@ -168,7 +168,7 @@ const useColumnSearch = () => {
                             minWidth: 210,
                         }}
                         onChange={(e) => setSelectedKeys(e ? [e] : [])}
-                        placeholder="Chọn ngày"
+                        placeholder="Chọn"
                         value={selectedKeys[0]}
                         path={path}
                         filter={filter}

@@ -7,8 +7,9 @@ use Maatwebsite\Excel\Concerns\ToCollection;
 use Exception;
 use Illuminate\Support\Facades\Validator;
 use App\Models\LichSuImport;
+use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 
-class {{ class }} implements ToCollection
+class {{ class }} implements ToCollection, WithMultipleSheets
 {
     // TODO: Config các thông tin cần thiết cho import
     protected $muc_import = 'Tên Mục Import';
@@ -19,6 +20,7 @@ class {{ class }} implements ToCollection
     protected $that_bai = 0;
     protected $ket_qua_import = [];
     protected $validated_data = [];
+    protected $tong_so_luong = 0;
 
     /**
      * Validate tất cả dữ liệu
@@ -61,6 +63,13 @@ class {{ class }} implements ToCollection
         }
     }
 
+    public function sheets(): array
+    {
+      return [
+        0 => $this // Chỉ đọc sheet đầu tiên (index 0)
+      ];
+    }
+
     /**
      * @param Collection $collection
      */
@@ -69,6 +78,7 @@ class {{ class }} implements ToCollection
         $data = array_slice($collection->toArray(), 1); // Bỏ qua dòng đầu tiên (header)
 
         $this->validateAllData($data);
+        $this->tong_so_luong = count($data);
 
         // Chỉ tạo bản ghi khi tất cả dữ liệu đều hợp lệ
         if ($this->that_bai === 0 && count($this->validated_data) > 0) {
@@ -171,6 +181,7 @@ class {{ class }} implements ToCollection
     {
         LichSuImport::create([
             'muc_import' => $this->muc_import,
+            'tong_so_luong' => $this->tong_so_luong,
             'so_luong_thanh_cong' => $this->thanh_cong,
             'so_luong_that_bai' => $this->that_bai,
             'ket_qua_import' => json_encode($this->ket_qua_import, JSON_UNESCAPED_UNICODE)

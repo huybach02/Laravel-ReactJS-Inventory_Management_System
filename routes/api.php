@@ -73,11 +73,24 @@ Route::group([
   // LoaiKhachHang
   Route::prefix('loai-khach-hang')->group(function () {
     Route::get('/', [\App\Modules\LoaiKhachHang\LoaiKhachHangController::class, 'index']);
+    Route::get('/options', [\App\Modules\LoaiKhachHang\LoaiKhachHangController::class, 'getOptions']);
     Route::get('/download-template-excel', [\App\Modules\LoaiKhachHang\LoaiKhachHangController::class, 'downloadTemplateExcel']);
     Route::post('/', [\App\Modules\LoaiKhachHang\LoaiKhachHangController::class, 'store']);
     Route::get('/{id}', [\App\Modules\LoaiKhachHang\LoaiKhachHangController::class, 'show']);
     Route::put('/{id}', [\App\Modules\LoaiKhachHang\LoaiKhachHangController::class, 'update']);
     Route::delete('/{id}', [\App\Modules\LoaiKhachHang\LoaiKhachHangController::class, 'destroy']);
     Route::post('/import-excel', [\App\Modules\LoaiKhachHang\LoaiKhachHangController::class, 'importExcel']);
+  });
+
+  // KhachHang
+  Route::prefix('khach-hang')->group(function () {
+    Route::get('/', [\App\Modules\KhachHang\KhachHangController::class, 'index']);
+    Route::get('/options', [\App\Modules\KhachHang\KhachHangController::class, 'getOptions']);
+    Route::get('/download-template-excel', [\App\Modules\KhachHang\KhachHangController::class, 'downloadTemplateExcelWithLoaiKhachHang']);
+    Route::post('/', [\App\Modules\KhachHang\KhachHangController::class, 'store']);
+    Route::get('/{id}', [\App\Modules\KhachHang\KhachHangController::class, 'show']);
+    Route::put('/{id}', [\App\Modules\KhachHang\KhachHangController::class, 'update']);
+    Route::delete('/{id}', [\App\Modules\KhachHang\KhachHangController::class, 'destroy']);
+    Route::post('/import-excel', [\App\Modules\KhachHang\KhachHangController::class, 'importExcel']);
   });
 });

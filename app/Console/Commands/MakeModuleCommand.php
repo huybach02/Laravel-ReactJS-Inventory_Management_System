@@ -142,6 +142,7 @@ class MakeModuleCommand extends Command
 
     return "// {$moduleName}\n  Route::prefix('{$routeName}')->group(function () {\n" .
       "    Route::get('/', [{$controllerClass}::class, 'index']);\n" .
+      "    Route::get('/options', [{$controllerClass}::class, 'getOptions']);\n" .
       "    Route::get('/download-template-excel', [{$controllerClass}::class, 'downloadTemplateExcel']);\n" .
       "    Route::post('/', [{$controllerClass}::class, 'store']);\n" .
       "    Route::get('/{id}', [{$controllerClass}::class, 'show']);\n" .
@@ -235,12 +236,20 @@ class {$moduleName}Controller extends Controller
         return CustomResponse::success([], 'Xóa thành công');
     }
 
+    /**
+     * Lấy danh sách {$singularName} dạng option
+     */
+    public function getOptions()
+    {
+      \$result = \$this->{$variableName}Service->getOptions();
+      return CustomResponse::success(\$result);
+    }
+
     public function downloadTemplateExcel()
     {
       \$path = public_path('mau-excel/{$moduleName}.xlsx');
       return response()->download(\$path);
     }
-  }
 
     public function importExcel(Request \$request)
     {
@@ -402,6 +411,14 @@ class {$moduleName}Service
       } catch (Exception \$e) {
         return CustomResponse::error(\$e->getMessage());
       }
+    }
+
+    /**
+     * Lấy danh sách {$singularName} dạng option
+     */
+    public function getOptions()
+    {
+      return {$modelName}::select('id as value', 'ten_{$snakeName} as label')->get();
     }
 }
 ";

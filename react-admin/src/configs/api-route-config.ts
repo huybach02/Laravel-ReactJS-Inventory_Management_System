@@ -18,6 +18,7 @@ export const API_ROUTE_CONFIG = {
     LICH_SU_IMPORT: "/lich-su-import",
 
     LOAI_KHACH_HANG: "/loai-khach-hang",
+    KHACH_HANG: "/khach-hang",
 };
 export const URL_CONSTANTS = {
     LOGIN: "/admin",
@@ -32,4 +33,5 @@ export const URL_CONSTANTS = {
     LICH_SU_IMPORT: "/admin/lich-su-import",
 
     LOAI_KHACH_HANG: "/admin/quan-ly-khach-hang/loai-khach-hang",
+    KHACH_HANG: "/admin/quan-ly-khach-hang/khach-hang",
 };

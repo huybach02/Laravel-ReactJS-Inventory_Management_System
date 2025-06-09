@@ -91,6 +91,12 @@ export const sidebarConfig = (navigate: NavigateFunction) => {
                     }),
                     onClick: () => navigate(URL_CONSTANTS.LOAI_KHACH_HANG),
                 },
+                {
+                    key: "khach-hang",
+                    label: "Danh sách khách hàng",
+                    icon: React.createElement(User, { style: iconStyle }),
+                    onClick: () => navigate(URL_CONSTANTS.KHACH_HANG),
+                },
             ],
         },
     ];
