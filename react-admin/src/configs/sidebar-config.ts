@@ -13,6 +13,7 @@ import {
     Menu,
     Warehouse,
     Boxes,
+    Layers2,
 } from "lucide-react";
 
 const iconStyle = {
@@ -114,6 +115,12 @@ export const sidebarConfig = (navigate: NavigateFunction) => {
                     label: "Nhà cung cấp",
                     icon: React.createElement(Warehouse, { style: iconStyle }),
                     onClick: () => navigate(URL_CONSTANTS.NHA_CUNG_CAP),
+                },
+                {
+                    key: "danh-muc-san-pham",
+                    label: "Danh mục sản phẩm",
+                    icon: React.createElement(Layers2, { style: iconStyle }),
+                    onClick: () => navigate(URL_CONSTANTS.DANH_MUC_SAN_PHAM),
                 },
             ],
         },

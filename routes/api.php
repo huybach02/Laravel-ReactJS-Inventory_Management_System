@@ -105,4 +105,16 @@ Route::group([
     Route::delete('/{id}', [\App\Modules\NhaCungCap\NhaCungCapController::class, 'destroy']);
     Route::post('/import-excel', [\App\Modules\NhaCungCap\NhaCungCapController::class, 'importExcel']);
   });
+
+  // DanhMucSanPham
+  Route::prefix('danh-muc-san-pham')->group(function () {
+    Route::get('/', [\App\Modules\DanhMucSanPham\DanhMucSanPhamController::class, 'index']);
+    Route::get('/options', [\App\Modules\DanhMucSanPham\DanhMucSanPhamController::class, 'getOptions']);
+    Route::get('/download-template-excel', [\App\Modules\DanhMucSanPham\DanhMucSanPhamController::class, 'downloadTemplateExcel']);
+    Route::post('/', [\App\Modules\DanhMucSanPham\DanhMucSanPhamController::class, 'store']);
+    Route::get('/{id}', [\App\Modules\DanhMucSanPham\DanhMucSanPhamController::class, 'show']);
+    Route::put('/{id}', [\App\Modules\DanhMucSanPham\DanhMucSanPhamController::class, 'update']);
+    Route::delete('/{id}', [\App\Modules\DanhMucSanPham\DanhMucSanPhamController::class, 'destroy']);
+    Route::post('/import-excel', [\App\Modules\DanhMucSanPham\DanhMucSanPhamController::class, 'importExcel']);
+  });
 });

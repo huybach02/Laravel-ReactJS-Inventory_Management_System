@@ -187,7 +187,6 @@ const DanhSachNhaCungCap = ({
         {
             title: "Ngày tạo",
             dataIndex: "created_at",
-            align: "right",
             render: (record: string): string => {
                 const date = dayjs(record);
                 return date.format("DD/MM/YYYY HH:mm:ss") || "";
@@ -197,7 +196,6 @@ const DanhSachNhaCungCap = ({
         {
             title: "Ngày cập nhật",
             dataIndex: "updated_at",
-            align: "right",
             render: (record: string): string => {
                 const date = dayjs(record);
                 return date.format("DD/MM/YYYY HH:mm:ss") || "";
@@ -237,7 +235,7 @@ const DanhSachNhaCungCap = ({
                         dataTable={danhSach?.data}
                         defaultColumns={defaultColumns}
                         filter={filter}
-                        scroll={{ x: 2000 }}
+                        scroll={{ x: 3000 }}
                         handlePageChange={handlePageChange}
                         handleLimitChange={handleLimitChange}
                         total={danhSach?.total}

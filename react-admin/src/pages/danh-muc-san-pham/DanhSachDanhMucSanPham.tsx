@@ -4,12 +4,9 @@ import { useEffect, useState } from "react";
 import type { User } from "../../types/user.type";
 import useColumnSearch from "../../hooks/useColumnSearch";
 import { getListData } from "../../services/getData.api";
-import {
-    createFilterQueryFromArray,
-    formatVietnameseCurrency,
-} from "../../utils/utils";
-import { Col, Flex, Row, Space, Tag } from "antd";
-import SuaKhachHang from "./SuaKhachHang";
+import { createFilterQueryFromArray } from "../../utils/utils";
+import { Col, Row, Space, Tag, Flex, Image } from "antd";
+import SuaDanhMucSanPham from "./SuaDanhMucSanPham";
 import Delete from "../../components/Delete";
 import { useDispatch, useSelector } from "react-redux";
 import CustomTable from "../../components/CustomTable";
@@ -20,9 +17,8 @@ import ExportTableToExcel from "../../components/ExportTableToExcel";
 import { OPTIONS_STATUS } from "../../utils/constant";
 import dayjs from "dayjs";
 import ImportExcel from "../../components/ImportExcel";
-import { API_ROUTE_CONFIG } from "../../configs/api-route-config";
 
-const DanhSachKhachHang = ({
+const DanhSachDanhMucSanPham = ({
     path,
     permission,
     title,
@@ -65,8 +61,6 @@ const DanhSachKhachHang = ({
         {
             title: "STT",
             dataIndex: "index",
-            align: "right",
-            width: 80,
             render: (_text: any, _record: any, index: any) => {
                 return (
                     filter.limit && (filter.page - 1) * filter.limit + index + 1
@@ -81,7 +75,11 @@ const DanhSachKhachHang = ({
                 return (
                     <Space size={0}>
                         {permission.edit && (
-                            <SuaKhachHang path={path} id={id} title={title} />
+                            <SuaDanhMucSanPham
+                                path={path}
+                                id={id}
+                                title={title}
+                            />
                         )}
                         {permission.delete && (
                             <Delete path={path} id={id} onShow={getDanhSach} />
@@ -91,87 +89,51 @@ const DanhSachKhachHang = ({
             },
         },
         {
-            title: "Tên khách hàng",
-            dataIndex: "ten_khach_hang",
-            ...inputSearch({
-                dataIndex: "ten_khach_hang",
-                operator: "contain",
-                nameColumn: "Tên khách hàng",
-            }),
-        },
-        {
-            title: "Email",
-            dataIndex: "email",
-            width: 300,
-            ...inputSearch({
-                dataIndex: "email",
-                operator: "contain",
-                nameColumn: "Email",
-            }),
-        },
-        {
-            title: "Số điện thoại",
-            dataIndex: "so_dien_thoai",
-            ...inputSearch({
-                dataIndex: "so_dien_thoai",
-                operator: "contain",
-                nameColumn: "Số điện thoại",
-            }),
-        },
-        {
-            title: "Địa chỉ",
-            dataIndex: "dia_chi",
-            ...inputSearch({
-                dataIndex: "dia_chi",
-                operator: "contain",
-                nameColumn: "Địa chỉ",
-            }),
-        },
-        {
-            title: "Loại khách hàng",
-            dataIndex: "loai_khach_hang",
-            ...selectSearch({
-                dataIndex: "loai_khach_hang_id",
-                path: API_ROUTE_CONFIG.LOAI_KHACH_HANG + "/options",
-                operator: "equal",
-                nameColumn: "Loại khách hàng",
-            }),
-            render: (record: any) => {
-                return record?.ten_loai_khach_hang || "Chưa có";
-            },
-            exportData: (record: any) => {
+            title: "Ảnh danh mục",
+            dataIndex: "images",
+            align: "center",
+            width: 150,
+            render: (images: any[]) => {
+                const image = images && images.length > 0 ? images[0].path : "";
                 return (
-                    record?.loai_khach_hang?.ten_loai_khach_hang || "Chưa có"
+                    <Image
+                        src={image || "https://via.placeholder.com/150"}
+                        alt="Ảnh đại diện"
+                        width={70}
+                        height={70}
+                    />
                 );
             },
-        },
-        {
-            title: "Công nợ",
-            dataIndex: "cong_no",
-            ...inputSearch({
-                dataIndex: "cong_no",
-                operator: "contain",
-                nameColumn: "Công nợ",
-            }),
-            render: (record: any) => {
-                return formatVietnameseCurrency(record);
+            exportData: (record: any) => {
+                const image =
+                    record.images && record.images.length > 0
+                        ? record.images[0].path
+                        : "";
+                return image;
             },
         },
         {
-            title: "Doanh thu tích lũy",
-            dataIndex: "doanh_thu_tich_luy",
+            title: "Mã danh mục",
+            dataIndex: "ma_danh_muc",
             ...inputSearch({
-                dataIndex: "doanh_thu_tich_luy",
+                dataIndex: "ma_danh_muc",
                 operator: "contain",
-                nameColumn: "Doanh thu tích lũy",
+                nameColumn: "Mã danh mục",
             }),
-            render: (record: any) => {
-                return formatVietnameseCurrency(record);
-            },
+        },
+        {
+            title: "Tên danh mục",
+            dataIndex: "ten_danh_muc",
+            ...inputSearch({
+                dataIndex: "ten_danh_muc",
+                operator: "contain",
+                nameColumn: "Tên danh mục",
+            }),
         },
         {
             title: "Ghi chú",
             dataIndex: "ghi_chu",
+            width: 300,
             ...inputSearch({
                 dataIndex: "ghi_chu",
                 operator: "contain",
@@ -239,14 +201,14 @@ const DanhSachKhachHang = ({
                                 params={{}}
                             />
                         )}
-                        {permission.create && <ImportExcel path={path} />}
+                        {/* {permission.create && <ImportExcel path={path} />} */}
                     </Row>
                     <CustomTable
                         rowKey="id"
                         dataTable={danhSach?.data}
                         defaultColumns={defaultColumns}
                         filter={filter}
-                        scroll={{ x: 3000 }}
+                        scroll={{ x: 1800 }}
                         handlePageChange={handlePageChange}
                         handleLimitChange={handleLimitChange}
                         total={danhSach?.total}
@@ -258,4 +220,4 @@ const DanhSachKhachHang = ({
     );
 };
 
-export default DanhSachKhachHang;
+export default DanhSachDanhMucSanPham;
