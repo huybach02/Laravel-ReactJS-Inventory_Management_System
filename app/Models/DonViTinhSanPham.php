@@ -6,10 +6,9 @@ use App\Traits\DateTimeFormatter;
 use App\Traits\UserNameResolver;
 use App\Traits\UserTrackable;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class DonViTinh extends Model
+class DonViTinhSanPham extends Model
 {
   //
 
@@ -26,14 +25,14 @@ class DonViTinh extends Model
     });
   }
 
-  public function sanPhams(): BelongsToMany
+  public function donViTinh(): BelongsTo
   {
-    return $this->belongsToMany(SanPham::class, 'don_vi_tinh_san_phams', 'don_vi_tinh_id', 'san_pham_id')->withTimestamps();
+    return $this->belongsTo(DonViTinh::class);
   }
 
-  public function donViTinhSanPhams(): HasMany
+  public function sanPham(): BelongsTo
   {
-    return $this->hasMany(DonViTinhSanPham::class);
+    return $this->belongsTo(SanPham::class);
   }
 
 

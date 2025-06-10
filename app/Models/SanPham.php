@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class DonViTinh extends Model
+class SanPham extends Model
 {
   //
 
@@ -26,9 +26,9 @@ class DonViTinh extends Model
     });
   }
 
-  public function sanPhams(): BelongsToMany
+  public function donViTinhs(): BelongsToMany
   {
-    return $this->belongsToMany(SanPham::class, 'don_vi_tinh_san_phams', 'don_vi_tinh_id', 'san_pham_id')->withTimestamps();
+    return $this->belongsToMany(DonViTinh::class, 'don_vi_tinh_san_phams', 'san_pham_id', 'don_vi_tinh_id')->withTimestamps();
   }
 
   public function donViTinhSanPhams(): HasMany

@@ -129,4 +129,16 @@ Route::group([
     Route::delete('/{id}', [\App\Modules\DonViTinh\DonViTinhController::class, 'destroy']);
     Route::post('/import-excel', [\App\Modules\DonViTinh\DonViTinhController::class, 'importExcel']);
   });
+
+  // SanPham
+  Route::prefix('san-pham')->group(function () {
+    Route::get('/', [\App\Modules\SanPham\SanPhamController::class, 'index']);
+    Route::get('/options', [\App\Modules\SanPham\SanPhamController::class, 'getOptions']);
+    Route::get('/download-template-excel', [\App\Modules\SanPham\SanPhamController::class, 'downloadTemplateExcel']);
+    Route::post('/', [\App\Modules\SanPham\SanPhamController::class, 'store']);
+    Route::get('/{id}', [\App\Modules\SanPham\SanPhamController::class, 'show']);
+    Route::put('/{id}', [\App\Modules\SanPham\SanPhamController::class, 'update']);
+    Route::delete('/{id}', [\App\Modules\SanPham\SanPhamController::class, 'destroy']);
+    Route::post('/import-excel', [\App\Modules\SanPham\SanPhamController::class, 'importExcel']);
+  });
 });
