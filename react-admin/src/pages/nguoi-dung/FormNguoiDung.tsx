@@ -1,5 +1,5 @@
 import { gioiTinhSelect } from "../../configs/select-config";
-import { passwordPattern } from "../../utils/patterns";
+import { passwordPattern, phonePattern } from "../../utils/patterns";
 import type { FormInstance } from "antd";
 import { Row, Col, Form, Input, DatePicker, Select } from "antd";
 import { useState, useEffect } from "react";
@@ -151,6 +151,10 @@ const FormNguoiDung = ({
                         {
                             required: true,
                             message: "Số điện thoại không được bỏ trống!",
+                        },
+                        {
+                            pattern: phonePattern,
+                            message: "Số điện thoại không hợp lệ!",
                         },
                     ]}
                 >

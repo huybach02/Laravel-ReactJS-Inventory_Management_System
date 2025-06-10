@@ -14,6 +14,7 @@ import {
     Warehouse,
     Boxes,
     Layers2,
+    Container,
 } from "lucide-react";
 
 const iconStyle = {
@@ -121,6 +122,12 @@ export const sidebarConfig = (navigate: NavigateFunction) => {
                     label: "Danh mục sản phẩm",
                     icon: React.createElement(Layers2, { style: iconStyle }),
                     onClick: () => navigate(URL_CONSTANTS.DANH_MUC_SAN_PHAM),
+                },
+                {
+                    key: "don-vi-tinh",
+                    label: "Đơn vị tính",
+                    icon: React.createElement(Container, { style: iconStyle }),
+                    onClick: () => navigate(URL_CONSTANTS.DON_VI_TINH),
                 },
             ],
         },

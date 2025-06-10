@@ -17,6 +17,7 @@ import LichSuImport from "../pages/lich-su-import/LichSuImport";
 import KhachHang from "../pages/khach-hang/KhachHang";
 import NhaCungCap from "../pages/nha-cung-cap/NhaCungCap";
 import DanhMucSanPham from "../pages/danh-muc-san-pham/DanhMucSanPham";
+import DonViTinh from "../pages/don-vi-tinh/DonViTinh";
 
 export const router = createBrowserRouter([
     {
@@ -151,6 +152,11 @@ export const router = createBrowserRouter([
                         children: [
                             { index: true, element: <DanhMucSanPham /> },
                         ],
+                    },
+                    {
+                        path: "don-vi-tinh",
+                        element: <MainLayout />,
+                        children: [{ index: true, element: <DonViTinh /> }],
                     },
                 ],
             },

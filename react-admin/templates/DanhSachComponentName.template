@@ -61,7 +61,7 @@ const DanhSach[ComponentName] = ({
       {
         title: 'STT',
         dataIndex: 'index',
-        align: 'right',
+        width: 80,
         render: (_text: any, _record: any, index: any) => {
           return filter.limit && (filter.page - 1) * filter.limit + index + 1;
         }
@@ -102,24 +102,43 @@ const DanhSach[ComponentName] = ({
             }),
       },
       {
-        title: 'Ngày tạo',
-        dataIndex: 'created_at',
-        align: 'right',
-        render: (record: string): string => {
-          const date = dayjs(record);
-          return date.format("DD/MM/YYYY HH:mm:ss") || "";
-        },
-        ...dateSearch({ dataIndex: 'created_at', nameColumn: 'Ngày tạo' })
+            title: "Người tạo",
+            dataIndex: "ten_nguoi_tao",
+            ...inputSearch({
+                dataIndex: "ten_nguoi_tao",
+                operator: "contain",
+                nameColumn: "Người tạo",
+            }),
       },
       {
-        title: 'Ngày cập nhật',
-        dataIndex: 'updated_at',
-        align: 'right',
-        render: (record: string): string => {
-          const date = dayjs(record);
-          return date.format("DD/MM/YYYY HH:mm:ss") || "";
-        },
-        ...dateSearch({ dataIndex: 'updated_at', nameColumn: 'Ngày cập nhật' })
+            title: "Ngày tạo",
+            dataIndex: "created_at",
+            render: (record: string): string => {
+                const date = dayjs(record);
+                return date.format("DD/MM/YYYY HH:mm:ss") || "";
+            },
+            ...dateSearch({ dataIndex: "created_at", nameColumn: "Ngày tạo" }),
+      },
+      {
+            title: "Người cập nhật",
+            dataIndex: "ten_nguoi_cap_nhat",
+            ...inputSearch({
+                dataIndex: "ten_nguoi_cap_nhat",
+                operator: "contain",
+                nameColumn: "Người cập nhật",
+            }),
+      },
+      {
+            title: "Ngày cập nhật",
+            dataIndex: "updated_at",
+            render: (record: string): string => {
+                const date = dayjs(record);
+                return date.format("DD/MM/YYYY HH:mm:ss") || "";
+            },
+            ...dateSearch({
+                dataIndex: "updated_at",
+                nameColumn: "Ngày cập nhật",
+            }),
       },
     ];
 

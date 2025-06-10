@@ -196,6 +196,15 @@ const DanhSachKhachHang = ({
             }),
         },
         {
+            title: "Người tạo",
+            dataIndex: "ten_nguoi_tao",
+            ...inputSearch({
+                dataIndex: "ten_nguoi_tao",
+                operator: "contain",
+                nameColumn: "Người tạo",
+            }),
+        },
+        {
             title: "Ngày tạo",
             dataIndex: "created_at",
             render: (record: string): string => {
@@ -203,6 +212,15 @@ const DanhSachKhachHang = ({
                 return date.format("DD/MM/YYYY HH:mm:ss") || "";
             },
             ...dateSearch({ dataIndex: "created_at", nameColumn: "Ngày tạo" }),
+        },
+        {
+            title: "Người cập nhật",
+            dataIndex: "ten_nguoi_cap_nhat",
+            ...inputSearch({
+                dataIndex: "ten_nguoi_cap_nhat",
+                operator: "contain",
+                nameColumn: "Người cập nhật",
+            }),
         },
         {
             title: "Ngày cập nhật",

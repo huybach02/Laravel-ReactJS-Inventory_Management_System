@@ -6,7 +6,7 @@ import useColumnSearch from "../../hooks/useColumnSearch";
 import { getListData } from "../../services/getData.api";
 import { createFilterQueryFromArray } from "../../utils/utils";
 import { Col, Row, Space, Tag, Flex } from "antd";
-import SuaNhaCungCap from "./SuaNhaCungCap";
+import SuaDonViTinh from "./SuaDonViTinh";
 import Delete from "../../components/Delete";
 import { useDispatch, useSelector } from "react-redux";
 import CustomTable from "../../components/CustomTable";
@@ -18,7 +18,7 @@ import { OPTIONS_STATUS } from "../../utils/constant";
 import dayjs from "dayjs";
 import ImportExcel from "../../components/ImportExcel";
 
-const DanhSachNhaCungCap = ({
+const DanhSachDonViTinh = ({
     path,
     permission,
     title,
@@ -61,7 +61,6 @@ const DanhSachNhaCungCap = ({
         {
             title: "STT",
             dataIndex: "index",
-            align: "right",
             render: (_text: any, _record: any, index: any) => {
                 return (
                     filter.limit && (filter.page - 1) * filter.limit + index + 1
@@ -76,7 +75,7 @@ const DanhSachNhaCungCap = ({
                 return (
                     <Space size={0}>
                         {permission.edit && (
-                            <SuaNhaCungCap path={path} id={id} title={title} />
+                            <SuaDonViTinh path={path} id={id} title={title} />
                         )}
                         {permission.delete && (
                             <Delete path={path} id={id} onShow={getDanhSach} />
@@ -86,85 +85,21 @@ const DanhSachNhaCungCap = ({
             },
         },
         {
-            title: "Mã nhà cung cấp",
-            dataIndex: "ma_nha_cung_cap",
+            title: "Tên đơn vị",
+            dataIndex: "ten_don_vi",
             ...inputSearch({
-                dataIndex: "ma_nha_cung_cap",
+                dataIndex: "ten_don_vi",
                 operator: "contain",
-                nameColumn: "Mã nhà cung cấp",
+                nameColumn: "Tên đơn vị",
             }),
         },
         {
-            title: "Tên nhà cung cấp",
-            dataIndex: "ten_nha_cung_cap",
+            title: "Ký hiệu",
+            dataIndex: "ky_hieu",
             ...inputSearch({
-                dataIndex: "ten_nha_cung_cap",
+                dataIndex: "ky_hieu",
                 operator: "contain",
-                nameColumn: "Tên nhà cung cấp",
-            }),
-        },
-        {
-            title: "Số điện thoại",
-            dataIndex: "so_dien_thoai",
-            ...inputSearch({
-                dataIndex: "so_dien_thoai",
-                operator: "contain",
-                nameColumn: "Số điện thoại",
-            }),
-        },
-        {
-            title: "Email",
-            dataIndex: "email",
-            ...inputSearch({
-                dataIndex: "email",
-                operator: "contain",
-                nameColumn: "Email",
-            }),
-        },
-        {
-            title: "Địa chỉ",
-            dataIndex: "dia_chi",
-            ...inputSearch({
-                dataIndex: "dia_chi",
-                operator: "contain",
-                nameColumn: "Địa chỉ",
-            }),
-        },
-        {
-            title: "Mã số thuế",
-            dataIndex: "ma_so_thue",
-            ...inputSearch({
-                dataIndex: "ma_so_thue",
-                operator: "contain",
-                nameColumn: "Mã số thuế",
-            }),
-        },
-        {
-            title: "Ngân hàng",
-            dataIndex: "ngan_hang",
-            ...inputSearch({
-                dataIndex: "ngan_hang",
-                operator: "contain",
-                nameColumn: "Ngân hàng",
-            }),
-        },
-        {
-            title: "Số tài khoản",
-            dataIndex: "so_tai_khoan",
-            ...inputSearch({
-                dataIndex: "so_tai_khoan",
-                operator: "contain",
-                nameColumn: "Số tài khoản",
-            }),
-        },
-        {
-            title: "Ghi chú",
-            dataIndex: "ghi_chu",
-            width: 250,
-            ...inputSearch({
-                dataIndex: "ghi_chu",
-                operator: "contain",
-                nameColumn: "Ghi chú",
+                nameColumn: "Ký hiệu",
             }),
         },
         {
@@ -246,14 +181,14 @@ const DanhSachNhaCungCap = ({
                                 params={{}}
                             />
                         )}
-                        {permission.create && <ImportExcel path={path} />}
+                        {/* {permission.create && <ImportExcel path={path} />} */}
                     </Row>
                     <CustomTable
                         rowKey="id"
                         dataTable={danhSach?.data}
                         defaultColumns={defaultColumns}
                         filter={filter}
-                        scroll={{ x: 3000 }}
+                        scroll={{ x: 1000 }}
                         handlePageChange={handlePageChange}
                         handleLimitChange={handleLimitChange}
                         total={danhSach?.total}
@@ -265,4 +200,4 @@ const DanhSachNhaCungCap = ({
     );
 };
 
-export default DanhSachNhaCungCap;
+export default DanhSachDonViTinh;

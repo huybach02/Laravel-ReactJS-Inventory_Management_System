@@ -2,6 +2,7 @@
 import { Row, Col, Form, Input, InputNumber, type FormInstance } from "antd";
 import { formatter, parser } from "../../utils/utils";
 import SelectFormApi from "../../components/select/SelectFormApi";
+import { phonePattern } from "../../utils/patterns";
 
 const FormKhachHang = ({ form }: { form: FormInstance }) => {
     return (
@@ -29,6 +30,10 @@ const FormKhachHang = ({ form }: { form: FormInstance }) => {
                             required: true,
                             message: "Email không được bỏ trống!",
                         },
+                        {
+                            type: "email",
+                            message: "Email không hợp lệ!",
+                        },
                     ]}
                 >
                     <Input placeholder="Nhập email" />
@@ -42,6 +47,10 @@ const FormKhachHang = ({ form }: { form: FormInstance }) => {
                         {
                             required: true,
                             message: "Số điện thoại không được bỏ trống!",
+                        },
+                        {
+                            pattern: phonePattern,
+                            message: "Số điện thoại không hợp lệ!",
                         },
                     ]}
                 >

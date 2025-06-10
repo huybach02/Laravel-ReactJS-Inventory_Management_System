@@ -117,4 +117,16 @@ Route::group([
     Route::delete('/{id}', [\App\Modules\DanhMucSanPham\DanhMucSanPhamController::class, 'destroy']);
     Route::post('/import-excel', [\App\Modules\DanhMucSanPham\DanhMucSanPhamController::class, 'importExcel']);
   });
+
+  // DonViTinh
+  Route::prefix('don-vi-tinh')->group(function () {
+    Route::get('/', [\App\Modules\DonViTinh\DonViTinhController::class, 'index']);
+    Route::get('/options', [\App\Modules\DonViTinh\DonViTinhController::class, 'getOptions']);
+    Route::get('/download-template-excel', [\App\Modules\DonViTinh\DonViTinhController::class, 'downloadTemplateExcel']);
+    Route::post('/', [\App\Modules\DonViTinh\DonViTinhController::class, 'store']);
+    Route::get('/{id}', [\App\Modules\DonViTinh\DonViTinhController::class, 'show']);
+    Route::put('/{id}', [\App\Modules\DonViTinh\DonViTinhController::class, 'update']);
+    Route::delete('/{id}', [\App\Modules\DonViTinh\DonViTinhController::class, 'destroy']);
+    Route::post('/import-excel', [\App\Modules\DonViTinh\DonViTinhController::class, 'importExcel']);
+  });
 });
