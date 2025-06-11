@@ -119,6 +119,6 @@ class DanhMucSanPhamService
    */
   public function getOptions()
   {
-    return DanhMucSanPham::select('id as value', 'ten_danh_muc_san_pham as label')->get();
+    return DanhMucSanPham::select('id as value', 'ten_danh_muc as label')->get();
   }
 }

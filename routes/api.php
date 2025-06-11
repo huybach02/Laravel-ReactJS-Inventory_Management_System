@@ -134,7 +134,7 @@ Route::group([
   Route::prefix('san-pham')->group(function () {
     Route::get('/', [\App\Modules\SanPham\SanPhamController::class, 'index']);
     Route::get('/options', [\App\Modules\SanPham\SanPhamController::class, 'getOptions']);
-    Route::get('/download-template-excel', [\App\Modules\SanPham\SanPhamController::class, 'downloadTemplateExcel']);
+    Route::get('/download-template-excel', [\App\Modules\SanPham\SanPhamController::class, 'downloadTemplateExcelWithRelations']);
     Route::post('/', [\App\Modules\SanPham\SanPhamController::class, 'store']);
     Route::get('/{id}', [\App\Modules\SanPham\SanPhamController::class, 'show']);
     Route::put('/{id}', [\App\Modules\SanPham\SanPhamController::class, 'update']);

@@ -16,15 +16,12 @@ export const API_ROUTE_CONFIG = {
     VAI_TRO_OPTIONS: "/vai-tro/options",
     DANH_SACH_PHAN_QUYEN: "/danh-sach-phan-quyen",
     LICH_SU_IMPORT: "/lich-su-import",
-
     LOAI_KHACH_HANG: "/loai-khach-hang",
     KHACH_HANG: "/khach-hang",
-
     NHA_CUNG_CAP: "/nha-cung-cap",
-
     DANH_MUC_SAN_PHAM: "/danh-muc-san-pham",
-
     DON_VI_TINH: "/don-vi-tinh",
+    SAN_PHAM: "/san-pham",
 };
 export const URL_CONSTANTS = {
     LOGIN: "/admin",
@@ -37,13 +34,10 @@ export const URL_CONSTANTS = {
     VERIFY_OTP: "/admin/verify-otp",
     PROFILE: "/admin/profile",
     LICH_SU_IMPORT: "/admin/lich-su-import",
-
     LOAI_KHACH_HANG: "/admin/quan-ly-khach-hang/loai-khach-hang",
     KHACH_HANG: "/admin/quan-ly-khach-hang/khach-hang",
-
     NHA_CUNG_CAP: "/admin/quan-ly-san-pham/nha-cung-cap",
-
     DANH_MUC_SAN_PHAM: "/admin/quan-ly-san-pham/danh-muc-san-pham",
-
     DON_VI_TINH: "/admin/quan-ly-san-pham/don-vi-tinh",
+    SAN_PHAM: "/admin/quan-ly-san-pham/san-pham",
 };

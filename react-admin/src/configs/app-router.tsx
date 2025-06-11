@@ -18,6 +18,7 @@ import KhachHang from "../pages/khach-hang/KhachHang";
 import NhaCungCap from "../pages/nha-cung-cap/NhaCungCap";
 import DanhMucSanPham from "../pages/danh-muc-san-pham/DanhMucSanPham";
 import DonViTinh from "../pages/don-vi-tinh/DonViTinh";
+import SanPham from "../pages/san-pham/SanPham";
 
 export const router = createBrowserRouter([
     {
@@ -157,6 +158,11 @@ export const router = createBrowserRouter([
                         path: "don-vi-tinh",
                         element: <MainLayout />,
                         children: [{ index: true, element: <DonViTinh /> }],
+                    },
+                    {
+                        path: "san-pham",
+                        element: <MainLayout />,
+                        children: [{ index: true, element: <SanPham /> }],
                     },
                 ],
             },

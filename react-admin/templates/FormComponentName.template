@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Row, Col, Form, Input, InputNumber, type FormInstance } from "antd";
+import { Row, Col, Form, Input, InputNumber, type FormInstance, Select } from "antd";
 import { formatter, parser } from "../../utils/utils";
 import SelectFormApi from "../../components/select/SelectFormApi";
+import { trangThaiSelect } from "../../configs/select-config";
 
 const Form[ComponentName] = ({ form }: { form: FormInstance }) => {
   return (

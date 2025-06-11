@@ -15,6 +15,7 @@ import {
     Boxes,
     Layers2,
     Container,
+    SquareMenu,
 } from "lucide-react";
 
 const iconStyle = {
@@ -128,6 +129,12 @@ export const sidebarConfig = (navigate: NavigateFunction) => {
                     label: "Đơn vị tính",
                     icon: React.createElement(Container, { style: iconStyle }),
                     onClick: () => navigate(URL_CONSTANTS.DON_VI_TINH),
+                },
+                {
+                    key: "san-pham",
+                    label: "Sản phẩm",
+                    icon: React.createElement(SquareMenu, { style: iconStyle }),
+                    onClick: () => navigate(URL_CONSTANTS.SAN_PHAM),
                 },
             ],
         },

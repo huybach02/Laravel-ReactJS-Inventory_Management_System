@@ -198,3 +198,102 @@ label {
     background-color: #f5f5f5;
     font-weight: bold;
 }
+
+/* Override Antd disabled styles nhưng giữ cursor not-allowed */
+
+/* Input disabled */
+.ant-input[disabled] {
+    color: rgba(0, 0, 0, 0.88) !important;
+    background-color: #ffffff !important;
+    border-color: #d9d9d9 !important;
+    cursor: not-allowed !important;
+    opacity: 1 !important;
+}
+
+/* Input.TextArea disabled */
+.ant-input[disabled].ant-input {
+    color: rgba(0, 0, 0, 0.88) !important;
+    background-color: #ffffff !important;
+    cursor: not-allowed !important;
+}
+
+/* InputNumber disabled */
+.ant-input-number-disabled {
+    color: rgba(0, 0, 0, 0.88) !important;
+    background-color: #ffffff !important;
+    border-color: #d9d9d9 !important;
+    cursor: not-allowed !important;
+    opacity: 1 !important;
+}
+
+.ant-input-number-disabled .ant-input-number-input[disabled] {
+    color: rgba(0, 0, 0, 0.88) !important;
+    background-color: transparent !important;
+    cursor: not-allowed !important;
+}
+
+/* Select disabled */
+.ant-select-disabled.ant-select:not(.ant-select-customize-input)
+    .ant-select-selector {
+    color: rgba(0, 0, 0, 0.88) !important;
+    background-color: #ffffff !important;
+    border-color: #d9d9d9 !important;
+    cursor: not-allowed !important;
+    opacity: 1 !important;
+}
+
+.ant-select-disabled.ant-select .ant-select-selection-item {
+    color: rgba(0, 0, 0, 0.88) !important;
+}
+
+.ant-select-disabled.ant-select .ant-select-selection-placeholder {
+    color: rgba(0, 0, 0, 0.25) !important;
+}
+
+/* Multiple Select disabled */
+.ant-select-multiple.ant-select-disabled .ant-select-selection-item {
+    color: rgba(0, 0, 0, 0.88) !important;
+    background-color: #f5f5f5 !important;
+    border-color: #d9d9d9 !important;
+}
+
+.ant-select-multiple.ant-select-disabled .ant-select-selection-item-remove {
+    display: none !important;
+}
+
+/* Cursor not-allowed cho tất cả disabled components */
+.ant-input[disabled],
+.ant-input-number-disabled,
+.ant-input-number-disabled .ant-input-number-input,
+.ant-select-disabled .ant-select-selector,
+.ant-select-disabled .ant-select-selection-search-input,
+.ant-select-disabled .ant-select-arrow {
+    cursor: not-allowed !important;
+}
+
+/* Override hover effects for disabled components */
+.ant-input[disabled]:hover,
+.ant-input-number-disabled:hover,
+.ant-select-disabled:hover .ant-select-selector {
+    border-color: #d9d9d9 !important;
+    cursor: not-allowed !important;
+}
+
+/* Không cho focus vào disabled components */
+.ant-input[disabled]:focus,
+.ant-input-number-disabled:focus,
+.ant-select-disabled:focus .ant-select-selector {
+    border-color: #d9d9d9 !important;
+    box-shadow: none !important;
+    cursor: not-allowed !important;
+}
+
+/* Image component disabled */
+.ant-image-preview-mask {
+    background-color: rgba(0, 0, 0, 0.45) !important;
+}
+
+/* Form Item label cho disabled fields */
+.ant-form-item-label > label[class*="disabled"] {
+    color: rgba(0, 0, 0, 0.88) !important;
+}

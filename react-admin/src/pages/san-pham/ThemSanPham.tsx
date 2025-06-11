@@ -2,39 +2,49 @@ import { PlusOutlined } from "@ant-design/icons";
 import { postData } from "../../services/postData.api";
 import { useState } from "react";
 import { Button, Form, Modal, Row } from "antd";
-import Form[ComponentName] from "./Form[ComponentName]";
-import { useDispatch } from "react-redux";
+import FormSanPham from "./FormSanPham";
+import { useDispatch, useSelector } from "react-redux";
 import { clearImageSingle, setReload } from "../../redux/slices/main.slice";
+import type { RootState } from "../../redux/store";
 
-const Them[ComponentName] = ({ path, title }: { path: string; title: string }) => {
+const ThemSanPham = ({ path, title }: { path: string; title: string }) => {
     const dispatch = useDispatch();
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [form] = Form.useForm();
 
+    const { imageSingle } = useSelector((state: RootState) => state.main);
+
     const showModal = async () => {
-      setIsModalOpen(true);
+        setIsModalOpen(true);
     };
 
     const handleCancel = () => {
-      setIsModalOpen(false);
-      form.resetFields();
-      dispatch(clearImageSingle());
+        setIsModalOpen(false);
+        form.resetFields();
+        dispatch(clearImageSingle());
     };
 
     const onCreate = async (values: any) => {
-      setIsLoading(true);
-      const closeModel = () => {
-        handleCancel();
-        dispatch(setReload());
-      };
-      await postData(path, values, closeModel);
-      setIsLoading(false);
+        setIsLoading(true);
+        const closeModel = () => {
+            handleCancel();
+            dispatch(setReload());
+        };
+        await postData(
+            path,
+            {
+                ...values,
+                image: imageSingle,
+            },
+            closeModel
+        );
+        setIsLoading(false);
     };
 
-  return (
-    <>
+    return (
+        <>
             <Button
                 onClick={showModal}
                 type="primary"
@@ -54,7 +64,7 @@ const Them[ComponentName] = ({ path, title }: { path: string; title: string }) =
                     <Row justify="end" key="footer">
                         <Button
                             key="submit"
-                            form="form[ComponentName]"
+                            form="formSanPham"
                             type="primary"
                             htmlType="submit"
                             size="large"
@@ -66,18 +76,16 @@ const Them[ComponentName] = ({ path, title }: { path: string; title: string }) =
                 ]}
             >
                 <Form
-                    id="form[ComponentName]"
+                    id="formSanPham"
                     form={form}
                     layout="vertical"
                     onFinish={onCreate}
                 >
-                    <Form[ComponentName]
-                        form={form}
-                    />
+                    <FormSanPham form={form} />
                 </Form>
             </Modal>
         </>
-  );
+    );
 };
 
-export default Them[ComponentName];
+export default ThemSanPham;
