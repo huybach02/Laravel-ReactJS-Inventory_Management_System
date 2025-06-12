@@ -5,6 +5,7 @@ namespace App\Imports;
 use App\Models\SanPham;
 use App\Modules\SanPham\Validates\CreateSanPhamRequest;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Exception;
 use Illuminate\Support\Facades\Validator;
@@ -61,6 +62,7 @@ class SanPhamImport implements ToCollection, WithMultipleSheets
           $this->addFailedResult($index, $item, 'Lỗi dữ liệu không hợp lệ', $validator->errors()->all());
         } else {
           $this->validated_data[] = [
+            'rawData' => $item,
             'rowData' => $rowData,
             'index' => $index,
             'item' => $item
@@ -106,6 +108,29 @@ class SanPhamImport implements ToCollection, WithMultipleSheets
     foreach ($this->validated_data as $valid_item) {
       try {
         $model = $this->model_class::create($valid_item['rowData']);
+
+        if ($valid_item['rawData'][0]) {
+          $model->images()->create([
+            'path' => $valid_item['rawData'][0],
+          ]);
+        }
+
+        $donViTinhId = explode(',', $valid_item['rawData'][4]);
+        if (isset($donViTinhId)) {
+          $model->donViTinhs()->attach($donViTinhId, [
+            'nguoi_tao' => Auth::user()->id,
+            'nguoi_cap_nhat' => Auth::user()->id
+          ]);
+        }
+
+        $nhaCungCapId = explode(',', $valid_item['rawData'][5]);
+        if (isset($nhaCungCapId)) {
+          $model->nhaCungCaps()->attach($nhaCungCapId, [
+            'nguoi_tao' => Auth::user()->id,
+            'nguoi_cap_nhat' => Auth::user()->id
+          ]);
+        }
+
         $this->thanh_cong++;
 
         $this->ket_qua_import[] = [

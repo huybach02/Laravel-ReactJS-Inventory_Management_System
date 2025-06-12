@@ -78,15 +78,19 @@ class SanPhamService
         'trang_thai' => $data['trang_thai'],
       ]);
 
-      $result->donViTinhs()->attach($data['don_vi_tinh_id'], [
-        'nguoi_tao' => Auth::user()->id,
-        'nguoi_cap_nhat' => Auth::user()->id
-      ]);
+      if (isset($data['don_vi_tinh_id'])) {
+        $result->donViTinhs()->attach($data['don_vi_tinh_id'], [
+          'nguoi_tao' => Auth::user()->id,
+          'nguoi_cap_nhat' => Auth::user()->id
+        ]);
+      }
 
-      $result->nhaCungCaps()->attach($data['nha_cung_cap_id'], [
-        'nguoi_tao' => Auth::user()->id,
-        'nguoi_cap_nhat' => Auth::user()->id
-      ]);
+      if (isset($data['nha_cung_cap_id'])) {
+        $result->nhaCungCaps()->attach($data['nha_cung_cap_id'], [
+          'nguoi_tao' => Auth::user()->id,
+          'nguoi_cap_nhat' => Auth::user()->id
+        ]);
+      }
 
       // TODO: Thêm ảnh vào bảng images (nếu có)
       if ($data['image']) {
