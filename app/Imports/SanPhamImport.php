@@ -3,6 +3,8 @@
 namespace App\Imports;
 
 use App\Models\SanPham;
+use App\Models\DonViTinh;
+use App\Models\NhaCungCap;
 use App\Modules\SanPham\Validates\CreateSanPhamRequest;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -41,11 +43,16 @@ class SanPhamImport implements ToCollection, WithMultipleSheets
       try {
         // |--------------------------------------------------------|
         // TODO: THAY ĐỔI CHO PHÙ HỢP VỚI CÁC TRƯỜNG TRONG createRequest VÀ TRONG DATABASE
+        $donViTinhId = !empty($item[4]) ? explode(',', $item[4]) : [];
+        $nhaCungCapId = !empty($item[5]) ? explode(',', $item[5]) : [];
+
         $rowData = [
           'ma_san_pham' => $item[1],
           'ten_san_pham' => $item[2],
           'danh_muc_id' => $item[3],
           'gia_nhap_mac_dinh' => $item[6],
+          'don_vi_tinh_id' => $donViTinhId,
+          'nha_cung_cap_id' => $nhaCungCapId,
           'ty_le_chiet_khau' => $item[7],
           'muc_loi_nhuan' => $item[8],
           'so_luong_canh_bao' => $item[9],
@@ -55,8 +62,17 @@ class SanPhamImport implements ToCollection, WithMultipleSheets
 
         // |--------------------------------------------------------|
 
-        // Validate dữ liệu
+        // Validate dữ liệu với callback after
         $validator = Validator::make($rowData, $rules, $messages);
+
+        // Gọi withValidator để thực hiện các validation bổ sung
+        if (method_exists($createRequest, 'withValidator')) {
+          // Thiết lập dữ liệu cho request để withValidator có thể truy cập
+          $createRequest->merge($rowData);
+
+          // Gọi withValidator với validator instance
+          $createRequest->withValidator($validator);
+        }
 
         if ($validator->fails()) {
           $this->addFailedResult($index, $item, 'Lỗi dữ liệu không hợp lệ', $validator->errors()->all());
@@ -65,7 +81,9 @@ class SanPhamImport implements ToCollection, WithMultipleSheets
             'rawData' => $item,
             'rowData' => $rowData,
             'index' => $index,
-            'item' => $item
+            'item' => $item,
+            'donViTinhId' => $donViTinhId,
+            'nhaCungCapId' => $nhaCungCapId
           ];
         }
       } catch (Exception $e) {
@@ -107,7 +125,13 @@ class SanPhamImport implements ToCollection, WithMultipleSheets
   {
     foreach ($this->validated_data as $valid_item) {
       try {
-        $model = $this->model_class::create($valid_item['rowData']);
+        // Loại bỏ các trường không cần thiết khi tạo model
+        $rowDataToCreate = array_diff_key($valid_item['rowData'], [
+          'don_vi_tinh_id' => [],
+          'nha_cung_cap_id' => []
+        ]);
+
+        $model = $this->model_class::create($rowDataToCreate);
 
         if ($valid_item['rawData'][0]) {
           $model->images()->create([
@@ -115,16 +139,16 @@ class SanPhamImport implements ToCollection, WithMultipleSheets
           ]);
         }
 
-        $donViTinhId = explode(',', $valid_item['rawData'][4]);
-        if (isset($donViTinhId)) {
+        $donViTinhId = $valid_item['donViTinhId'];
+        if (!empty($donViTinhId)) {
           $model->donViTinhs()->attach($donViTinhId, [
             'nguoi_tao' => Auth::user()->id,
             'nguoi_cap_nhat' => Auth::user()->id
           ]);
         }
 
-        $nhaCungCapId = explode(',', $valid_item['rawData'][5]);
-        if (isset($nhaCungCapId)) {
+        $nhaCungCapId = $valid_item['nhaCungCapId'];
+        if (!empty($nhaCungCapId)) {
           $model->nhaCungCaps()->attach($nhaCungCapId, [
             'nguoi_tao' => Auth::user()->id,
             'nguoi_cap_nhat' => Auth::user()->id

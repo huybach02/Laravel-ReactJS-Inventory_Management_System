@@ -3,6 +3,9 @@
 namespace App\Modules\SanPham\Validates;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Models\DonViTinh;
+use App\Models\NhaCungCap;
+use Illuminate\Validation\Validator;
 
 class CreateSanPhamRequest extends FormRequest
 {
@@ -27,8 +30,8 @@ class CreateSanPhamRequest extends FormRequest
       'ten_san_pham' => 'required|string|max:255',
       'image' => 'nullable|string',
       'danh_muc_id' => 'required|integer|exists:danh_muc_san_phams,id',
-      'don_vi_tinh_id' => 'nullable|array',
-      'nha_cung_cap_id' => 'nullable|array',
+      'don_vi_tinh_id' => 'required|array',
+      'nha_cung_cap_id' => 'required|array',
       'gia_nhap_mac_dinh' => 'required|numeric',
       'ty_le_chiet_khau' => 'required|numeric|min:0|max:100',
       'muc_loi_nhuan' => 'required|numeric|min:0|max:100',
@@ -36,6 +39,47 @@ class CreateSanPhamRequest extends FormRequest
       'ghi_chu' => 'nullable|string',
       'trang_thai' => 'required|integer|in:0,1',
     ];
+  }
+
+  /**
+   * Configure the validator instance.
+   *
+   * @param \Illuminate\Validation\Validator $validator
+   * @return void
+   */
+  public function withValidator(Validator $validator)
+  {
+    $validator->after(function ($validator) {
+      // Validate đơn vị tính
+      $donViTinhId = $this->don_vi_tinh_id;
+      if (!empty($donViTinhId)) {
+        // Chuyển đổi tất cả các phần tử trong mảng ID thành số nguyên
+        $donViTinhIds = array_map('intval', $donViTinhId);
+        $existingDonViTinhIds = DonViTinh::whereIn('id', $donViTinhIds)->pluck('id')->toArray();
+        // Đảm bảo mảng kết quả cũng là số nguyên
+        $existingDonViTinhIds = array_map('intval', $existingDonViTinhIds);
+        $missingDonViTinhIds = array_diff($donViTinhIds, $existingDonViTinhIds);
+
+        if (!empty($missingDonViTinhIds)) {
+          $validator->errors()->add('don_vi_tinh_id', 'Một số id đơn vị tính không tồn tại: ' . implode(', ', $missingDonViTinhIds));
+        }
+      }
+
+      // Validate nhà cung cấp
+      $nhaCungCapId = $this->nha_cung_cap_id;
+      if (!empty($nhaCungCapId)) {
+        // Chuyển đổi tất cả các phần tử trong mảng ID thành số nguyên
+        $nhaCungCapIds = array_map('intval', $nhaCungCapId);
+        $existingNhaCungCapIds = NhaCungCap::whereIn('id', $nhaCungCapIds)->pluck('id')->toArray();
+        // Đảm bảo mảng kết quả cũng là số nguyên
+        $existingNhaCungCapIds = array_map('intval', $existingNhaCungCapIds);
+        $missingNhaCungCapIds = array_diff($nhaCungCapIds, $existingNhaCungCapIds);
+
+        if (!empty($missingNhaCungCapIds)) {
+          $validator->errors()->add('nha_cung_cap_id', 'Một số id nhà cung cấp không tồn tại: ' . implode(', ', $missingNhaCungCapIds));
+        }
+      }
+    });
   }
 
   /**
