@@ -14,88 +14,94 @@ use Illuminate\Support\Str;
 
 class DonViTinhController extends Controller
 {
-    protected $donViTinhService;
-    
-    public function __construct(DonViTinhService $donViTinhService)
-    {
-        $this->donViTinhService = $donViTinhService;
-    }
-    
-    /**
-     * Lấy danh sách DonViTinhs
-     */
-    public function index(Request $request)
-    {
-        $params = $request->all();
+  protected $donViTinhService;
 
-        // Xử lý và validate parameters
-        $params = Helper::validateFilterParams($params);
+  public function __construct(DonViTinhService $donViTinhService)
+  {
+    $this->donViTinhService = $donViTinhService;
+  }
 
-        $result = $this->donViTinhService->getAll($params);
+  /**
+   * Lấy danh sách DonViTinhs
+   */
+  public function index(Request $request)
+  {
+    $params = $request->all();
 
-        return CustomResponse::success([
-          'collection' => $result['data'],
-          'total' => $result['total'],
-          'pagination' => $result['pagination'] ?? null
-        ]);
-    }
-    
-    /**
-     * Tạo mới DonViTinh
-     */
-    public function store(CreateDonViTinhRequest $request)
-    {
-        $result = $this->donViTinhService->create($request->validated());
-        return CustomResponse::success($result, 'Tạo mới thành công');
-    }
-    
-    /**
-     * Lấy thông tin DonViTinh
-     */
-    public function show($id)
-    {
-        $result = $this->donViTinhService->getById($id);
-        return CustomResponse::success($result);
-    }
-    
-    /**
-     * Cập nhật DonViTinh
-     */
-    public function update(UpdateDonViTinhRequest $request, $id)
-    {
-        $result = $this->donViTinhService->update($id, $request->validated());
-        return CustomResponse::success($result, 'Cập nhật thành công');
-    }
-    
-    /**
-     * Xóa DonViTinh
-     */
-    public function destroy($id)
-    {
-        $result = $this->donViTinhService->delete($id);
-        return CustomResponse::success([], 'Xóa thành công');
-    }
+    // Xử lý và validate parameters
+    $params = Helper::validateFilterParams($params);
 
-    /**
-     * Lấy danh sách DonViTinh dạng option
-     */
-    public function getOptions()
-    {
-      $result = $this->donViTinhService->getOptions();
-      return CustomResponse::success($result);
-    }
+    $result = $this->donViTinhService->getAll($params);
 
-    public function downloadTemplateExcel()
-    {
-      $path = public_path('mau-excel/DonViTinh.xlsx');
-      return response()->download($path);
-    }
+    return CustomResponse::success([
+      'collection' => $result['data'],
+      'total' => $result['total'],
+      'pagination' => $result['pagination'] ?? null
+    ]);
+  }
 
-    public function importExcel(Request $request)
-    {
-      $request->validate([
-        'file' => 'required|file|mimes:xlsx,xls,csv',
-      ]);
+  /**
+   * Tạo mới DonViTinh
+   */
+  public function store(CreateDonViTinhRequest $request)
+  {
+    $result = $this->donViTinhService->create($request->validated());
+    return CustomResponse::success($result, 'Tạo mới thành công');
+  }
+
+  /**
+   * Lấy thông tin DonViTinh
+   */
+  public function show($id)
+  {
+    $result = $this->donViTinhService->getById($id);
+    return CustomResponse::success($result);
+  }
+
+  /**
+   * Cập nhật DonViTinh
+   */
+  public function update(UpdateDonViTinhRequest $request, $id)
+  {
+    $result = $this->donViTinhService->update($id, $request->validated());
+    return CustomResponse::success($result, 'Cập nhật thành công');
+  }
+
+  /**
+   * Xóa DonViTinh
+   */
+  public function destroy($id)
+  {
+    $result = $this->donViTinhService->delete($id);
+    return CustomResponse::success([], 'Xóa thành công');
+  }
+
+  /**
+   * Lấy danh sách DonViTinh dạng option
+   */
+  public function getOptions()
+  {
+    $result = $this->donViTinhService->getOptions();
+    return CustomResponse::success($result);
+  }
+
+  public function getOptionsBySanPham($sanPhamId)
+  {
+    $result = $this->donViTinhService->getOptionsBySanPham($sanPhamId);
+    return CustomResponse::success($result);
+  }
+
+  public function downloadTemplateExcel()
+  {
+    $path = public_path('mau-excel/DonViTinh.xlsx');
+    return response()->download($path);
+  }
+
+  public function importExcel(Request $request)
+  {
+    $request->validate([
+      'file' => 'required|file|mimes:xlsx,xls,csv',
+    ]);
 
     try {
       $data = $request->file('file');

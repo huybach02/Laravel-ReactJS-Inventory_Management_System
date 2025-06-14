@@ -67,7 +67,7 @@ class PhieuNhapKhoService
 
       $checkNgayNhapKho = $data['ngay_nhap_kho'] <= date('Y-m-d');
 
-      foreach ($data['chi_tiet_phieu_nhap_kho'] as $key => $chiTiet) {
+      foreach ($data['danh_sach_san_pham'] as $key => $chiTiet) {
         $sanPham = SanPham::find($chiTiet['san_pham_id']);
 
         $tongTienNhap = $chiTiet['gia_nhap'] * $chiTiet['so_luong_nhap'];
@@ -80,10 +80,11 @@ class PhieuNhapKhoService
         $tongTienHang += $thanhTienSauChietKhau;
         $tongChietKhau += $tongChietKhau;
 
-        $data['chi_tiet_phieu_nhap_kho'][$key]['tong_tien_nhap'] = $tongTienNhap;
-        $data['chi_tiet_phieu_nhap_kho'][$key]['gia_von_don_vi'] = $giaVonDonVi;
-        $data['chi_tiet_phieu_nhap_kho'][$key]['gia_ban_le_don_vi'] = $giaBanLeDonVi;
-        $data['chi_tiet_phieu_nhap_kho'][$key]['loi_nhuan_ban_le'] = $loiNhuanBanLe;
+        $data['danh_sach_san_pham'][$key]['nha_cung_cap_id'] = $data['nha_cung_cap_id'];
+        $data['danh_sach_san_pham'][$key]['tong_tien_nhap'] = $tongTienNhap;
+        $data['danh_sach_san_pham'][$key]['gia_von_don_vi'] = $giaVonDonVi;
+        $data['danh_sach_san_pham'][$key]['gia_ban_le_don_vi'] = $giaBanLeDonVi;
+        $data['danh_sach_san_pham'][$key]['loi_nhuan_ban_le'] = $loiNhuanBanLe;
       }
 
       $tongTienTruocThueVAT = $tongTienHang + ($data['chi_phi_nhap_hang'] ?? 0) - ($data['giam_gia_nhap_hang'] ?? 0);
@@ -94,9 +95,11 @@ class PhieuNhapKhoService
       $data['tong_chiet_khau'] = $tongChietKhau;
       $data['tong_tien'] = $tongTien;
 
-      $result = PhieuNhapKho::create($data);
+      $dataCreate = $data;
+      unset($dataCreate['danh_sach_san_pham']);
+      $result = PhieuNhapKho::create($dataCreate);
 
-      foreach ($data['chi_tiet_phieu_nhap_kho'] as $chiTiet) {
+      foreach ($data['danh_sach_san_pham'] as $chiTiet) {
         $chiTiet['phieu_nhap_kho_id'] = $result->id;
         $chiTiet['ma_lo_san_pham'] = Helper::generateMaLoSanPham();
         ChiTietPhieuNhapKho::create($chiTiet);

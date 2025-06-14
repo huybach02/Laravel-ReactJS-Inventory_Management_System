@@ -16,6 +16,7 @@ import {
     Layers2,
     Container,
     SquareMenu,
+    NotepadText,
 } from "lucide-react";
 
 const iconStyle = {
@@ -135,6 +136,22 @@ export const sidebarConfig = (navigate: NavigateFunction) => {
                     label: "Sản phẩm",
                     icon: React.createElement(SquareMenu, { style: iconStyle }),
                     onClick: () => navigate(URL_CONSTANTS.SAN_PHAM),
+                },
+            ],
+        },
+
+        {
+            key: "quan-ly-kho",
+            label: "Quản lý kho",
+            icon: React.createElement(Warehouse, { style: iconStyle }),
+            children: [
+                {
+                    key: "phieu-nhap-kho",
+                    label: "Phiếu nhập kho",
+                    icon: React.createElement(NotepadText, {
+                        style: iconStyle,
+                    }),
+                    onClick: () => navigate(URL_CONSTANTS.PHIEU_NHAP_KHO),
                 },
             ],
         },

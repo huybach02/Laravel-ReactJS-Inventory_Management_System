@@ -122,6 +122,7 @@ Route::group([
   Route::prefix('don-vi-tinh')->group(function () {
     Route::get('/', [\App\Modules\DonViTinh\DonViTinhController::class, 'index']);
     Route::get('/options', [\App\Modules\DonViTinh\DonViTinhController::class, 'getOptions']);
+    Route::get('/options-by-san-pham/{sanPhamId}', [\App\Modules\DonViTinh\DonViTinhController::class, 'getOptionsBySanPham']);
     Route::get('/download-template-excel', [\App\Modules\DonViTinh\DonViTinhController::class, 'downloadTemplateExcel']);
     Route::post('/', [\App\Modules\DonViTinh\DonViTinhController::class, 'store']);
     Route::get('/{id}', [\App\Modules\DonViTinh\DonViTinhController::class, 'show']);
@@ -134,6 +135,7 @@ Route::group([
   Route::prefix('san-pham')->group(function () {
     Route::get('/', [\App\Modules\SanPham\SanPhamController::class, 'index']);
     Route::get('/options', [\App\Modules\SanPham\SanPhamController::class, 'getOptions']);
+    Route::get('/options-by-nha-cung-cap/{nhaCungCapId}', [\App\Modules\SanPham\SanPhamController::class, 'getOptionsByNhaCungCap']);
     Route::get('/download-template-excel', [\App\Modules\SanPham\SanPhamController::class, 'downloadTemplateExcelWithRelations']);
     Route::post('/', [\App\Modules\SanPham\SanPhamController::class, 'store']);
     Route::get('/{id}', [\App\Modules\SanPham\SanPhamController::class, 'show']);

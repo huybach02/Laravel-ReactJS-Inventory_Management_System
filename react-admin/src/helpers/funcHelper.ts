@@ -110,3 +110,9 @@ export function mergeArrays(arr1: any, arr2: any) {
 
     return merged;
 }
+
+export const generateMaPhieu = (prefix: string) => {
+    const currentDate = dayjs().format("YYYYMMDD");
+    const timeCreate = dayjs().format("HHmmss");
+    return `${prefix}-${currentDate}-${timeCreate}`;
+};

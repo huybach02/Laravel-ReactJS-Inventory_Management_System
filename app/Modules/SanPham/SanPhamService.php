@@ -178,4 +178,18 @@ class SanPhamService
   {
     return SanPham::select('id as value', 'ten_san_pham as label')->get();
   }
+
+  /**
+   * Lấy danh sách SanPham dạng option theo NhaCungCap
+   */
+  public function getOptionsByNhaCungCap($nhaCungCapId)
+  {
+    return SanPham::whereHas('nhaCungCaps', function ($query) use ($nhaCungCapId) {
+      $query->withoutGlobalScope('withUserNames')
+        ->where('nha_cung_caps.id', $nhaCungCapId);
+    })
+      ->withoutGlobalScope('withUserNames')
+      ->select('san_phams.id as value', 'san_phams.ten_san_pham as label')
+      ->get();
+  }
 }

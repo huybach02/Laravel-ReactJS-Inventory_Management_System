@@ -121,4 +121,18 @@ class DonViTinhService
   {
     return DonViTinh::select('id as value', 'ten_don_vi as label')->get();
   }
+
+  /**
+   * Lấy danh sách DonViTinh dạng option theo sản phẩm
+   */
+  public function getOptionsBySanPham($sanPhamId)
+  {
+    return DonViTinh::whereHas('sanPhams', function ($query) use ($sanPhamId) {
+      $query->withoutGlobalScope('withUserNames')
+        ->where('san_phams.id', $sanPhamId);
+    })
+      ->withoutGlobalScope('withUserNames')
+      ->select('id as value', 'ten_don_vi as label')
+      ->get();
+  }
 }

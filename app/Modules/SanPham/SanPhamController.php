@@ -90,6 +90,12 @@ class SanPhamController extends Controller
     return CustomResponse::success($result);
   }
 
+  public function getOptionsByNhaCungCap($nhaCungCapId)
+  {
+    $result = $this->sanPhamService->getOptionsByNhaCungCap($nhaCungCapId);
+    return CustomResponse::success($result);
+  }
+
   public function downloadTemplateExcel()
   {
     $path = public_path('mau-excel/SanPham.xlsx');
@@ -206,7 +212,6 @@ class SanPhamController extends Controller
 
       // Download file
       return response()->download($tempPath, $fileName . '.xlsx')->deleteFileAfterSend(true);
-
     } catch (\Exception $e) {
       return CustomResponse::error('Lỗi tạo file Excel: ' . $e->getMessage(), 500);
     }
