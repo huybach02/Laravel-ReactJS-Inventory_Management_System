@@ -141,4 +141,40 @@ Route::group([
     Route::delete('/{id}', [\App\Modules\SanPham\SanPhamController::class, 'destroy']);
     Route::post('/import-excel', [\App\Modules\SanPham\SanPhamController::class, 'importExcel']);
   });
+
+  // QuanLyKho
+  Route::prefix('quan-ly-kho')->group(function () {
+    Route::get('/', [\App\Modules\QuanLyKho\QuanLyKhoController::class, 'index']);
+    Route::get('/options', [\App\Modules\QuanLyKho\QuanLyKhoController::class, 'getOptions']);
+    Route::get('/download-template-excel', [\App\Modules\QuanLyKho\QuanLyKhoController::class, 'downloadTemplateExcel']);
+    Route::post('/', [\App\Modules\QuanLyKho\QuanLyKhoController::class, 'store']);
+    Route::get('/{id}', [\App\Modules\QuanLyKho\QuanLyKhoController::class, 'show']);
+    Route::put('/{id}', [\App\Modules\QuanLyKho\QuanLyKhoController::class, 'update']);
+    Route::delete('/{id}', [\App\Modules\QuanLyKho\QuanLyKhoController::class, 'destroy']);
+    Route::post('/import-excel', [\App\Modules\QuanLyKho\QuanLyKhoController::class, 'importExcel']);
+  });
+
+  // QuanLyCongNo
+  Route::prefix('quan-ly-cong-no')->group(function () {
+    Route::get('/', [\App\Modules\QuanLyCongNo\QuanLyCongNoController::class, 'index']);
+    Route::get('/options', [\App\Modules\QuanLyCongNo\QuanLyCongNoController::class, 'getOptions']);
+    Route::get('/download-template-excel', [\App\Modules\QuanLyCongNo\QuanLyCongNoController::class, 'downloadTemplateExcel']);
+    Route::post('/', [\App\Modules\QuanLyCongNo\QuanLyCongNoController::class, 'store']);
+    Route::get('/{id}', [\App\Modules\QuanLyCongNo\QuanLyCongNoController::class, 'show']);
+    Route::put('/{id}', [\App\Modules\QuanLyCongNo\QuanLyCongNoController::class, 'update']);
+    Route::delete('/{id}', [\App\Modules\QuanLyCongNo\QuanLyCongNoController::class, 'destroy']);
+    Route::post('/import-excel', [\App\Modules\QuanLyCongNo\QuanLyCongNoController::class, 'importExcel']);
+  });
+
+  // PhieuNhapKho
+  Route::prefix('phieu-nhap-kho')->group(function () {
+    Route::get('/', [\App\Modules\PhieuNhapKho\PhieuNhapKhoController::class, 'index']);
+    Route::get('/options', [\App\Modules\PhieuNhapKho\PhieuNhapKhoController::class, 'getOptions']);
+    Route::get('/download-template-excel', [\App\Modules\PhieuNhapKho\PhieuNhapKhoController::class, 'downloadTemplateExcel']);
+    Route::post('/', [\App\Modules\PhieuNhapKho\PhieuNhapKhoController::class, 'store']);
+    Route::get('/{id}', [\App\Modules\PhieuNhapKho\PhieuNhapKhoController::class, 'show']);
+    Route::put('/{id}', [\App\Modules\PhieuNhapKho\PhieuNhapKhoController::class, 'update']);
+    Route::delete('/{id}', [\App\Modules\PhieuNhapKho\PhieuNhapKhoController::class, 'destroy']);
+    Route::post('/import-excel', [\App\Modules\PhieuNhapKho\PhieuNhapKhoController::class, 'importExcel']);
+  });
 });

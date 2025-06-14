@@ -72,4 +72,9 @@ class Helper
 
     return "index";
   }
+
+  public static function generateMaLoSanPham()
+  {
+    return "LOSP_" . time();
+  }
 }

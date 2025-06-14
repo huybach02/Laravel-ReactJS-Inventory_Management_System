@@ -89,4 +89,10 @@ return [
     "KHOA" => 0,
     "KICH_HOAT" => 1,
   ],
+  "PHAN_LOAI_CONG_NO" => [
+    "NO_NHA_CUNG_CAP" => 1,
+    "THANH_TOAN_NHA_CUNG_CAP" => 2,
+    "KHACH_HANG_NO" => 3,
+    "KHACH_HANG_THANH_TOAN" => 4,
+  ],
 ];
