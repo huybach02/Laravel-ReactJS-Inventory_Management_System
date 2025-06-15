@@ -2,6 +2,18 @@
 
 return [
   [
+    "name" => "phieu-chi",
+    "actions" => [
+      "index" => true,
+      "create" => true,
+      "show" => true,
+      // "edit" => true,
+      "delete" => true,
+      "export" => true,
+      "showMenu" => true
+    ]
+  ],
+  [
     "name" => "quan-ly-ton-kho",
     "actions" => [
       "index" => true,

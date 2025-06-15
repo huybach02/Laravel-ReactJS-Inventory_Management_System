@@ -18,6 +18,8 @@ import {
     SquareMenu,
     NotepadText,
     Package2,
+    Wallet,
+    PanelBottomOpen,
 } from "lucide-react";
 
 const iconStyle = {
@@ -159,6 +161,21 @@ export const sidebarConfig = (navigate: NavigateFunction) => {
                     label: "Quản lý tồn kho",
                     icon: React.createElement(Package2, { style: iconStyle }),
                     onClick: () => navigate(URL_CONSTANTS.QUAN_LY_TON_KHO),
+                },
+            ],
+        },
+        {
+            key: "quan-ly-thu-chi",
+            label: "Quản lý thu chi",
+            icon: React.createElement(Wallet, { style: iconStyle }),
+            children: [
+                {
+                    key: "phieu-chi",
+                    label: "Phiếu chi",
+                    icon: React.createElement(PanelBottomOpen, {
+                        style: iconStyle,
+                    }),
+                    onClick: () => navigate(URL_CONSTANTS.PHIEU_CHI),
                 },
             ],
         },

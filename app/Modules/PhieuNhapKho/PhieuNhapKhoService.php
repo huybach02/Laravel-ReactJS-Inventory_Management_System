@@ -240,6 +240,27 @@ class PhieuNhapKhoService
    */
   public function getOptions()
   {
-    return PhieuNhapKho::select('id as value', 'ten_phieu_nhap_kho as label')->get();
+    return PhieuNhapKho::select('id as value', 'ma_phieu_nhap_kho as label')->get();
+  }
+
+  /**
+   * Lấy danh sách PhieuNhapKho dạng option
+   */
+  public function getOptionsByNhaCungCap($nhaCungCapId)
+  {
+    return PhieuNhapKho::where('nha_cung_cap_id', $nhaCungCapId)->select('id as value', 'ma_phieu_nhap_kho as label')->get();
+  }
+
+  /**
+   * Lấy danh sách PhieuNhapKho dạng option
+   */
+  public function getTongTienCanThanhToanTheoNhaCungCap($nhaCungCapId)
+  {
+    $model = PhieuNhapKho::where('nha_cung_cap_id', $nhaCungCapId)->get();
+    $tongTien = 0;
+    foreach ($model as $item) {
+      $tongTien += $item->tong_tien - $item->da_thanh_toan;
+    }
+    return $tongTien;
   }
 }

@@ -159,7 +159,9 @@ Route::group([
   // PhieuNhapKho
   Route::prefix('phieu-nhap-kho')->group(function () {
     Route::get('/', [\App\Modules\PhieuNhapKho\PhieuNhapKhoController::class, 'index']);
+    Route::get('/tong-tien-can-thanh-toan-theo-nha-cung-cap/{nhaCungCapId}', [\App\Modules\PhieuNhapKho\PhieuNhapKhoController::class, 'getTongTienCanThanhToanTheoNhaCungCap']);
     Route::get('/options', [\App\Modules\PhieuNhapKho\PhieuNhapKhoController::class, 'getOptions']);
+    Route::get('/options-by-nha-cung-cap/{nhaCungCapId}', [\App\Modules\PhieuNhapKho\PhieuNhapKhoController::class, 'getOptionsByNhaCungCap']);
     Route::get('/download-template-excel', [\App\Modules\PhieuNhapKho\PhieuNhapKhoController::class, 'downloadTemplateExcel']);
     Route::post('/', [\App\Modules\PhieuNhapKho\PhieuNhapKhoController::class, 'store']);
     Route::get('/{id}', [\App\Modules\PhieuNhapKho\PhieuNhapKhoController::class, 'show']);
@@ -178,5 +180,17 @@ Route::group([
     Route::put('/{id}', [\App\Modules\QuanLyTonKho\QuanLyTonKhoController::class, 'update']);
     Route::delete('/{id}', [\App\Modules\QuanLyTonKho\QuanLyTonKhoController::class, 'destroy']);
     Route::post('/import-excel', [\App\Modules\QuanLyTonKho\QuanLyTonKhoController::class, 'importExcel']);
+  });
+
+  // PhieuChi
+  Route::prefix('phieu-chi')->group(function () {
+    Route::get('/', [\App\Modules\PhieuChi\PhieuChiController::class, 'index']);
+    Route::get('/options', [\App\Modules\PhieuChi\PhieuChiController::class, 'getOptions']);
+    Route::get('/download-template-excel', [\App\Modules\PhieuChi\PhieuChiController::class, 'downloadTemplateExcel']);
+    Route::post('/', [\App\Modules\PhieuChi\PhieuChiController::class, 'store']);
+    Route::get('/{id}', [\App\Modules\PhieuChi\PhieuChiController::class, 'show']);
+    Route::put('/{id}', [\App\Modules\PhieuChi\PhieuChiController::class, 'update']);
+    Route::delete('/{id}', [\App\Modules\PhieuChi\PhieuChiController::class, 'destroy']);
+    Route::post('/import-excel', [\App\Modules\PhieuChi\PhieuChiController::class, 'importExcel']);
   });
 });

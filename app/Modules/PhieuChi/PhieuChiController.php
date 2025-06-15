@@ -1,28 +1,28 @@
 <?php
 
-namespace App\Modules\PhieuNhapKho;
+namespace App\Modules\PhieuChi;
 
 use App\Http\Controllers\Controller;
-use App\Modules\PhieuNhapKho\Validates\CreatePhieuNhapKhoRequest;
-use App\Modules\PhieuNhapKho\Validates\UpdatePhieuNhapKhoRequest;
+use App\Modules\PhieuChi\Validates\CreatePhieuChiRequest;
+use App\Modules\PhieuChi\Validates\UpdatePhieuChiRequest;
 use App\Class\CustomResponse;
 use App\Class\Helper;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Imports\PhieuNhapKhoImport;
+use App\Imports\PhieuChiImport;
 use Illuminate\Support\Str;
 
-class PhieuNhapKhoController extends Controller
+class PhieuChiController extends Controller
 {
-  protected $phieuNhapKhoService;
+  protected $phieuChiService;
 
-  public function __construct(PhieuNhapKhoService $phieuNhapKhoService)
+  public function __construct(PhieuChiService $phieuChiService)
   {
-    $this->phieuNhapKhoService = $phieuNhapKhoService;
+    $this->phieuChiService = $phieuChiService;
   }
 
   /**
-   * Lấy danh sách PhieuNhapKhos
+   * Lấy danh sách PhieuChis
    */
   public function index(Request $request)
   {
@@ -31,7 +31,7 @@ class PhieuNhapKhoController extends Controller
     // Xử lý và validate parameters
     $params = Helper::validateFilterParams($params);
 
-    $result = $this->phieuNhapKhoService->getAll($params);
+    $result = $this->phieuChiService->getAll($params);
 
     return CustomResponse::success([
       'collection' => $result['data'],
@@ -41,71 +41,55 @@ class PhieuNhapKhoController extends Controller
   }
 
   /**
-   * Tạo mới PhieuNhapKho
+   * Tạo mới PhieuChi
    */
-  public function store(CreatePhieuNhapKhoRequest $request)
+  public function store(CreatePhieuChiRequest $request)
   {
-    $result = $this->phieuNhapKhoService->create($request->validated());
+    $result = $this->phieuChiService->create($request->validated());
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
+    }
     return CustomResponse::success($result, 'Tạo mới thành công');
   }
 
   /**
-   * Lấy thông tin PhieuNhapKho
+   * Lấy thông tin PhieuChi
    */
   public function show($id)
   {
-    $result = $this->phieuNhapKhoService->getById($id);
+    $result = $this->phieuChiService->getById($id);
     return CustomResponse::success($result);
   }
 
   /**
-   * Cập nhật PhieuNhapKho
+   * Cập nhật PhieuChi
    */
-  public function update(UpdatePhieuNhapKhoRequest $request, $id)
+  public function update(UpdatePhieuChiRequest $request, $id)
   {
-    $result = $this->phieuNhapKhoService->update($id, $request->validated());
-    return CustomResponse::success($result, 'Cập nhật thành công');
+    return CustomResponse::error('Không thể cập nhật phiếu chi');
   }
 
   /**
-   * Xóa PhieuNhapKho
+   * Xóa PhieuChi
    */
   public function destroy($id)
   {
-    $result = $this->phieuNhapKhoService->delete($id);
+    $result = $this->phieuChiService->delete($id);
     return CustomResponse::success([], 'Xóa thành công');
   }
 
   /**
-   * Lấy danh sách PhieuNhapKho dạng option
+   * Lấy danh sách PhieuChi dạng option
    */
   public function getOptions()
   {
-    $result = $this->phieuNhapKhoService->getOptions();
-    return CustomResponse::success($result);
-  }
-
-  /**
-   * Lấy danh sách PhieuNhapKho dạng option
-   */
-  public function getOptionsByNhaCungCap($nhaCungCapId)
-  {
-    $result = $this->phieuNhapKhoService->getOptionsByNhaCungCap($nhaCungCapId);
-    return CustomResponse::success($result);
-  }
-
-  /**
-   * Lấy tổng tiền cần thanh toán theo nhà cung cấp
-   */
-  public function getTongTienCanThanhToanTheoNhaCungCap($nhaCungCapId)
-  {
-    $result = $this->phieuNhapKhoService->getTongTienCanThanhToanTheoNhaCungCap($nhaCungCapId);
+    $result = $this->phieuChiService->getOptions();
     return CustomResponse::success($result);
   }
 
   public function downloadTemplateExcel()
   {
-    $path = public_path('mau-excel/PhieuNhapKho.xlsx');
+    $path = public_path('mau-excel/PhieuChi.xlsx');
     return response()->download($path);
   }
 
@@ -120,16 +104,11 @@ class PhieuNhapKhoController extends Controller
       $filename = Str::random(10) . '.' . $data->getClientOriginalExtension();
       $path = $data->move(public_path('excel'), $filename);
 
-      $import = new PhieuNhapKhoImport();
+      $import = new PhieuChiImport();
       Excel::import($import, $path);
 
       $thanhCong = $import->getThanhCong();
       $thatBai = $import->getThatBai();
-
-      // Xóa file sau khi import
-      if (file_exists($path)) {
-        unlink($path);
-      }
 
       if ($thatBai > 0) {
         return CustomResponse::error('Import không thành công. Có ' . $thatBai . ' bản ghi lỗi và ' . $thanhCong . ' bản ghi thành công');

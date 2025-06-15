@@ -25,3 +25,14 @@ export const OPTIONS_LOAI_PHIEU_NHAP = [
     { value: 2, label: "Nhập đổi hàng" },
     { value: 3, label: "Nhập từ sản xuất" },
 ];
+
+export const OPTIONS_LOAI_PHIEU_CHI = [
+    { value: 1, label: "Thanh toán phiếu nhập kho" },
+    { value: 2, label: "Thanh toán công nợ nhà cung cấp" },
+    { value: 3, label: "Chi khác" },
+];
+
+export const OPTIONS_PHUONG_THUC_THANH_TOAN = [
+    { value: 1, label: "Tiền mặt" },
+    { value: 2, label: "Chuyển khoản" },
+];
