@@ -349,7 +349,11 @@ const FormNguoiDung = ({
             </Col>
             {!isUpdateProfile && (
                 <Col span={24} xs={24} lg={24}>
-                    <Form.Item name="status" label="Trạng thái">
+                    <Form.Item
+                        name="status"
+                        label="Trạng thái"
+                        initialValue={1}
+                    >
                         <Select options={trangThaiSelect} />
                     </Form.Item>
                 </Col>

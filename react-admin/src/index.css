@@ -297,3 +297,17 @@ label {
 .ant-form-item-label > label[class*="disabled"] {
     color: rgba(0, 0, 0, 0.88) !important;
 }
+
+@media (min-width: 1200px) {
+    .product-list-container {
+        overflow-x: visible !important;
+    }
+    .product-row {
+        min-width: auto !important;
+    }
+}
+@media (max-width: 1199px) {
+    .product-row {
+        min-width: 1200px !important;
+    }
+}

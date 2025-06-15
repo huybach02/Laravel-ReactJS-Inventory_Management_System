@@ -169,10 +169,6 @@ const DanhSachDanhMucSanPham = ({
         {
             title: "Ngày tạo",
             dataIndex: "created_at",
-            render: (record: string): string => {
-                const date = dayjs(record);
-                return date.format("DD/MM/YYYY HH:mm:ss") || "";
-            },
             ...dateSearch({ dataIndex: "created_at", nameColumn: "Ngày tạo" }),
         },
         {
@@ -187,10 +183,6 @@ const DanhSachDanhMucSanPham = ({
         {
             title: "Ngày cập nhật",
             dataIndex: "updated_at",
-            render: (record: string): string => {
-                const date = dayjs(record);
-                return date.format("DD/MM/YYYY HH:mm:ss") || "";
-            },
             ...dateSearch({
                 dataIndex: "updated_at",
                 nameColumn: "Ngày cập nhật",

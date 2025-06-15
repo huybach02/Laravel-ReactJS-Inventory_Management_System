@@ -1,15 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { EditOutlined } from "@ant-design/icons";
+import { EyeOutlined } from "@ant-design/icons";
 import { useState } from "react";
 import { Button, Form, Modal } from "antd";
-import { useDispatch } from "react-redux";
 import { getDataById } from "../../services/getData.api";
-import { setReload } from "../../redux/slices/main.slice";
-import { putData } from "../../services/updateData";
 import dayjs from "dayjs";
 import FormNhapTuNhaCungCap from "./FormNhapTuNhaCungCap";
 
-const SuaPhieuNhapKho = ({
+const ChiTietPhieuNhapKho = ({
     path,
     id,
     title,
@@ -20,9 +17,7 @@ const SuaPhieuNhapKho = ({
 }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const [isSubmitting, setIsSubmitting] = useState(false);
     const [form] = Form.useForm();
-    const dispatch = useDispatch();
 
     const showModal = async () => {
         setIsModalOpen(true);
@@ -81,78 +76,38 @@ const SuaPhieuNhapKho = ({
         setIsModalOpen(false);
     };
 
-    const onUpdate = async (values: any) => {
-        setIsSubmitting(true);
-        const closeModel = () => {
-            handleCancel();
-            dispatch(setReload());
-        };
-        console.log(values);
-        await putData(
-            path,
-            id,
-            {
-                ...values,
-                ngay_nhap_kho: dayjs(values.ngay_nhap_kho).format("YYYY-MM-DD"),
-                danh_sach_san_pham: values.danh_sach_san_pham.map(
-                    (item: any) => ({
-                        ...item,
-                        ngay_san_xuat: dayjs(item.ngay_san_xuat).format(
-                            "YYYY-MM-DD"
-                        ),
-                        ngay_het_han: dayjs(item.ngay_het_han).format(
-                            "YYYY-MM-DD"
-                        ),
-                        chiet_khau: Number(item.chiet_khau),
-                    })
-                ),
-            },
-            closeModel
-        );
-        setIsSubmitting(false);
-    };
-
     return (
         <>
             <Button
                 onClick={showModal}
                 type="primary"
                 size="small"
-                title={`Sửa ${title}`}
-                icon={<EditOutlined />}
+                title={`Chi tiết ${title}`}
+                icon={<EyeOutlined />}
+                style={{
+                    marginRight: 5,
+                }}
             />
             <Modal
-                title={`Sửa ${title}`}
+                title={`Chi tiết ${title}`}
                 open={isModalOpen}
                 onCancel={handleCancel}
                 maskClosable={false}
                 loading={isLoading}
                 centered
                 width={1800}
-                footer={[
-                    <Button
-                        key="submit"
-                        form={`formSuaPhieuNhapKho-${id}`}
-                        type="primary"
-                        htmlType="submit"
-                        size="large"
-                        loading={isSubmitting}
-                    >
-                        Lưu
-                    </Button>,
-                ]}
+                footer={null}
             >
                 <Form
-                    id={`formSuaPhieuNhapKho-${id}`}
+                    id={`formChiTietPhieuNhapKho-${id}`}
                     form={form}
                     layout="vertical"
-                    onFinish={onUpdate}
                 >
-                    <FormNhapTuNhaCungCap form={form} isEditing={true} />
+                    <FormNhapTuNhaCungCap form={form} isDetail={true} />
                 </Form>
             </Modal>
         </>
     );
 };
 
-export default SuaPhieuNhapKho;
+export default ChiTietPhieuNhapKho;

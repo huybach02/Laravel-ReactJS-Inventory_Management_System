@@ -7,35 +7,30 @@ import {
     Input,
     InputNumber,
     type FormInstance,
-    Select,
     DatePicker,
-    Card,
     Typography,
-    Flex,
-    Table,
-    Button,
-    Space,
 } from "antd";
-import { PlusOutlined, MinusCircleOutlined } from "@ant-design/icons";
 import { formatter, parser } from "../../utils/utils";
-import SelectFormApi from "../../components/select/SelectFormApi";
-import { trangThaiSelect } from "../../configs/select-config";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../redux/store";
-import { API_ROUTE_CONFIG } from "../../configs/api-route-config";
-import { getDataById } from "../../services/getData.api";
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import dayjs from "dayjs";
 import { generateMaPhieu } from "../../helpers/funcHelper";
+import { phonePattern } from "../../utils/patterns";
+import ThongTinNhaCungCap from "./components/ThongTinNhaCungCap";
+import DanhSachSanPham from "./components/DanhSachSanPham";
 
-const FormNhapTuNhaCungCap = ({ form }: { form: FormInstance }) => {
+const FormNhapTuNhaCungCap = ({
+    form,
+    isEditing = false,
+    isDetail = false,
+}: {
+    form: FormInstance;
+    isEditing?: boolean;
+    isDetail?: boolean;
+}) => {
     const { user } = useSelector((state: RootState) => state.auth);
 
-    const [infoNhaCungCap, setInfoNhaCungCap] = useState<any>(null);
-    const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [selectedProducts, setSelectedProducts] = useState<{
-        [key: number]: any;
-    }>({});
     const [tongTienHang, setTongTienHang] = useState<number>(0);
 
     // Theo dõi thay đổi trong danh sách sản phẩm với debounce
@@ -54,180 +49,58 @@ const FormNhapTuNhaCungCap = ({ form }: { form: FormInstance }) => {
         return tongTienCoBan + tienThue;
     }, [tongTienHang, chiPhiNhapHang, giamGiaNhapHang, thueVat]);
 
-    const fetchInfoNhaCungCap = useCallback(
-        async (value: string) => {
-            setIsLoading(true);
-            try {
-                const response = await getDataById(
-                    Number(value),
-                    API_ROUTE_CONFIG.NHA_CUNG_CAP
-                );
-                setInfoNhaCungCap(response);
-
-                // Reset danh sách sản phẩm khi thay đổi nhà cung cấp
-                const currentProducts =
-                    form.getFieldValue("danh_sach_san_pham") || [];
-                const resetProducts = currentProducts.map(() => ({
-                    san_pham_id: undefined,
-                    so_luong: undefined,
-                    gia_nhap: undefined,
-                    gia_ban: undefined,
-                    ngay_san_xuat: undefined,
-                    han_su_dung: undefined,
-                    vi_tri_luu: undefined,
-                    tong_tien: undefined,
-                }));
-                form.setFieldValue("danh_sach_san_pham", resetProducts);
-            } catch (error) {
-                console.error("Error:", error);
-            } finally {
-                setIsLoading(false);
-            }
-        },
-        [form]
-    );
-
-    const fetchProductDetail = useCallback(
-        async (productId: string, rowIndex: number) => {
-            try {
-                const response = await getDataById(
-                    Number(productId),
-                    API_ROUTE_CONFIG.SAN_PHAM
-                );
-
-                // Tự động điền một số thông tin nếu có
-                if (response) {
-                    // Ví dụ: tự động điền giá nhập mặc định nếu có
-                    if (response.gia_nhap_mac_dinh) {
-                        form.setFieldValue(
-                            ["danh_sach_san_pham", rowIndex, "gia_nhap"],
-                            response.gia_nhap_mac_dinh
-                        );
-                    }
-
-                    // Tự động điền đơn vị tính mặc định nếu có
-                    if (response.ty_le_chiet_khau) {
-                        form.setFieldValue(
-                            ["danh_sach_san_pham", rowIndex, "chiet_khau"],
-                            response.ty_le_chiet_khau
-                        );
-                    }
-                }
-            } catch (error) {
-                console.error("Error fetching product detail:", error);
-            }
-        },
-        [form]
-    );
-
-    const columns = [
-        {
-            title: "Tên nhà cung cấp",
-            dataIndex: "ten_nha_cung_cap",
-            key: "ten_nha_cung_cap",
-        },
-        {
-            title: "Mã nhà cung cấp",
-            dataIndex: "ma_nha_cung_cap",
-            key: "ma_nha_cung_cap",
-        },
-        {
-            title: "Số điện thoại",
-            dataIndex: "so_dien_thoai",
-            key: "so_dien_thoai",
-        },
-        {
-            title: "Email",
-            dataIndex: "email",
-            key: "email",
-        },
-        {
-            title: "Mã số thuế",
-            dataIndex: "ma_so_thue",
-            key: "ma_so_thue",
-        },
-        {
-            title: "Ngân hàng",
-            dataIndex: "ngan_hang",
-            key: "ngan_hang",
-        },
-        {
-            title: "Số tài khoản",
-            dataIndex: "so_tai_khoan",
-            key: "so_tai_khoan",
-        },
-        {
-            title: "Địa chỉ",
-            dataIndex: "dia_chi",
-            key: "dia_chi",
-        },
-        {
-            title: "Công nợ",
-            dataIndex: "cong_no",
-            key: "cong_no",
-            render: (value: number) => {
-                return (
-                    <Typography.Text>{formatter(value) || 0}</Typography.Text>
-                );
-            },
-        },
-    ];
-
-    useEffect(() => {
-        if (!form.getFieldValue("nha_cung_cap_id")) {
-            setInfoNhaCungCap(null);
+    // Tính toán tổng tiền cho từng sản phẩm với useMemo
+    const calculatedProducts = useMemo(() => {
+        if (!danhSachSanPham || !Array.isArray(danhSachSanPham)) {
+            return [];
         }
-    }, [form.getFieldValue("nha_cung_cap_id")]);
 
-    // Tự động tính toán tổng tiền cho từng dòng sản phẩm
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            if (danhSachSanPham && Array.isArray(danhSachSanPham)) {
-                const updatedProducts = danhSachSanPham.map(
-                    (item: any, index: number) => {
-                        if (item && item.so_luong_nhap && item.gia_nhap) {
-                            const soLuong = Number(item.so_luong_nhap) || 0;
-                            const giaNhap = Number(item.gia_nhap) || 0;
-                            const chietKhau = Number(item.chiet_khau) || 0;
-                            const tongTien =
-                                soLuong * giaNhap * (1 - chietKhau / 100);
+        return danhSachSanPham.map((item: any, index: number) => {
+            if (item && item.so_luong_nhap && item.gia_nhap) {
+                const soLuong = Number(item.so_luong_nhap) || 0;
+                const giaNhap = Number(item.gia_nhap) || 0;
+                const chietKhau = Number(item.chiet_khau) || 0;
+                const tongTien = soLuong * giaNhap * (1 - chietKhau / 100);
 
-                            if (tongTien !== item.tong_tien) {
-                                form.setFieldValue(
-                                    ["danh_sach_san_pham", index, "tong_tien"],
-                                    tongTien
-                                );
-                            }
-                        }
-                        return item;
-                    }
+                return { ...item, tongTien, index };
+            }
+            return { ...item, tongTien: 0, index };
+        });
+    }, [danhSachSanPham]);
+
+    // Tính tổng tiền hàng từ calculated products
+    const calculatedTongTienHang = useMemo(() => {
+        return calculatedProducts.reduce((tong, item) => {
+            return tong + (item.tongTien || 0);
+        }, 0);
+    }, [calculatedProducts]);
+
+    // Update form values khi có thay đổi trong calculations
+    const updateFormValues = useCallback(() => {
+        calculatedProducts.forEach((item) => {
+            const currentTongTien = form.getFieldValue([
+                "danh_sach_san_pham",
+                item.index,
+                "tong_tien",
+            ]);
+            if (item.tongTien !== currentTongTien) {
+                form.setFieldValue(
+                    ["danh_sach_san_pham", item.index, "tong_tien"],
+                    item.tongTien
                 );
             }
-        }, 50); // Debounce 50ms
+        });
+    }, [calculatedProducts, form]);
 
-        return () => clearTimeout(timer);
-    }, [danhSachSanPham, form]);
-
-    // Tính tổng tiền hàng khi danh sách sản phẩm thay đổi với debounce
+    // Effect để update form values với debounce nhẹ
     useEffect(() => {
         const timer = setTimeout(() => {
-            let tong = 0;
-            if (danhSachSanPham && Array.isArray(danhSachSanPham)) {
-                danhSachSanPham.forEach((item: any) => {
-                    if (
-                        item &&
-                        typeof item.tong_tien === "number" &&
-                        !isNaN(item.tong_tien)
-                    ) {
-                        tong += item.tong_tien;
-                    }
-                });
-            }
-            setTongTienHang(tong);
-        }, 100); // Debounce 100ms
+            updateFormValues();
+            setTongTienHang(calculatedTongTienHang);
+        }, 50);
 
         return () => clearTimeout(timer);
-    }, [danhSachSanPham]);
+    }, [updateFormValues, calculatedTongTienHang]);
 
     return (
         <Row gutter={[10, 10]}>
@@ -243,7 +116,10 @@ const FormNhapTuNhaCungCap = ({ form }: { form: FormInstance }) => {
                     ]}
                     initialValue={generateMaPhieu("PNK")}
                 >
-                    <Input placeholder="Nhập mã phiếu nhập kho" />
+                    <Input
+                        placeholder="Nhập mã phiếu nhập kho"
+                        disabled={isDetail}
+                    />
                 </Form.Item>
             </Col>
             <Col span={8} xs={24} sm={24} md={24} lg={8} xl={8}>
@@ -262,6 +138,7 @@ const FormNhapTuNhaCungCap = ({ form }: { form: FormInstance }) => {
                         placeholder="Nhập ngày nhập"
                         style={{ width: "100%" }}
                         format="DD/MM/YYYY"
+                        disabled={isDetail}
                     />
                 </Form.Item>
             </Col>
@@ -279,7 +156,10 @@ const FormNhapTuNhaCungCap = ({ form }: { form: FormInstance }) => {
                     name="so_hoa_don_nha_cung_cap"
                     label="Số hóa đơn nhà cung cấp"
                 >
-                    <Input placeholder="Nhập số hóa đơn nhà cung cấp" />
+                    <Input
+                        placeholder="Nhập số hóa đơn nhà cung cấp"
+                        disabled={isDetail}
+                    />
                 </Form.Item>
             </Col>
             <Col span={8} xs={24} sm={24} md={24} lg={8} xl={8}>
@@ -293,457 +173,35 @@ const FormNhapTuNhaCungCap = ({ form }: { form: FormInstance }) => {
                         },
                     ]}
                 >
-                    <Input placeholder="Nhập người giao hàng" />
+                    <Input
+                        placeholder="Nhập người giao hàng"
+                        disabled={isDetail}
+                    />
                 </Form.Item>
             </Col>
             <Col span={8} xs={24} sm={24} md={24} lg={8} xl={8}>
                 <Form.Item
                     name="so_dien_thoai_nguoi_giao_hang"
                     label="Số điện thoại người giao hàng"
+                    rules={[
+                        {
+                            pattern: phonePattern,
+                            message:
+                                "Số điện thoại người giao hàng không hợp lệ!",
+                        },
+                    ]}
                 >
-                    <Input placeholder="Nhập số điện thoại người giao hàng" />
+                    <Input
+                        placeholder="Nhập số điện thoại người giao hàng"
+                        disabled={isDetail}
+                    />
                 </Form.Item>
             </Col>
             <Col span={24}>
-                <Card>
-                    <Row>
-                        <Col span={24}>
-                            <SelectFormApi
-                                name="nha_cung_cap_id"
-                                label="Nhà cung cấp"
-                                path={
-                                    API_ROUTE_CONFIG.NHA_CUNG_CAP + "/options"
-                                }
-                                placeholder="Chọn nhà cung cấp"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message:
-                                            "Nhà cung cấp không được bỏ trống!",
-                                    },
-                                ]}
-                                onChange={fetchInfoNhaCungCap}
-                            />
-                        </Col>
-                        {infoNhaCungCap && (
-                            <Col span={24}>
-                                <Typography.Title level={4}>
-                                    Thông tin nhà cung cấp
-                                </Typography.Title>
-                                <Table
-                                    key={infoNhaCungCap?.id}
-                                    columns={columns}
-                                    dataSource={[
-                                        {
-                                            ...infoNhaCungCap,
-                                        },
-                                    ]}
-                                    pagination={false}
-                                    loading={isLoading}
-                                    scroll={{ x: "max-content" }}
-                                />
-                            </Col>
-                        )}
-                    </Row>
-                </Card>
+                <ThongTinNhaCungCap form={form} isDetail={isDetail} />
             </Col>
             <Col span={24} style={{ marginBottom: 20 }}>
-                <Card>
-                    <Typography.Title level={4}>
-                        Danh sách nhập sản phẩm/nguyên vật liệu
-                    </Typography.Title>
-                    <div
-                        className="product-list-container"
-                        style={{
-                            overflowX: "auto",
-                            overflowY: "visible",
-                        }}
-                    >
-                        <style>
-                            {`
-                                @media (min-width: 1200px) {
-                                    .product-list-container {
-                                        overflow-x: visible !important;
-                                    }
-                                    .product-row {
-                                        min-width: auto !important;
-                                    }
-                                }
-                                @media (max-width: 1199px) {
-                                    .product-row {
-                                        min-width: 1200px !important;
-                                    }
-                                }
-                            `}
-                        </style>
-                        <Form.List name="danh_sach_san_pham">
-                            {(fields, { add, remove }) => (
-                                <>
-                                    <Row
-                                        gutter={[8, 8]}
-                                        className="product-row"
-                                        style={{
-                                            marginBottom: 16,
-                                        }}
-                                    >
-                                        <Col span={4}>
-                                            <Typography.Text strong>
-                                                Tên SP/NVL
-                                            </Typography.Text>
-                                        </Col>
-                                        <Col span={2}>
-                                            <Typography.Text strong>
-                                                Đơn vị tính
-                                            </Typography.Text>
-                                        </Col>
-                                        <Col span={3}>
-                                            <Typography.Text strong>
-                                                Ngày sản xuất
-                                            </Typography.Text>
-                                        </Col>
-                                        <Col span={3}>
-                                            <Typography.Text strong>
-                                                Hạn sử dụng
-                                            </Typography.Text>
-                                        </Col>
-                                        <Col span={2}>
-                                            <Typography.Text strong>
-                                                Số lượng nhập
-                                            </Typography.Text>
-                                        </Col>
-                                        <Col span={3}>
-                                            <Typography.Text strong>
-                                                Giá nhập
-                                            </Typography.Text>
-                                        </Col>
-                                        <Col span={2}>
-                                            <Typography.Text strong>
-                                                Chiết khấu
-                                            </Typography.Text>
-                                        </Col>
-                                        <Col span={3}>
-                                            <Typography.Text strong>
-                                                Tổng tiền
-                                            </Typography.Text>
-                                        </Col>
-                                        <Col span={2}>
-                                            <Typography.Text strong>
-                                                Thao tác
-                                            </Typography.Text>
-                                        </Col>
-                                    </Row>
-
-                                    {fields.map(
-                                        ({ key, name, ...restField }) => (
-                                            <Row
-                                                key={key}
-                                                gutter={[8, 8]}
-                                                className="product-row"
-                                                style={{
-                                                    marginBottom: 8,
-                                                }}
-                                            >
-                                                <Col span={4}>
-                                                    <Form.Item
-                                                        {...restField}
-                                                        name={[
-                                                            name,
-                                                            "san_pham_id",
-                                                        ]}
-                                                        rules={[
-                                                            {
-                                                                required: true,
-                                                                message:
-                                                                    "Vui lòng chọn sản phẩm!",
-                                                            },
-                                                        ]}
-                                                    >
-                                                        <SelectFormApi
-                                                            path={
-                                                                API_ROUTE_CONFIG.SAN_PHAM +
-                                                                `/options-by-nha-cung-cap/${infoNhaCungCap.id}`
-                                                            }
-                                                            placeholder="Chọn sản phẩm"
-                                                            showSearch
-                                                            key={
-                                                                infoNhaCungCap?.id ||
-                                                                "all"
-                                                            }
-                                                            onChange={(
-                                                                value
-                                                            ) => {
-                                                                // Reset đơn vị tính khi thay đổi sản phẩm
-                                                                form.setFieldValue(
-                                                                    [
-                                                                        "danh_sach_san_pham",
-                                                                        name,
-                                                                        "don_vi_tinh_id",
-                                                                    ],
-                                                                    undefined
-                                                                );
-
-                                                                // Reset giá nhập và tổng tiền
-                                                                form.setFieldValue(
-                                                                    [
-                                                                        "danh_sach_san_pham",
-                                                                        name,
-                                                                        "so_luong_nhap",
-                                                                    ],
-                                                                    undefined
-                                                                );
-                                                                form.setFieldValue(
-                                                                    [
-                                                                        "danh_sach_san_pham",
-                                                                        name,
-                                                                        "gia_nhap",
-                                                                    ],
-                                                                    undefined
-                                                                );
-                                                                form.setFieldValue(
-                                                                    [
-                                                                        "danh_sach_san_pham",
-                                                                        name,
-                                                                        "tong_tien",
-                                                                    ],
-                                                                    undefined
-                                                                );
-
-                                                                // Update selected products state
-                                                                setSelectedProducts(
-                                                                    (prev) => ({
-                                                                        ...prev,
-                                                                        [name]: value,
-                                                                    })
-                                                                );
-
-                                                                // Gọi API để lấy thông tin chi tiết sản phẩm
-                                                                if (value) {
-                                                                    fetchProductDetail(
-                                                                        value,
-                                                                        name
-                                                                    );
-                                                                }
-                                                            }}
-                                                        />
-                                                    </Form.Item>
-                                                </Col>
-                                                <Col span={2}>
-                                                    <Form.Item
-                                                        {...restField}
-                                                        name={[
-                                                            name,
-                                                            "don_vi_tinh_id",
-                                                        ]}
-                                                        rules={[
-                                                            {
-                                                                required: true,
-                                                                message:
-                                                                    "Vui lòng chọn đơn vị tính!",
-                                                            },
-                                                        ]}
-                                                        dependencies={[
-                                                            "san_pham_id",
-                                                        ]}
-                                                    >
-                                                        <SelectFormApi
-                                                            path={
-                                                                API_ROUTE_CONFIG.DON_VI_TINH +
-                                                                `/options-by-san-pham/${selectedProducts[name]}`
-                                                            }
-                                                            placeholder="Chọn đơn vị tính"
-                                                            showSearch
-                                                            disabled={
-                                                                !selectedProducts[
-                                                                    name
-                                                                ]
-                                                            }
-                                                            key={
-                                                                selectedProducts[
-                                                                    name
-                                                                ] ||
-                                                                "no-product"
-                                                            }
-                                                        />
-                                                    </Form.Item>
-                                                </Col>
-                                                <Col span={3}>
-                                                    <Form.Item
-                                                        {...restField}
-                                                        name={[
-                                                            name,
-                                                            "ngay_san_xuat",
-                                                        ]}
-                                                    >
-                                                        <DatePicker
-                                                            placeholder="Ngày sản xuất"
-                                                            style={{
-                                                                width: "100%",
-                                                            }}
-                                                            format="DD/MM/YYYY"
-                                                        />
-                                                    </Form.Item>
-                                                </Col>
-                                                <Col span={3}>
-                                                    <Form.Item
-                                                        {...restField}
-                                                        name={[
-                                                            name,
-                                                            "han_su_dung",
-                                                        ]}
-                                                    >
-                                                        <DatePicker
-                                                            placeholder="Hạn sử dụng"
-                                                            style={{
-                                                                width: "100%",
-                                                            }}
-                                                            format="DD/MM/YYYY"
-                                                        />
-                                                    </Form.Item>
-                                                </Col>
-                                                <Col span={2}>
-                                                    <Form.Item
-                                                        {...restField}
-                                                        name={[
-                                                            name,
-                                                            "so_luong_nhap",
-                                                        ]}
-                                                        rules={[
-                                                            {
-                                                                required: true,
-                                                                message:
-                                                                    "Vui lòng nhập số lượng!",
-                                                            },
-                                                        ]}
-                                                    >
-                                                        <InputNumber
-                                                            min={1}
-                                                            placeholder="Số lượng"
-                                                            style={{
-                                                                width: "100%",
-                                                            }}
-                                                        />
-                                                    </Form.Item>
-                                                </Col>
-                                                <Col span={3}>
-                                                    <Form.Item
-                                                        {...restField}
-                                                        name={[
-                                                            name,
-                                                            "gia_nhap",
-                                                        ]}
-                                                        rules={[
-                                                            {
-                                                                required: true,
-                                                                message:
-                                                                    "Vui lòng nhập giá nhập!",
-                                                            },
-                                                        ]}
-                                                    >
-                                                        <InputNumber
-                                                            min={0}
-                                                            placeholder="Giá nhập"
-                                                            style={{
-                                                                width: "100%",
-                                                            }}
-                                                            formatter={
-                                                                formatter
-                                                            }
-                                                            parser={parser}
-                                                            addonAfter="đ"
-                                                        />
-                                                    </Form.Item>
-                                                </Col>
-                                                <Col span={2}>
-                                                    <Form.Item
-                                                        {...restField}
-                                                        name={[
-                                                            name,
-                                                            "chiet_khau",
-                                                        ]}
-                                                        initialValue={0}
-                                                    >
-                                                        <InputNumber
-                                                            min={0}
-                                                            placeholder="Chiết khấu"
-                                                            style={{
-                                                                width: "100%",
-                                                            }}
-                                                            formatter={
-                                                                formatter
-                                                            }
-                                                            parser={parser}
-                                                            max={100}
-                                                            addonAfter="%"
-                                                        />
-                                                    </Form.Item>
-                                                </Col>
-                                                <Col span={3}>
-                                                    <Form.Item
-                                                        {...restField}
-                                                        name={[
-                                                            name,
-                                                            "tong_tien",
-                                                        ]}
-                                                        dependencies={[
-                                                            [
-                                                                name,
-                                                                "so_luong_nhap",
-                                                            ],
-                                                            [name, "gia_nhap"],
-                                                            [
-                                                                name,
-                                                                "chiet_khau",
-                                                            ],
-                                                        ]}
-                                                    >
-                                                        <InputNumber
-                                                            placeholder="Tổng tiền"
-                                                            style={{
-                                                                width: "100%",
-                                                            }}
-                                                            formatter={
-                                                                formatter
-                                                            }
-                                                            parser={parser}
-                                                            disabled
-                                                            addonAfter="đ"
-                                                        />
-                                                    </Form.Item>
-                                                </Col>
-                                                <Col span={2}>
-                                                    <Button
-                                                        type="text"
-                                                        danger
-                                                        icon={
-                                                            <MinusCircleOutlined />
-                                                        }
-                                                        onClick={() =>
-                                                            remove(name)
-                                                        }
-                                                    />
-                                                </Col>
-                                            </Row>
-                                        )
-                                    )}
-
-                                    <Row>
-                                        <Col span={24}>
-                                            <Button
-                                                type="dashed"
-                                                onClick={() => add()}
-                                                block
-                                                icon={<PlusOutlined />}
-                                                disabled={!infoNhaCungCap}
-                                            >
-                                                Thêm sản phẩm
-                                            </Button>
-                                        </Col>
-                                    </Row>
-                                </>
-                            )}
-                        </Form.List>
-                    </div>
-                </Card>
+                <DanhSachSanPham form={form} isDetail={isDetail} />
             </Col>
             <Col span={5} xs={25} sm={12} md={5} lg={5} xl={5}>
                 <Typography.Title level={5}>Tổng tiền hàng</Typography.Title>
@@ -770,6 +228,7 @@ const FormNhapTuNhaCungCap = ({ form }: { form: FormInstance }) => {
                         addonAfter="đ"
                         formatter={formatter}
                         parser={parser}
+                        disabled={isEditing || isDetail}
                     />
                 </Form.Item>
             </Col>
@@ -792,6 +251,7 @@ const FormNhapTuNhaCungCap = ({ form }: { form: FormInstance }) => {
                         addonAfter="đ"
                         formatter={formatter}
                         parser={parser}
+                        disabled={isEditing || isDetail}
                     />
                 </Form.Item>
             </Col>
@@ -813,6 +273,7 @@ const FormNhapTuNhaCungCap = ({ form }: { form: FormInstance }) => {
                         style={{ width: "100%" }}
                         addonAfter="%"
                         max={100}
+                        disabled={isEditing || isDetail}
                     />
                 </Form.Item>
             </Col>
@@ -838,7 +299,7 @@ const FormNhapTuNhaCungCap = ({ form }: { form: FormInstance }) => {
             </Col>
             <Col span={24}>
                 <Form.Item name="ghi_chu" label="Ghi chú">
-                    <Input.TextArea placeholder="Ghi chú" />
+                    <Input.TextArea placeholder="Ghi chú" disabled={isDetail} />
                 </Form.Item>
             </Col>
         </Row>

@@ -4,7 +4,10 @@ import { useEffect, useState } from "react";
 import type { User } from "../../types/user.type";
 import useColumnSearch from "../../hooks/useColumnSearch";
 import { getListData } from "../../services/getData.api";
-import { createFilterQueryFromArray } from "../../utils/utils";
+import {
+    createFilterQueryFromArray,
+    formatVietnameseCurrency,
+} from "../../utils/utils";
 import { Col, Row, Space, Tag, Flex } from "antd";
 import SuaPhieuNhapKho from "./SuaPhieuNhapKho";
 import Delete from "../../components/Delete";
@@ -14,9 +17,10 @@ import type { RootState } from "../../redux/store";
 import { usePagination } from "../../hooks/usePagination";
 import type { Actions } from "../../types/main.type";
 import ExportTableToExcel from "../../components/ExportTableToExcel";
-import { OPTIONS_STATUS } from "../../utils/constant";
+import { OPTIONS_LOAI_PHIEU_NHAP, OPTIONS_STATUS } from "../../utils/constant";
 import dayjs from "dayjs";
 import ImportExcel from "../../components/ImportExcel";
+import ChiTietPhieuNhapKho from "./ChiTietPhieuNhapKho";
 
 const DanhSachPhieuNhapKho = ({
     path,
@@ -32,8 +36,8 @@ const DanhSachPhieuNhapKho = ({
     const isReload = useSelector((state: RootState) => state.main.isReload);
 
     const [danhSach, setDanhSach] = useState<
-          { data: User[]; total: number } | undefined
-      >({ data: [], total: 0 });
+        { data: User[]; total: number } | undefined
+    >({ data: [], total: 0 });
     const { filter, handlePageChange, handleLimitChange } = usePagination({
         page: 1,
         limit: 20,
@@ -48,49 +52,121 @@ const DanhSachPhieuNhapKho = ({
     const [isLoading, setIsLoading] = useState(false);
 
     const getDanhSach = async () => {
-      setIsLoading(true);
-      const params = { ...filter, ...createFilterQueryFromArray(query) };
-      const danhSach = await getListData(path, params);
-      if (danhSach) {
-          setIsLoading(false);
-      }
-      setDanhSach(danhSach);
+        setIsLoading(true);
+        const params = { ...filter, ...createFilterQueryFromArray(query) };
+        const danhSach = await getListData(path, params);
+        if (danhSach) {
+            setIsLoading(false);
+        }
+        setDanhSach(danhSach);
     };
 
     const defaultColumns: any = [
-      {
-        title: 'STT',
-        dataIndex: 'index',
-        width: 80,
-        render: (_text: any, _record: any, index: any) => {
-          return filter.limit && (filter.page - 1) * filter.limit + index + 1;
-        }
-      },
-      {
-        title: 'Thao tác',
-        dataIndex: 'id',
-        align: 'center',
-        render: (id: number) => {
-          return (
-            <Space size={0}>
-              {permission.edit && <SuaPhieuNhapKho path={path} id={id} title={title} />}
-              {permission.delete && <Delete path={path} id={id} onShow={getDanhSach} />}
-            </Space>
-          );
-        }
-      },
-      {
-        title: 'Tên',
-        dataIndex: 'ten',
-        ...inputSearch({ dataIndex: 'ten', operator: 'contain', nameColumn: 'Tài khoản' })
-      },
-      {
+        {
+            title: "STT",
+            dataIndex: "index",
+            width: 80,
+            render: (_text: any, _record: any, index: any) => {
+                return (
+                    filter.limit && (filter.page - 1) * filter.limit + index + 1
+                );
+            },
+        },
+        {
+            title: "Thao tác",
+            dataIndex: "id",
+            align: "center",
+            render: (id: number, record: any) => {
+                return (
+                    <Space size={0}>
+                        {permission.show && (
+                            <ChiTietPhieuNhapKho
+                                path={path}
+                                id={id}
+                                title={title}
+                            />
+                        )}
+                        {permission.edit && record.trang_thai === 0 && (
+                            <SuaPhieuNhapKho
+                                path={path}
+                                id={id}
+                                title={title}
+                            />
+                        )}
+                        {permission.delete && record.trang_thai === 0 && (
+                            <Delete path={path} id={id} onShow={getDanhSach} />
+                        )}
+                    </Space>
+                );
+            },
+        },
+        {
+            title: "Mã phiếu nhập",
+            dataIndex: "ma_phieu_nhap_kho",
+            ...inputSearch({
+                dataIndex: "ma_phieu_nhap_kho",
+                operator: "contain",
+                nameColumn: "Mã phiếu nhập",
+            }),
+        },
+        {
+            title: "Ngày nhập kho",
+            dataIndex: "ngay_nhap_kho",
+            render: (record: string): string => {
+                const date = dayjs(record);
+                return date.format("DD/MM/YYYY") || "";
+            },
+            ...dateSearch({
+                dataIndex: "ngay_nhap_kho",
+                nameColumn: "Ngày nhập kho",
+            }),
+        },
+        {
+            title: "Loại phiếu nhập",
+            dataIndex: "loai_phieu_nhap",
+            ...selectSearchWithOutApi({
+                dataIndex: "loai_phieu_nhap",
+                operator: "contain",
+                nameColumn: "Loại phiếu nhập",
+                options: OPTIONS_LOAI_PHIEU_NHAP,
+            }),
+            render: (loai_phieu_nhap: number) => {
+                return OPTIONS_LOAI_PHIEU_NHAP.find(
+                    (item) => item.value === loai_phieu_nhap
+                )?.label;
+            },
+        },
+        {
+            title: "Tổng tiền",
+            dataIndex: "tong_tien",
+            ...inputSearch({
+                dataIndex: "tong_tien",
+                operator: "contain",
+                nameColumn: "Mã phiếu nhập",
+            }),
+            render: (tong_tien: number) => {
+                return formatVietnameseCurrency(tong_tien);
+            },
+        },
+        {
             title: "Trạng thái",
             dataIndex: "trang_thai",
             render: (trang_thai: number) => {
                 return (
-                    <Tag color={trang_thai === 1 ? "green" : "red"}>
-                        {trang_thai === 1 ? "Hoạt động" : "Không hoạt động"}
+                    <Tag
+                        color={
+                            trang_thai === 0
+                                ? "red"
+                                : trang_thai === 1
+                                ? "orange"
+                                : "green"
+                        }
+                    >
+                        {trang_thai === 0
+                            ? "Chưa có thanh toán"
+                            : trang_thai === 1
+                            ? "Đã thanh toán một phần"
+                            : "Đã thanh toán hoàn tất"}
                     </Tag>
                 );
             },
@@ -100,8 +176,8 @@ const DanhSachPhieuNhapKho = ({
                 nameColumn: "Trạng thái",
                 options: OPTIONS_STATUS,
             }),
-      },
-      {
+        },
+        {
             title: "Người tạo",
             dataIndex: "ten_nguoi_tao",
             ...inputSearch({
@@ -109,17 +185,13 @@ const DanhSachPhieuNhapKho = ({
                 operator: "contain",
                 nameColumn: "Người tạo",
             }),
-      },
-      {
+        },
+        {
             title: "Ngày tạo",
             dataIndex: "created_at",
-            render: (record: string): string => {
-                const date = dayjs(record);
-                return date.format("DD/MM/YYYY HH:mm:ss") || "";
-            },
             ...dateSearch({ dataIndex: "created_at", nameColumn: "Ngày tạo" }),
-      },
-      {
+        },
+        {
             title: "Người cập nhật",
             dataIndex: "ten_nguoi_cap_nhat",
             ...inputSearch({
@@ -127,27 +199,23 @@ const DanhSachPhieuNhapKho = ({
                 operator: "contain",
                 nameColumn: "Người cập nhật",
             }),
-      },
-      {
+        },
+        {
             title: "Ngày cập nhật",
             dataIndex: "updated_at",
-            render: (record: string): string => {
-                const date = dayjs(record);
-                return date.format("DD/MM/YYYY HH:mm:ss") || "";
-            },
             ...dateSearch({
                 dataIndex: "updated_at",
                 nameColumn: "Ngày cập nhật",
             }),
-      },
+        },
     ];
 
     useEffect(() => {
-      getDanhSach();
-      // eslint-disable-next-line react-hooks/exhaustive-deps
+        getDanhSach();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isReload, filter, query]);
 
-     return (
+    return (
         <Row>
             <Col span={24}>
                 <Flex vertical gap={10}>

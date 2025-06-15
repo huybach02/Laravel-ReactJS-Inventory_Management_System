@@ -75,6 +75,15 @@ export const createFilterQueryFormObject = (obj: any) => {
     return queryString;
 };
 
+export const createFilterQueryString = (
+    index: number,
+    field: string,
+    operator: string,
+    value: string | number
+) => {
+    return `f[${index}][field]=${field}&f[${index}][operator]=${operator}&f[${index}][value]=${value}`;
+};
+
 export const createFilterQueryFromArray = (
     obj: { field: string; operator: string; value: number | string }[]
 ) => {

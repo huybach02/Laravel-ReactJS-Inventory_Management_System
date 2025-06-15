@@ -14,7 +14,7 @@ interface SelectFormApiProps
     initialValue?: any;
     path: string;
     filter?: any;
-    reload?: boolean;
+    reload?: boolean | any;
 }
 
 const SelectFormApi = ({
@@ -30,6 +30,8 @@ const SelectFormApi = ({
     size = "middle",
     disabled,
     reload,
+    value,
+    ...restProps
 }: SelectFormApiProps) => {
     const [options, setOptions] = useState<{ value: string; label: string }[]>([
         { value: "", label: "" },
@@ -37,18 +39,39 @@ const SelectFormApi = ({
 
     useEffect(() => {
         async function getData() {
-            const data = await getDataSelect(path, filter);
-            const optionsSelect = data.map((item: any) => {
-                return {
-                    ...item,
-                    value: item.id || item.value,
-                    label: item.name || item.label,
-                };
-            });
-            if (data.length === 0) {
+            // Không gọi API nếu path rỗng hoặc undefined
+            if (!path || path.trim() === "") {
+                setOptions([]);
                 return;
             }
-            setOptions(optionsSelect);
+
+            try {
+                const data = await getDataSelect(path, filter);
+
+                // Kiểm tra data có phải là array và có data không
+                if (!data || !Array.isArray(data)) {
+                    setOptions([]);
+                    return;
+                }
+
+                const optionsSelect = data.map((item: any) => {
+                    return {
+                        ...item,
+                        value: item.id || item.value,
+                        label: item.name || item.label,
+                    };
+                });
+
+                if (data.length === 0) {
+                    setOptions([]);
+                    return;
+                }
+
+                setOptions(optionsSelect);
+            } catch (error) {
+                console.error("Error loading select options:", error);
+                setOptions([]);
+            }
         }
         getData();
     }, [filter, path, reload]);
@@ -69,6 +92,8 @@ const SelectFormApi = ({
                 allowClear
                 size={size}
                 disabled={disabled}
+                value={value}
+                {...restProps}
             />
         </Form.Item>
     );

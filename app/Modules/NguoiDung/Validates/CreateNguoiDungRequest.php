@@ -35,7 +35,7 @@ class CreateNguoiDungRequest extends FormRequest
       'ward_id' => 'required|integer',
       'address' => 'required|string|max:255',
       'status' => 'required|integer',
-      'image' => 'string',
+      'image' => 'nullable|string',
       'ma_vai_tro' => 'required|string',
     ];
   }

@@ -119,11 +119,6 @@ class SanPhamController extends Controller
       $thanhCong = $import->getThanhCong();
       $thatBai = $import->getThatBai();
 
-      // Xóa file sau khi import
-      if (file_exists($path)) {
-        unlink($path);
-      }
-
       if ($thatBai > 0) {
         return CustomResponse::error('Import không thành công. Có ' . $thatBai . ' bản ghi lỗi và ' . $thanhCong . ' bản ghi thành công');
       }

@@ -75,6 +75,8 @@ class Helper
 
   public static function generateMaLoSanPham()
   {
-    return "LOSP_" . time();
+    $maLo = "LOSP_" . uniqid();
+
+    return $maLo;
   }
 }
