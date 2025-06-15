@@ -144,18 +144,6 @@ Route::group([
     Route::post('/import-excel', [\App\Modules\SanPham\SanPhamController::class, 'importExcel']);
   });
 
-  // QuanLyKho
-  Route::prefix('quan-ly-kho')->group(function () {
-    Route::get('/', [\App\Modules\QuanLyKho\QuanLyKhoController::class, 'index']);
-    Route::get('/options', [\App\Modules\QuanLyKho\QuanLyKhoController::class, 'getOptions']);
-    Route::get('/download-template-excel', [\App\Modules\QuanLyKho\QuanLyKhoController::class, 'downloadTemplateExcel']);
-    Route::post('/', [\App\Modules\QuanLyKho\QuanLyKhoController::class, 'store']);
-    Route::get('/{id}', [\App\Modules\QuanLyKho\QuanLyKhoController::class, 'show']);
-    Route::put('/{id}', [\App\Modules\QuanLyKho\QuanLyKhoController::class, 'update']);
-    Route::delete('/{id}', [\App\Modules\QuanLyKho\QuanLyKhoController::class, 'destroy']);
-    Route::post('/import-excel', [\App\Modules\QuanLyKho\QuanLyKhoController::class, 'importExcel']);
-  });
-
   // QuanLyCongNo
   Route::prefix('quan-ly-cong-no')->group(function () {
     Route::get('/', [\App\Modules\QuanLyCongNo\QuanLyCongNoController::class, 'index']);
@@ -178,5 +166,17 @@ Route::group([
     Route::put('/{id}', [\App\Modules\PhieuNhapKho\PhieuNhapKhoController::class, 'update']);
     Route::delete('/{id}', [\App\Modules\PhieuNhapKho\PhieuNhapKhoController::class, 'destroy']);
     Route::post('/import-excel', [\App\Modules\PhieuNhapKho\PhieuNhapKhoController::class, 'importExcel']);
+  });
+
+  // QuanLyTonKho
+  Route::prefix('quan-ly-ton-kho')->group(function () {
+    Route::get('/', [\App\Modules\QuanLyTonKho\QuanLyTonKhoController::class, 'index']);
+    Route::get('/options', [\App\Modules\QuanLyTonKho\QuanLyTonKhoController::class, 'getOptions']);
+    Route::get('/download-template-excel', [\App\Modules\QuanLyTonKho\QuanLyTonKhoController::class, 'downloadTemplateExcel']);
+    Route::post('/', [\App\Modules\QuanLyTonKho\QuanLyTonKhoController::class, 'store']);
+    Route::get('/{id}', [\App\Modules\QuanLyTonKho\QuanLyTonKhoController::class, 'show']);
+    Route::put('/{id}', [\App\Modules\QuanLyTonKho\QuanLyTonKhoController::class, 'update']);
+    Route::delete('/{id}', [\App\Modules\QuanLyTonKho\QuanLyTonKhoController::class, 'destroy']);
+    Route::post('/import-excel', [\App\Modules\QuanLyTonKho\QuanLyTonKhoController::class, 'importExcel']);
   });
 });

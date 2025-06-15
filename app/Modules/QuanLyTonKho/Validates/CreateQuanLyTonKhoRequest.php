@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Modules\QuanLyKho\Validates;
+namespace App\Modules\QuanLyTonKho\Validates;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateQuanLyKhoRequest extends FormRequest
+class CreateQuanLyTonKhoRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,8 +22,8 @@ class UpdateQuanLyKhoRequest extends FormRequest
     public function rules(): array
     {
         return [
-            // Thêm các quy tắc validation cho cập nhật QuanLyKho ở đây
-            'name' => 'sometimes|required|string|max:255',
+            // Thêm các quy tắc validation cho QuanLyTonKho ở đây
+            'name' => 'required|string|max:255',
             // 'description' => 'nullable|string',
             // 'active' => 'boolean',
         ];
@@ -37,8 +37,8 @@ class UpdateQuanLyKhoRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.required' => 'Tên QuanLyKho là bắt buộc',
-            'name.max' => 'Tên QuanLyKho không được vượt quá 255 ký tự',
+            'name.required' => 'Tên QuanLyTonKho là bắt buộc',
+            'name.max' => 'Tên QuanLyTonKho không được vượt quá 255 ký tự',
         ];
     }
 }

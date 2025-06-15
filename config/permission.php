@@ -2,6 +2,18 @@
 
 return [
   [
+    "name" => "quan-ly-ton-kho",
+    "actions" => [
+      "index" => true,
+      // "create" => true,
+      // "show" => true,
+      // "edit" => true,
+      // "delete" => true,
+      "export" => true,
+      "showMenu" => true
+    ]
+  ],
+  [
     "name" => "phieu-nhap-kho",
     "actions" => [
       "index" => true,
@@ -17,22 +29,6 @@ return [
     "name" => "quan-ly-cong-no",
     "actions" => [
       "index" => true,
-      // "create" => true,
-      // "show" => true,
-      // "edit" => true,
-      // "delete" => true,
-      "export" => true,
-      "showMenu" => true
-    ]
-  ],
-  [
-    "name" => "quan-ly-kho",
-    "actions" => [
-      "index" => true,
-      // "create" => true,
-      // "show" => true,
-      // "edit" => true,
-      // "delete" => true,
       "export" => true,
       "showMenu" => true
     ]

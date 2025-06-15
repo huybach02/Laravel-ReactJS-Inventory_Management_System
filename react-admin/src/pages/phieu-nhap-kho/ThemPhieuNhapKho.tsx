@@ -16,6 +16,7 @@ const ThemPhieuNhapKho = ({ path, title }: { path: string; title: string }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [form] = Form.useForm();
+    const [tab, setTab] = useState("1");
 
     const showModal = async () => {
         setIsModalOpen(true);
@@ -51,7 +52,7 @@ const ThemPhieuNhapKho = ({ path, title }: { path: string; title: string }) => {
                         chiet_khau: Number(item.chiet_khau),
                     })
                 ),
-                loai_phieu_nhap: 1,
+                loai_phieu_nhap: Number(tab),
             },
             closeModel
         );
@@ -59,7 +60,7 @@ const ThemPhieuNhapKho = ({ path, title }: { path: string; title: string }) => {
     };
 
     const onChange = (key: string) => {
-        console.log(key);
+        setTab(key);
     };
 
     const items = [
@@ -121,7 +122,12 @@ const ThemPhieuNhapKho = ({ path, title }: { path: string; title: string }) => {
                     </Row>,
                 ]}
             >
-                <Tabs onChange={onChange} type="card" items={items} />
+                <Tabs
+                    onChange={onChange}
+                    type="card"
+                    items={items}
+                    activeKey={tab}
+                />
             </Modal>
         </>
     );

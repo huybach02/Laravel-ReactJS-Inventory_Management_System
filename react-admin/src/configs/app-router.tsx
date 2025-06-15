@@ -20,6 +20,7 @@ import DanhMucSanPham from "../pages/danh-muc-san-pham/DanhMucSanPham";
 import DonViTinh from "../pages/don-vi-tinh/DonViTinh";
 import SanPham from "../pages/san-pham/SanPham";
 import PhieuNhapKho from "../pages/phieu-nhap-kho/PhieuNhapKho";
+import QuanLyTonKho from "../pages/quan-ly-ton-kho/QuanLyTonKho";
 
 export const router = createBrowserRouter([
     {
@@ -174,6 +175,11 @@ export const router = createBrowserRouter([
                         path: "phieu-nhap-kho",
                         element: <MainLayout />,
                         children: [{ index: true, element: <PhieuNhapKho /> }],
+                    },
+                    {
+                        path: "quan-ly-ton-kho",
+                        element: <MainLayout />,
+                        children: [{ index: true, element: <QuanLyTonKho /> }],
                     },
                 ],
             },

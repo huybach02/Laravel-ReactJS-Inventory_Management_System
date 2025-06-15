@@ -24,6 +24,8 @@ export const API_ROUTE_CONFIG = {
     SAN_PHAM: "/san-pham",
 
     PHIEU_NHAP_KHO: "/phieu-nhap-kho",
+
+    QUAN_LY_TON_KHO: "/quan-ly-ton-kho",
 };
 export const URL_CONSTANTS = {
     LOGIN: "/admin",
@@ -44,4 +46,6 @@ export const URL_CONSTANTS = {
     SAN_PHAM: "/admin/quan-ly-san-pham/san-pham",
 
     PHIEU_NHAP_KHO: "/admin/quan-ly-kho/phieu-nhap-kho",
+
+    QUAN_LY_TON_KHO: "/admin/quan-ly-kho/quan-ly-ton-kho",
 };
