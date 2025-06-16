@@ -88,9 +88,10 @@ class PhieuNhapKhoController extends Controller
   /**
    * Lấy danh sách PhieuNhapKho dạng option
    */
-  public function getOptionsByNhaCungCap($nhaCungCapId)
+  public function getOptionsByNhaCungCap($nhaCungCapId, Request $request)
   {
-    $result = $this->phieuNhapKhoService->getOptionsByNhaCungCap($nhaCungCapId);
+    $params = $request->all();
+    $result = $this->phieuNhapKhoService->getOptionsByNhaCungCap($nhaCungCapId, $params);
     return CustomResponse::success($result);
   }
 

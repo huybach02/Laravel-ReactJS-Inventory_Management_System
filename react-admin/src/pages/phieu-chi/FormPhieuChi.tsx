@@ -9,6 +9,8 @@ import {
     type FormInstance,
     Select,
     DatePicker,
+    Table,
+    Typography,
 } from "antd";
 import { formatter, parser } from "../../utils/utils";
 import SelectFormApi from "../../components/select/SelectFormApi";
@@ -23,7 +25,15 @@ import dayjs from "dayjs";
 import { getDataById } from "../../services/getData.api";
 import { useEffect, useState } from "react";
 
-const FormPhieuChi = ({ form }: { form: FormInstance }) => {
+const FormPhieuChi = ({
+    form,
+    isDetail,
+    chiTietPhieuChi,
+}: {
+    form: FormInstance;
+    isDetail?: boolean;
+    chiTietPhieuChi?: any;
+}) => {
     const nhaCungCapId = Form.useWatch("nha_cung_cap_id", form);
     const loaiPhieuChi = Form.useWatch("loai_phieu_chi", form);
     const phuongThucThanhToan = Form.useWatch("phuong_thuc_thanh_toan", form);
@@ -58,6 +68,26 @@ const FormPhieuChi = ({ form }: { form: FormInstance }) => {
         }
     }, [phieuNhapKhoId, loaiPhieuChi, nhaCungCapId]);
 
+    const columns = [
+        {
+            title: "Phiếu nhập kho",
+            dataIndex: "ma_phieu_nhap_kho",
+            key: "phieu_nhap_kho",
+        },
+        {
+            title: "Số tiền cần thanh toán",
+            dataIndex: "tong_tien_can_thanh_toan",
+            key: "tong_tien_can_thanh_toan",
+            render: (text: string) => formatter(text) + " đ",
+        },
+        {
+            title: "Số tiền đã thanh toán",
+            dataIndex: "tong_tien_da_thanh_toan",
+            key: "tong_tien_da_thanh_toan",
+            render: (text: string) => formatter(text) + " đ",
+        },
+    ];
+
     return (
         <Row gutter={[10, 10]}>
             <Col span={12}>
@@ -72,7 +102,10 @@ const FormPhieuChi = ({ form }: { form: FormInstance }) => {
                     ]}
                     initialValue={generateMaPhieu("CHI")}
                 >
-                    <Input placeholder="Nhập mã phiếu chi" />
+                    <Input
+                        placeholder="Nhập mã phiếu chi"
+                        disabled={isDetail}
+                    />
                 </Form.Item>
             </Col>
             <Col span={12}>
@@ -91,6 +124,7 @@ const FormPhieuChi = ({ form }: { form: FormInstance }) => {
                         placeholder="Chọn ngày chi"
                         format="DD/MM/YYYY"
                         style={{ width: "100%" }}
+                        disabled={isDetail}
                     />
                 </Form.Item>
             </Col>
@@ -113,6 +147,7 @@ const FormPhieuChi = ({ form }: { form: FormInstance }) => {
                             form.setFieldValue("phieu_nhap_kho_id", undefined);
                             form.setFieldValue("so_tien_can_thanh_toan", 0);
                         }}
+                        disabled={isDetail}
                     />
                 </Form.Item>
             </Col>
@@ -135,6 +170,7 @@ const FormPhieuChi = ({ form }: { form: FormInstance }) => {
                             form.setFieldValue("phieu_nhap_kho_id", undefined);
                             form.setFieldValue("so_tien_can_thanh_toan", 0);
                         }}
+                        disabled={isDetail}
                     />
                 </Col>
             )}
@@ -150,6 +186,9 @@ const FormPhieuChi = ({ form }: { form: FormInstance }) => {
                                   nhaCungCapId
                                 : ""
                         }
+                        filter={{
+                            chua_hoan_thanh: true,
+                        }}
                         reload={nhaCungCapId}
                         placeholder="Chọn phiếu nhập kho"
                         rules={[
@@ -158,10 +197,11 @@ const FormPhieuChi = ({ form }: { form: FormInstance }) => {
                                 message: "Phiếu nhập kho không được bỏ trống!",
                             },
                         ]}
+                        disabled={isDetail}
                     />
                 </Col>
             )}
-            {(loaiPhieuChi === 1 || loaiPhieuChi === 2) && (
+            {(loaiPhieuChi === 1 || loaiPhieuChi === 2) && !isDetail && (
                 <Col span={12}>
                     <Form.Item
                         name="so_tien_can_thanh_toan"
@@ -173,7 +213,7 @@ const FormPhieuChi = ({ form }: { form: FormInstance }) => {
                             formatter={formatter}
                             parser={parser}
                             addonAfter="đ"
-                            disabled
+                            disabled={isDetail}
                         />
                     </Form.Item>
                 </Col>
@@ -196,9 +236,28 @@ const FormPhieuChi = ({ form }: { form: FormInstance }) => {
                         formatter={formatter}
                         parser={parser}
                         addonAfter="đ"
+                        disabled={isDetail}
                     />
                 </Form.Item>
             </Col>
+
+            <Col span={24}>
+                {isDetail && chiTietPhieuChi && chiTietPhieuChi.length > 0 && (
+                    <>
+                        <Typography.Title level={5}>
+                            Chi tiết phiếu chi
+                        </Typography.Title>
+                        <Table
+                            columns={columns}
+                            dataSource={chiTietPhieuChi}
+                            pagination={false}
+                            bordered
+                            style={{ marginBottom: 20 }}
+                        />
+                    </>
+                )}
+            </Col>
+
             <Col span={12}>
                 <Form.Item
                     name="nguoi_nhan"
@@ -210,7 +269,7 @@ const FormPhieuChi = ({ form }: { form: FormInstance }) => {
                         },
                     ]}
                 >
-                    <Input placeholder="Nhập người nhận" />
+                    <Input placeholder="Nhập người nhận" disabled={isDetail} />
                 </Form.Item>
             </Col>
             <Col span={12}>
@@ -228,6 +287,7 @@ const FormPhieuChi = ({ form }: { form: FormInstance }) => {
                     <Select
                         options={OPTIONS_PHUONG_THUC_THANH_TOAN}
                         placeholder="Chọn phương thức thanh toán"
+                        disabled={isDetail}
                     />
                 </Form.Item>
             </Col>
@@ -243,7 +303,10 @@ const FormPhieuChi = ({ form }: { form: FormInstance }) => {
                             },
                         ]}
                     >
-                        <Input placeholder="Nhập số tài khoản" />
+                        <Input
+                            placeholder="Nhập số tài khoản"
+                            disabled={isDetail}
+                        />
                     </Form.Item>
                 </Col>
             )}
@@ -259,7 +322,10 @@ const FormPhieuChi = ({ form }: { form: FormInstance }) => {
                             },
                         ]}
                     >
-                        <Input placeholder="Nhập ngân hàng" />
+                        <Input
+                            placeholder="Nhập ngân hàng"
+                            disabled={isDetail}
+                        />
                     </Form.Item>
                 </Col>
             )}
@@ -275,13 +341,21 @@ const FormPhieuChi = ({ form }: { form: FormInstance }) => {
                             },
                         ]}
                     >
-                        <Input.TextArea placeholder="Nhập lý do chi" rows={2} />
+                        <Input.TextArea
+                            placeholder="Nhập lý do chi"
+                            rows={2}
+                            disabled={isDetail}
+                        />
                     </Form.Item>
                 </Col>
             )}
             <Col span={24}>
                 <Form.Item name="ghi_chu" label="Ghi chú">
-                    <Input.TextArea placeholder="Nhập ghi chú" rows={2} />
+                    <Input.TextArea
+                        placeholder="Nhập ghi chú"
+                        rows={2}
+                        disabled={isDetail}
+                    />
                 </Form.Item>
             </Col>
         </Row>

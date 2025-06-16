@@ -116,3 +116,8 @@ export const generateMaPhieu = (prefix: string) => {
     const timeCreate = dayjs().format("HHmmss");
     return `${prefix}-${currentDate}-${timeCreate}`;
 };
+
+export const checkIsToday = (date: string) => {
+    const parsedDate = dayjs(date, "DD/MM/YYYY HH:mm:ss");
+    return parsedDate.isValid() && parsedDate.isSame(dayjs(), "day");
+};

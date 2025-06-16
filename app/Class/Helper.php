@@ -79,4 +79,26 @@ class Helper
 
     return $maLo;
   }
+
+  public static function checkIsToday($date)
+  {
+    try {
+      // Chuyển đổi về Carbon nếu cần
+      if (is_string($date)) {
+        // Nếu là chuỗi định dạng d/m/Y H:i:s (từ trait DateTimeFormatter)
+        $carbonDate = str_contains($date, '/')
+          ? Carbon::createFromFormat('d/m/Y H:i:s', $date)
+          : Carbon::parse($date);
+      } elseif ($date instanceof \DateTime) {
+        $carbonDate = Carbon::instance($date);
+      } else {
+        $carbonDate = $date; // Đã là Carbon
+      }
+
+      // So sánh ngày
+      return $carbonDate->isToday();
+    } catch (\Exception $e) {
+      return false;
+    }
+  }
 }

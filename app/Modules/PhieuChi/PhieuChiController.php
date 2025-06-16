@@ -75,6 +75,9 @@ class PhieuChiController extends Controller
   public function destroy($id)
   {
     $result = $this->phieuChiService->delete($id);
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
+    }
     return CustomResponse::success([], 'Xóa thành công');
   }
 

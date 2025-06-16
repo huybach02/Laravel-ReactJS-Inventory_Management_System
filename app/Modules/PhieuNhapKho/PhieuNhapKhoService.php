@@ -21,15 +21,19 @@ class PhieuNhapKhoService
   {
     try {
       // Tạo query cơ bản với relationships thay vì JOIN
-      $query = PhieuNhapKho::query()->with([
-        'images',
-      ]);
+      $query = PhieuNhapKho::query()
+        ->withoutGlobalScopes(['withUserNames'])
+        ->leftJoin('nha_cung_caps', 'phieu_nhap_khos.nha_cung_cap_id', '=', 'nha_cung_caps.id');
+
 
       // Sử dụng FilterWithPagination để xử lý filter và pagination
       $result = FilterWithPagination::findWithPagination(
         $query,
         $params,
-        ['*'] // Columns cần select
+        [
+          'phieu_nhap_khos.*',
+          'nha_cung_caps.ten_nha_cung_cap'
+        ] // Columns cần select
       );
 
       return [
@@ -246,9 +250,13 @@ class PhieuNhapKhoService
   /**
    * Lấy danh sách PhieuNhapKho dạng option
    */
-  public function getOptionsByNhaCungCap($nhaCungCapId)
+  public function getOptionsByNhaCungCap($nhaCungCapId, $params = [])
   {
-    return PhieuNhapKho::where('nha_cung_cap_id', $nhaCungCapId)->select('id as value', 'ma_phieu_nhap_kho as label')->get();
+    $query = PhieuNhapKho::where('nha_cung_cap_id', $nhaCungCapId);
+    if (isset($params['chua_hoan_thanh'])) {
+      $query->whereRaw('da_thanh_toan < tong_tien');
+    }
+    return $query->select('id as value', 'ma_phieu_nhap_kho as label')->get();
   }
 
   /**

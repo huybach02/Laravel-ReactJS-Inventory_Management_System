@@ -6,7 +6,6 @@ import useColumnSearch from "../../hooks/useColumnSearch";
 import { getListData } from "../../services/getData.api";
 import { createFilterQueryFromArray, formatter } from "../../utils/utils";
 import { Col, Row, Space, Tag, Flex } from "antd";
-import SuaPhieuChi from "./SuaPhieuChi";
 import Delete from "../../components/Delete";
 import { useDispatch, useSelector } from "react-redux";
 import CustomTable from "../../components/CustomTable";
@@ -21,6 +20,8 @@ import {
 } from "../../utils/constant";
 import dayjs from "dayjs";
 import ImportExcel from "../../components/ImportExcel";
+import ChiTietPhieuChi from "./ChiTietPhieuChi";
+import { checkIsToday } from "../../helpers/funcHelper";
 
 const DanhSachPhieuChi = ({
     path,
@@ -76,13 +77,24 @@ const DanhSachPhieuChi = ({
             title: "Thao tác",
             dataIndex: "id",
             align: "center",
-            render: (id: number) => {
+            render: (id: number, record: any) => {
                 return (
                     <Space size={0}>
-                        {/* {permission.edit && <SuaPhieuChi path={path} id={id} title={title} />} */}
-                        {permission.delete && (
-                            <Delete path={path} id={id} onShow={getDanhSach} />
+                        {permission.show && (
+                            <ChiTietPhieuChi
+                                path={path}
+                                id={id}
+                                title={title}
+                            />
                         )}
+                        {permission.delete &&
+                            checkIsToday(record?.created_at || "") && (
+                                <Delete
+                                    path={path}
+                                    id={id}
+                                    onShow={getDanhSach}
+                                />
+                            )}
                     </Space>
                 );
             },

@@ -7,7 +7,9 @@ use Illuminate\Support\Facades\DB;
 use Exception;
 use App\Class\CustomResponse;
 use App\Class\FilterWithPagination;
+use App\Models\ChiTietPhieuChi;
 use App\Models\PhieuNhapKho;
+use App\Class\Helper;
 
 class PhieuChiService
 {
@@ -48,7 +50,25 @@ class PhieuChiService
    */
   public function getById($id)
   {
-    return PhieuChi::with('images')->find($id);
+    $phieuChi = PhieuChi::find($id);
+
+    if ($phieuChi->loai_phieu_chi == 2) {
+      $query = "
+      SELECT
+        phieu_nhap_khos.ma_phieu_nhap_kho,
+        phieu_nhap_khos.tong_tien as tong_tien_can_thanh_toan,
+        chi_tiet_phieu_chis.so_tien as tong_tien_da_thanh_toan
+      FROM phieu_chis
+      LEFT JOIN chi_tiet_phieu_chis ON phieu_chis.id = chi_tiet_phieu_chis.phieu_chi_id
+      LEFT JOIN phieu_nhap_khos ON chi_tiet_phieu_chis.phieu_nhap_kho_id = phieu_nhap_khos.id
+      WHERE phieu_chis.id = $id";
+
+      $data = DB::select($query);
+
+      $phieuChi->chi_tiet_phieu_chi = $data;
+    }
+
+    return $phieuChi;
   }
 
   /**
@@ -77,6 +97,9 @@ class PhieuChiService
             'trang_thai' => $daThanhToan < $phieuNhapKho->tong_tien ? 1 : ($daThanhToan == $phieuNhapKho->tong_tien ? 2 : 0), // 1: đã thanh toán, 2: chưa thanh toán, 0: hủy
           ]);
 
+          // Tạo phiếu chi
+          $phieuChi = PhieuChi::create($data);
+
           break;
         case 2: // thanh toán công nợ
           if (empty($data['nha_cung_cap_id'])) {
@@ -104,6 +127,9 @@ class PhieuChiService
             return CustomResponse::error('Số tiền thanh toán nhiều hơn số tiền cần thanh toán nhà cung cấp');
           }
 
+          // Tạo phiếu chi
+          $phieuChi = PhieuChi::create($data);
+
           // Phân bổ tiền thanh toán cho từng phiếu
           foreach ($phieuNhapKhos as $phieu) {
             if ($soTienThanhToan <= 0) break;
@@ -120,18 +146,22 @@ class PhieuChiService
             ]);
 
             $soTienThanhToan -= $soTienThanhToanPhieu;
+
+            ChiTietPhieuChi::create([
+              'phieu_chi_id' => $phieuChi->id,
+              'phieu_nhap_kho_id' => $phieu->id,
+              'so_tien' => $soTienThanhToanPhieu
+            ]);
           }
           break;
         case 3: // chi khác
+          $phieuChi = PhieuChi::create($data);
           break;
         default:
           return CustomResponse::error('Loại phiếu chi không hợp lệ');
       }
-
-      $result = PhieuChi::create($data);
-
       DB::commit();
-      return $result;
+      return $phieuChi;
     } catch (Exception $e) {
       DB::rollBack();
       return CustomResponse::error($e->getMessage());
@@ -143,24 +173,7 @@ class PhieuChiService
    */
   public function update($id, array $data)
   {
-    try {
-      $model = PhieuChi::findOrFail($id);
-      $model->update($data);
-
-      // TODO: Cập nhật ảnh vào bảng images (nếu có)
-      // if ($data['image']) {
-      //   $model->images()->get()->each(function ($image) use ($data) {
-      //     $image->update([
-      //       'path' => $data['image'],
-      //     ]);
-      //   });
-      // }
-
-
-      return $model->fresh();
-    } catch (Exception $e) {
-      return CustomResponse::error($e->getMessage());
-    }
+    return CustomResponse::error('Không thể cập nhật phiếu chi');
   }
 
 
@@ -172,11 +185,36 @@ class PhieuChiService
     try {
       $model = PhieuChi::findOrFail($id);
 
-      // TODO: Xóa ảnh vào bảng images (nếu có)
-      // $model->images()->get()->each(function ($image) {
-      //   $image->delete();
-      // });
+      if (!Helper::checkIsToday($model->created_at)) {
+        return CustomResponse::error('Chỉ được xóa phiếu chi trong ngày hôm nay');
+      }
 
+      switch ($model->loai_phieu_chi) {
+
+        case 1: // chi thanh toán cho phiếu nhập kho
+          $phieuNhapKho = PhieuNhapKho::find($model->phieu_nhap_kho_id);
+          $phieuNhapKho->update([
+            'da_thanh_toan' => $phieuNhapKho->da_thanh_toan - $model->so_tien,
+          ]);
+          break;
+        case 2: // thanh toán công nợ
+          $chiTietPhieuChi = ChiTietPhieuChi::where('phieu_chi_id', $id)->get();
+          foreach ($chiTietPhieuChi as $chiTiet) {
+            $phieuNhapKho = PhieuNhapKho::find($chiTiet->phieu_nhap_kho_id);
+            $daThanhToan = $phieuNhapKho->da_thanh_toan - $chiTiet->so_tien;
+            $phieuNhapKho->update([
+              'da_thanh_toan' => $daThanhToan,
+              'trang_thai' => $this->getTrangThaiThanhToan($daThanhToan, $phieuNhapKho->tong_tien),
+            ]);
+          }
+          // Xóa các chi tiết phiếu chi
+          ChiTietPhieuChi::where('phieu_chi_id', $id)->delete();
+          break;
+        case 3: // chi khác
+          break;
+        default:
+          return CustomResponse::error('Loại phiếu chi không hợp lệ');
+      }
       return $model->delete();
     } catch (Exception $e) {
       return CustomResponse::error($e->getMessage());

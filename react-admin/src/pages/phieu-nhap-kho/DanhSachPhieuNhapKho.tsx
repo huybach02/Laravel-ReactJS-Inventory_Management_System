@@ -137,6 +137,18 @@ const DanhSachPhieuNhapKho = ({
             },
         },
         {
+            title: "Nhà cung cấp",
+            dataIndex: "ten_nha_cung_cap",
+            ...inputSearch({
+                dataIndex: "nha_cung_caps.ten_nha_cung_cap",
+                operator: "contain",
+                nameColumn: "Nhà cung cấp",
+            }),
+            render: (ten_nha_cung_cap: any) => {
+                return ten_nha_cung_cap;
+            },
+        },
+        {
             title: "Tổng tiền",
             dataIndex: "tong_tien",
             ...inputSearch({
@@ -146,6 +158,18 @@ const DanhSachPhieuNhapKho = ({
             }),
             render: (tong_tien: number) => {
                 return formatVietnameseCurrency(tong_tien);
+            },
+        },
+        {
+            title: "Đã thanh toán",
+            dataIndex: "da_thanh_toan",
+            ...inputSearch({
+                dataIndex: "da_thanh_toan",
+                operator: "contain",
+                nameColumn: "Đã thanh toán",
+            }),
+            render: (da_thanh_toan: number) => {
+                return formatVietnameseCurrency(da_thanh_toan);
             },
         },
         {
@@ -238,7 +262,7 @@ const DanhSachPhieuNhapKho = ({
                         dataTable={danhSach?.data}
                         defaultColumns={defaultColumns}
                         filter={filter}
-                        scroll={{ x: 1000 }}
+                        scroll={{ x: 2000 }}
                         handlePageChange={handlePageChange}
                         handleLimitChange={handleLimitChange}
                         total={danhSach?.total}
