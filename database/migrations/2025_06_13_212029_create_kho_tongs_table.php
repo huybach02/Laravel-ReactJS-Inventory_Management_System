@@ -16,6 +16,7 @@ return new class extends Migration
       $table->string('ma_lo_san_pham')->unique();
       $table->foreignId('san_pham_id')->constrained('san_phams');
       $table->integer('so_luong_ton');
+      $table->tinyInteger('trang_thai')->default(0)->comment('0: hết hàng, 1: sắp hết hàng, 2: ổn định');
 
 
       $table->string('nguoi_tao');

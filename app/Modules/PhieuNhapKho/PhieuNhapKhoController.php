@@ -96,11 +96,21 @@ class PhieuNhapKhoController extends Controller
   }
 
   /**
-   * Lấy tổng tiền cần thanh toán theo nhà cung cấp
+   * Lấy tổng tiền cần thanh toán theo nha cung cap
    */
   public function getTongTienCanThanhToanTheoNhaCungCap($nhaCungCapId)
   {
     $result = $this->phieuNhapKhoService->getTongTienCanThanhToanTheoNhaCungCap($nhaCungCapId);
+    return CustomResponse::success($result);
+  }
+
+  /**
+   * Lấy tổng tiền cần thanh toán theo nhiều phiếu nhập kho
+   */
+  public function getTongTienCanThanhToanTheoNhieuPhieuNhapKho(Request $request)
+  {
+    $phieuNhapKhoIds = $request->query('phieu_nhap_kho_ids');
+    $result = $this->phieuNhapKhoService->getTongTienCanThanhToanTheoNhieuPhieuNhapKho($phieuNhapKhoIds);
     return CustomResponse::success($result);
   }
 

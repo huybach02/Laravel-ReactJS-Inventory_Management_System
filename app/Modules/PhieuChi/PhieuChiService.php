@@ -52,12 +52,13 @@ class PhieuChiService
   {
     $phieuChi = PhieuChi::find($id);
 
-    if ($phieuChi->loai_phieu_chi == 2) {
+    if ($phieuChi->loai_phieu_chi == 2 || $phieuChi->loai_phieu_chi == 4) {
       $query = "
       SELECT
         phieu_nhap_khos.ma_phieu_nhap_kho,
-        phieu_nhap_khos.tong_tien as tong_tien_can_thanh_toan,
-        chi_tiet_phieu_chis.so_tien as tong_tien_da_thanh_toan
+        phieu_nhap_khos.tong_tien - COALESCE((SELECT SUM(so_tien) FROM chi_tiet_phieu_chis WHERE phieu_nhap_kho_id = phieu_nhap_khos.id AND phieu_chi_id < $id), 0) as tong_tien_can_thanh_toan,
+        chi_tiet_phieu_chis.so_tien as tong_tien_da_thanh_toan,
+        (phieu_nhap_khos.tong_tien - COALESCE((SELECT SUM(so_tien) FROM chi_tiet_phieu_chis WHERE phieu_nhap_kho_id = phieu_nhap_khos.id AND phieu_chi_id < $id), 0) - chi_tiet_phieu_chis.so_tien) as so_tien_con_lai
       FROM phieu_chis
       LEFT JOIN chi_tiet_phieu_chis ON phieu_chis.id = chi_tiet_phieu_chis.phieu_chi_id
       LEFT JOIN phieu_nhap_khos ON chi_tiet_phieu_chis.phieu_nhap_kho_id = phieu_nhap_khos.id
@@ -157,6 +158,60 @@ class PhieuChiService
         case 3: // chi khác
           $phieuChi = PhieuChi::create($data);
           break;
+        case 4: // chi thanh toán cho nhiều phiếu nhập kho chỉ định
+          if (empty($data['phieu_nhap_kho_ids'])) {
+            return CustomResponse::error('Phiếu nhập kho không được để trống');
+          }
+
+          // Lấy các phiếu nhập kho chưa thanh toán đủ
+          $phieuNhapKhos = PhieuNhapKho::whereIn('id', $data['phieu_nhap_kho_ids'])
+            ->whereRaw('da_thanh_toan < tong_tien')
+            ->orderBy('id', 'asc')
+            ->get();
+
+          if ($phieuNhapKhos->isEmpty()) {
+            return CustomResponse::error('Không tìm thấy công nợ của nhà cung cấp này');
+          }
+
+          // Tính tổng số tiền cần thanh toán
+          $tongTienCanThanhToan = $phieuNhapKhos->sum(function ($phieu) {
+            return $phieu->tong_tien - $phieu->da_thanh_toan;
+          });
+
+          $soTienThanhToan = $data['so_tien'];
+
+          if ($tongTienCanThanhToan < $soTienThanhToan) {
+            return CustomResponse::error('Số tiền thanh toán nhiều hơn số tiền cần thanh toán nhà cung cấp');
+          }
+
+          // Tạo phiếu chi
+          unset($data['phieu_nhap_kho_ids']);
+          $phieuChi = PhieuChi::create($data);
+
+          // Phân bổ tiền thanh toán cho từng phiếu
+          foreach ($phieuNhapKhos as $phieu) {
+            if ($soTienThanhToan <= 0) break;
+
+            $soTienCanThanhToan = $phieu->tong_tien - $phieu->da_thanh_toan;
+            $soTienThanhToanPhieu = min($soTienCanThanhToan, $soTienThanhToan);
+
+            $daThanhToanMoi = $phieu->da_thanh_toan + $soTienThanhToanPhieu;
+            $trangThaiMoi = $this->getTrangThaiThanhToan($daThanhToanMoi, $phieu->tong_tien);
+
+            $phieu->update([
+              'da_thanh_toan' => $daThanhToanMoi,
+              'trang_thai' => $trangThaiMoi
+            ]);
+
+            $soTienThanhToan -= $soTienThanhToanPhieu;
+
+            ChiTietPhieuChi::create([
+              'phieu_chi_id' => $phieuChi->id,
+              'phieu_nhap_kho_id' => $phieu->id,
+              'so_tien' => $soTienThanhToanPhieu
+            ]);
+          }
+          break;
         default:
           return CustomResponse::error('Loại phiếu chi không hợp lệ');
       }
@@ -211,6 +266,9 @@ class PhieuChiService
           ChiTietPhieuChi::where('phieu_chi_id', $id)->delete();
           break;
         case 3: // chi khác
+          break;
+        case 4: // chi thanh toán cho nhiều phiếu nhập kho chỉ định
+
           break;
         default:
           return CustomResponse::error('Loại phiếu chi không hợp lệ');

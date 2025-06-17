@@ -23,7 +23,9 @@ class PhieuNhapKhoService
       // Tạo query cơ bản với relationships thay vì JOIN
       $query = PhieuNhapKho::query()
         ->withoutGlobalScopes(['withUserNames'])
-        ->leftJoin('nha_cung_caps', 'phieu_nhap_khos.nha_cung_cap_id', '=', 'nha_cung_caps.id');
+        ->leftJoin('nha_cung_caps', 'phieu_nhap_khos.nha_cung_cap_id', '=', 'nha_cung_caps.id')
+        ->leftJoin('users as nguoi_tao', 'phieu_nhap_khos.nguoi_tao', '=', 'nguoi_tao.id')
+        ->leftJoin('users as nguoi_cap_nhat', 'phieu_nhap_khos.nguoi_cap_nhat', '=', 'nguoi_cap_nhat.id');
 
 
       // Sử dụng FilterWithPagination để xử lý filter và pagination
@@ -32,7 +34,9 @@ class PhieuNhapKhoService
         $params,
         [
           'phieu_nhap_khos.*',
-          'nha_cung_caps.ten_nha_cung_cap'
+          'nha_cung_caps.ten_nha_cung_cap',
+          'nguoi_tao.name as ten_nguoi_tao',
+          'nguoi_cap_nhat.name as ten_nguoi_cap_nhat'
         ] // Columns cần select
       );
 
@@ -110,6 +114,7 @@ class PhieuNhapKhoService
       $result = PhieuNhapKho::create($dataCreate);
 
       foreach ($data['danh_sach_san_pham'] as $chiTiet) {
+        $sanPham = SanPham::find($chiTiet['san_pham_id']);
         $chiTiet['phieu_nhap_kho_id'] = $result->id;
         $chiTiet['ma_lo_san_pham'] = Helper::generateMaLoSanPham();
         ChiTietPhieuNhapKho::create($chiTiet);
@@ -118,6 +123,7 @@ class PhieuNhapKhoService
             'ma_lo_san_pham' => $chiTiet['ma_lo_san_pham'],
             'san_pham_id' => $chiTiet['san_pham_id'],
             'so_luong_ton' => $chiTiet['so_luong_nhap'],
+            'trang_thai' => $sanPham->so_luong_canh_bao > $chiTiet['so_luong_nhap'] ? 1 : 2,
           ]);
         }
       }
@@ -256,7 +262,7 @@ class PhieuNhapKhoService
     if (isset($params['chua_hoan_thanh'])) {
       $query->whereRaw('da_thanh_toan < tong_tien');
     }
-    return $query->select('id as value', 'ma_phieu_nhap_kho as label')->get();
+    return $query->select('id as value', DB::raw("CONCAT(ma_phieu_nhap_kho, ' (Công nợ: ', REPLACE(FORMAT(tong_tien - da_thanh_toan, 0), ',', '.'), ' đ)') as label"))->get();
   }
 
   /**
@@ -265,6 +271,20 @@ class PhieuNhapKhoService
   public function getTongTienCanThanhToanTheoNhaCungCap($nhaCungCapId)
   {
     $model = PhieuNhapKho::where('nha_cung_cap_id', $nhaCungCapId)->get();
+    $tongTien = 0;
+    foreach ($model as $item) {
+      $tongTien += $item->tong_tien - $item->da_thanh_toan;
+    }
+    return $tongTien;
+  }
+
+  /**
+   * Lấy danh sách PhieuNhapKho dạng option
+   */
+  public function getTongTienCanThanhToanTheoNhieuPhieuNhapKho($phieuNhapKhoIds)
+  {
+    $phieuNhapKhoIds = explode(",", $phieuNhapKhoIds);
+    $model = PhieuNhapKho::whereIn('id', $phieuNhapKhoIds)->get();
     $tongTien = 0;
     foreach ($model as $item) {
       $tongTien += $item->tong_tien - $item->da_thanh_toan;

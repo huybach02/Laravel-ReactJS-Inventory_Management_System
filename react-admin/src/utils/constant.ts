@@ -10,6 +10,12 @@ export const OPTIONS_STATUS = [
     { value: "0", label: "Không hoạt động" },
 ];
 
+export const OPTIONS_STATUS_TON_KHO = [
+    { value: "0", label: "Hết hàng" },
+    { value: "1", label: "Sắp hết hàng" },
+    { value: "2", label: "Ổn định" },
+];
+
 export const OPTIONS_CHO_PHEP_NGOAI_GIO = [
     { value: "1", label: "Cho phép" },
     { value: "0", label: "Không cho phép" },
@@ -28,6 +34,7 @@ export const OPTIONS_LOAI_PHIEU_NHAP = [
 
 export const OPTIONS_LOAI_PHIEU_CHI = [
     { value: 1, label: "Thanh toán phiếu nhập kho" },
+    { value: 4, label: "Thanh toán nhiều phiếu nhập kho" },
     { value: 2, label: "Thanh toán công nợ nhà cung cấp" },
     { value: 3, label: "Chi khác" },
 ];

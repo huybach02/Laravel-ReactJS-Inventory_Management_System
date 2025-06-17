@@ -22,7 +22,7 @@ import {
 } from "../../utils/constant";
 import { API_ROUTE_CONFIG } from "../../configs/api-route-config";
 import dayjs from "dayjs";
-import { getDataById } from "../../services/getData.api";
+import { getDataById, getDataSelect } from "../../services/getData.api";
 import { useEffect, useState } from "react";
 
 const FormPhieuChi = ({
@@ -59,6 +59,21 @@ const FormPhieuChi = ({
         form.setFieldValue("so_tien_can_thanh_toan", response);
     };
 
+    const fetchTongTienCanThanhToanTheoNhieuPhieuNhapKho = async () => {
+        const response = await getDataSelect(
+            API_ROUTE_CONFIG.PHIEU_NHAP_KHO +
+                "/tong-tien-can-thanh-toan-theo-nhieu-phieu-nhap-kho",
+            {
+                phieu_nhap_kho_ids: form
+                    .getFieldValue("phieu_nhap_kho_ids")
+                    .join(","),
+            }
+        );
+        form.setFieldValue("so_tien_can_thanh_toan", response);
+    };
+
+    const phieuNhapKhoIds = Form.useWatch("phieu_nhap_kho_ids", form);
+
     useEffect(() => {
         if (phieuNhapKhoId && loaiPhieuChi === 1) {
             fetchInfoPhieuNhapKho();
@@ -66,7 +81,14 @@ const FormPhieuChi = ({
         if (nhaCungCapId && loaiPhieuChi === 2) {
             fetchTongTienCanThanhToanTheoNhaCungCap();
         }
-    }, [phieuNhapKhoId, loaiPhieuChi, nhaCungCapId]);
+        if (
+            loaiPhieuChi === 4 &&
+            phieuNhapKhoIds &&
+            phieuNhapKhoIds.length > 0
+        ) {
+            fetchTongTienCanThanhToanTheoNhieuPhieuNhapKho();
+        }
+    }, [phieuNhapKhoId, loaiPhieuChi, nhaCungCapId, phieuNhapKhoIds]);
 
     const columns = [
         {
@@ -84,6 +106,12 @@ const FormPhieuChi = ({
             title: "Số tiền đã thanh toán",
             dataIndex: "tong_tien_da_thanh_toan",
             key: "tong_tien_da_thanh_toan",
+            render: (text: string) => formatter(text) + " đ",
+        },
+        {
+            title: "Số tiền còn lại",
+            dataIndex: "so_tien_con_lai",
+            key: "so_tien_con_lai",
             render: (text: string) => formatter(text) + " đ",
         },
     ];
@@ -151,7 +179,9 @@ const FormPhieuChi = ({
                     />
                 </Form.Item>
             </Col>
-            {(loaiPhieuChi === 1 || loaiPhieuChi === 2) && (
+            {(loaiPhieuChi === 1 ||
+                loaiPhieuChi === 2 ||
+                loaiPhieuChi === 4) && (
                 <Col span={12}>
                     <SelectFormApi
                         name="nha_cung_cap_id"
@@ -161,7 +191,9 @@ const FormPhieuChi = ({
                         rules={[
                             {
                                 required:
-                                    loaiPhieuChi === 1 || loaiPhieuChi === 2,
+                                    loaiPhieuChi === 1 ||
+                                    loaiPhieuChi === 2 ||
+                                    loaiPhieuChi === 4,
                                 message: "Nhà cung cấp không được bỏ trống!",
                             },
                         ]}
@@ -201,23 +233,52 @@ const FormPhieuChi = ({
                     />
                 </Col>
             )}
-            {(loaiPhieuChi === 1 || loaiPhieuChi === 2) && !isDetail && (
+            {loaiPhieuChi === 4 && !isDetail && (
                 <Col span={12}>
-                    <Form.Item
-                        name="so_tien_can_thanh_toan"
-                        label="Số tiền cần thanh toán"
-                    >
-                        <InputNumber
-                            placeholder="Nhập số tiền cần thanh toán"
-                            style={{ width: "100%" }}
-                            formatter={formatter}
-                            parser={parser}
-                            addonAfter="đ"
-                            disabled={isDetail}
-                        />
-                    </Form.Item>
+                    <SelectFormApi
+                        mode="multiple"
+                        name="phieu_nhap_kho_ids"
+                        label="Phiếu một hoặc nhiều nhập kho"
+                        path={
+                            nhaCungCapId
+                                ? API_ROUTE_CONFIG.PHIEU_NHAP_KHO +
+                                  "/options-by-nha-cung-cap/" +
+                                  nhaCungCapId
+                                : ""
+                        }
+                        filter={{
+                            chua_hoan_thanh: true,
+                        }}
+                        reload={nhaCungCapId}
+                        placeholder="Chọn phiếu nhập kho"
+                        rules={[
+                            {
+                                required: loaiPhieuChi === 4,
+                                message: "Phiếu nhập kho không được bỏ trống!",
+                            },
+                        ]}
+                        disabled={isDetail}
+                    />
                 </Col>
             )}
+            {(loaiPhieuChi === 1 || loaiPhieuChi === 2 || loaiPhieuChi === 4) &&
+                !isDetail && (
+                    <Col span={12}>
+                        <Form.Item
+                            name="so_tien_can_thanh_toan"
+                            label="Số tiền cần thanh toán"
+                        >
+                            <InputNumber
+                                placeholder="Nhập số tiền cần thanh toán"
+                                style={{ width: "100%" }}
+                                formatter={formatter}
+                                parser={parser}
+                                addonAfter="đ"
+                                disabled
+                            />
+                        </Form.Item>
+                    </Col>
+                )}
             <Col span={12}>
                 <Form.Item
                     name="so_tien"

@@ -35,8 +35,7 @@ class QuanLyTonKhoService
         $query,
         $params,
         $type == 1 ? [
-          "kho_tongs.so_luong_ton",
-          "kho_tongs.ma_lo_san_pham",
+          "kho_tongs.*",
           "san_phams.ten_san_pham",
           "nha_cung_caps.ten_nha_cung_cap",
           "don_vi_tinhs.ten_don_vi",
@@ -65,7 +64,23 @@ class QuanLyTonKhoService
    */
   public function getById($id)
   {
-    return KhoTong::with('images')->find($id);
+    $query = KhoTong::query()
+      ->withoutGlobalScope('withUserNames') // Tắt global scope để tránh lỗi ambiguous column khi join
+      ->leftJoin('san_phams', 'kho_tongs.san_pham_id', '=', 'san_phams.id')
+      ->leftJoin('chi_tiet_phieu_nhap_khos', 'kho_tongs.ma_lo_san_pham', '=', 'chi_tiet_phieu_nhap_khos.ma_lo_san_pham')
+      ->leftJoin('nha_cung_caps', 'chi_tiet_phieu_nhap_khos.nha_cung_cap_id', '=', 'nha_cung_caps.id')
+      ->leftJoin('don_vi_tinhs', 'chi_tiet_phieu_nhap_khos.don_vi_tinh_id', '=', 'don_vi_tinhs.id')
+      ->select(
+        "kho_tongs.*",
+        "san_phams.ten_san_pham",
+        "san_phams.muc_loi_nhuan",
+        "san_phams.so_luong_canh_bao",
+        "nha_cung_caps.ten_nha_cung_cap",
+        "don_vi_tinhs.ten_don_vi",
+        "chi_tiet_phieu_nhap_khos.*",
+      );
+
+    return $query->find($id);
   }
 
   /**

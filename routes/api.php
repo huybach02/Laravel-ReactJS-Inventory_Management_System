@@ -162,6 +162,7 @@ Route::group([
     Route::get('/tong-tien-can-thanh-toan-theo-nha-cung-cap/{nhaCungCapId}', [\App\Modules\PhieuNhapKho\PhieuNhapKhoController::class, 'getTongTienCanThanhToanTheoNhaCungCap']);
     Route::get('/options', [\App\Modules\PhieuNhapKho\PhieuNhapKhoController::class, 'getOptions']);
     Route::get('/options-by-nha-cung-cap/{nhaCungCapId}', [\App\Modules\PhieuNhapKho\PhieuNhapKhoController::class, 'getOptionsByNhaCungCap']);
+    Route::get('/tong-tien-can-thanh-toan-theo-nhieu-phieu-nhap-kho', [\App\Modules\PhieuNhapKho\PhieuNhapKhoController::class, 'getTongTienCanThanhToanTheoNhieuPhieuNhapKho']);
     Route::get('/download-template-excel', [\App\Modules\PhieuNhapKho\PhieuNhapKhoController::class, 'downloadTemplateExcel']);
     Route::post('/', [\App\Modules\PhieuNhapKho\PhieuNhapKhoController::class, 'store']);
     Route::get('/{id}', [\App\Modules\PhieuNhapKho\PhieuNhapKhoController::class, 'show']);

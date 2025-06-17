@@ -151,11 +151,6 @@ const DanhSachPhieuNhapKho = ({
         {
             title: "Tổng tiền",
             dataIndex: "tong_tien",
-            ...inputSearch({
-                dataIndex: "tong_tien",
-                operator: "contain",
-                nameColumn: "Mã phiếu nhập",
-            }),
             render: (tong_tien: number) => {
                 return formatVietnameseCurrency(tong_tien);
             },
@@ -163,13 +158,16 @@ const DanhSachPhieuNhapKho = ({
         {
             title: "Đã thanh toán",
             dataIndex: "da_thanh_toan",
-            ...inputSearch({
-                dataIndex: "da_thanh_toan",
-                operator: "contain",
-                nameColumn: "Đã thanh toán",
-            }),
             render: (da_thanh_toan: number) => {
                 return formatVietnameseCurrency(da_thanh_toan);
+            },
+        },
+        {
+            title: "Số tiền còn lại",
+            render: (record: any) => {
+                return formatVietnameseCurrency(
+                    record.tong_tien - record.da_thanh_toan
+                );
             },
         },
         {
@@ -198,7 +196,20 @@ const DanhSachPhieuNhapKho = ({
                 dataIndex: "trang_thai",
                 operator: "equal",
                 nameColumn: "Trạng thái",
-                options: OPTIONS_STATUS,
+                options: [
+                    {
+                        label: "Chưa có thanh toán",
+                        value: "0",
+                    },
+                    {
+                        label: "Đã thanh toán một phần",
+                        value: "1",
+                    },
+                    {
+                        label: "Đã thanh toán hoàn tất",
+                        value: "2",
+                    },
+                ],
             }),
         },
         {

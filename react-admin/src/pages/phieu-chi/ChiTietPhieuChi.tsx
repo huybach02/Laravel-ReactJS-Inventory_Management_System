@@ -46,7 +46,7 @@ const ChiTietPhieuChi = ({
         });
         setIsLoading(false);
 
-        if (data.loai_phieu_chi == 2) {
+        if (data.loai_phieu_chi == 2 || data.loai_phieu_chi == 4) {
             setChiTietPhieuChi(data.chi_tiet_phieu_chi);
         }
     };

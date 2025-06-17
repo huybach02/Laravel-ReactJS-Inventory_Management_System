@@ -18,7 +18,7 @@ return [
     "actions" => [
       "index" => true,
       // "create" => true,
-      // "show" => true,
+      "show" => true,
       // "edit" => true,
       // "delete" => true,
       "export" => true,
