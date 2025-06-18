@@ -32,9 +32,8 @@ RUN composer install --no-scripts --no-autoloader --no-interaction --ignore-plat
 # Sao chép toàn bộ mã nguồn vào container
 COPY . /var/www/html
 
-# Chạy composer install đầy đủ
-RUN composer dump-autoload --optimize --ignore-platform-reqs && \
-    composer run-script post-install-cmd --ignore-platform-reqs
+# Chạy composer dump-autoload
+RUN composer dump-autoload --optimize --ignore-platform-reqs
 
 # Thiết lập quyền truy cập
 RUN chown -R www-data:www-data /var/www/html

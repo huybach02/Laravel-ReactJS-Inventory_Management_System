@@ -6,7 +6,7 @@ COPY . .
 
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
-RUN composer install --no-interaction --no-dev --optimize-autoloader --ignore-platform-reqs
+RUN composer install --no-interaction --optimize-autoloader --ignore-platform-reqs
 
 RUN chmod -R 775 storage bootstrap/cache
 
