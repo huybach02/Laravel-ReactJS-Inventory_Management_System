@@ -20,18 +20,21 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Thiết lập thư mục làm việc
 WORKDIR /var/www/html
 
+# Thiết lập biến môi trường cho Composer
+ENV COMPOSER_ALLOW_SUPERUSER=1
+
 # Sao chép composer.json và composer.lock trước
 COPY composer.json composer.lock ./
 
 # Cài đặt các dependencies của Laravel
-RUN composer install --no-scripts --no-autoloader --no-interaction
+RUN composer install --no-scripts --no-autoloader --no-interaction --ignore-platform-reqs
 
 # Sao chép toàn bộ mã nguồn vào container
 COPY . /var/www/html
 
 # Chạy composer install đầy đủ
-RUN composer dump-autoload --optimize && \
-    composer run-script post-install-cmd
+RUN composer dump-autoload --optimize --ignore-platform-reqs && \
+    composer run-script post-install-cmd --ignore-platform-reqs
 
 # Thiết lập quyền truy cập
 RUN chown -R www-data:www-data /var/www/html

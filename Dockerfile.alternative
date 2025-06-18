@@ -4,7 +4,9 @@ WORKDIR /var/www/html
 
 COPY . .
 
-RUN composer install --no-interaction --no-dev --optimize-autoloader
+ENV COMPOSER_ALLOW_SUPERUSER=1
+
+RUN composer install --no-interaction --no-dev --optimize-autoloader --ignore-platform-reqs
 
 RUN chmod -R 775 storage bootstrap/cache
 
