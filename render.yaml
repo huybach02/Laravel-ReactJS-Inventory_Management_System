@@ -1,9 +1,8 @@
 services:
   - type: web
     name: laravel-ims
-    runtime: php
-    buildCommand: "composer install && php artisan optimize:clear && php artisan storage:link && php artisan migrate --force"
-    startCommand: "php artisan serve --host 0.0.0.0 --port $PORT"
+    runtime: docker
+    plan: free
     envVars:
       - key: APP_ENV
         value: production
