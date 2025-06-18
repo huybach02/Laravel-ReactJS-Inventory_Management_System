@@ -188,11 +188,18 @@ const ImportExcel = ({ path }: { path: string }) => {
                         <Button
                             type="primary"
                             icon={<Download size={14} />}
-                            onClick={() =>
+                            onClick={() => {
+                                // Kiểm tra và loại bỏ dấu / trùng lặp
+                                const baseUrl = apiURL.endsWith("/")
+                                    ? apiURL.slice(0, -1)
+                                    : apiURL;
+                                const pathSegment = path.startsWith("/")
+                                    ? path
+                                    : `/${path}`;
                                 window.open(
-                                    `${apiURL}${path}/download-template-excel`
-                                )
-                            }
+                                    `${baseUrl}${pathSegment}/download-template-excel`
+                                );
+                            }}
                         >
                             Tải xuống file excel mẫu
                         </Button>
