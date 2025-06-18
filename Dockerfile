@@ -7,11 +7,12 @@ RUN apt-get update && apt-get install -y \
     libpng-dev \
     libonig-dev \
     libxml2-dev \
+    libzip-dev \
     zip \
     unzip
 
 # Cài đặt các PHP extensions
-RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
+RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
 
 # Cài đặt composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -19,15 +20,25 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Thiết lập thư mục làm việc
 WORKDIR /var/www/html
 
+# Sao chép composer.json và composer.lock trước
+COPY composer.json composer.lock ./
+
+# Cài đặt các dependencies của Laravel
+RUN composer install --no-scripts --no-autoloader --no-interaction
+
 # Sao chép toàn bộ mã nguồn vào container
 COPY . /var/www/html
 
-# Cài đặt các dependencies của Laravel
-RUN composer install --no-interaction --no-dev --optimize-autoloader
+# Chạy composer install đầy đủ
+RUN composer dump-autoload --optimize && \
+    composer run-script post-install-cmd
 
 # Thiết lập quyền truy cập
 RUN chown -R www-data:www-data /var/www/html
 RUN chmod -R 755 /var/www/html/storage
+
+# Tạo symbolic link cho storage
+RUN php artisan storage:link || true
 
 # Cấu hình Apache
 COPY apache-config.conf /etc/apache2/sites-available/000-default.conf
