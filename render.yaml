@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: laravel-ims
+    runtime: php
+    buildCommand: "composer install && php artisan optimize:clear && php artisan storage:link && php artisan migrate --force"
+    startCommand: "php artisan serve --host 0.0.0.0 --port $PORT"
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
+      - key: APP_KEY
+        fromEnvVar: APP_KEY
+      - key: DB_CONNECTION
+        value: mysql
+      - key: DB_HOST
+        fromEnvVar: DB_HOST
+      - key: DB_PORT
+        fromEnvVar: DB_PORT
+      - key: DB_DATABASE
+        fromEnvVar: DB_DATABASE
+      - key: DB_USERNAME
+        fromEnvVar: DB_USERNAME
+      - key: DB_PASSWORD
+        fromEnvVar: DB_PASSWORD
