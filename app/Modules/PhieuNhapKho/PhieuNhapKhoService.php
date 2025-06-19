@@ -259,10 +259,18 @@ class PhieuNhapKhoService
   public function getOptionsByNhaCungCap($nhaCungCapId, $params = [])
   {
     $query = PhieuNhapKho::where('nha_cung_cap_id', $nhaCungCapId);
-    if (isset($params['chua_hoan_thanh'])) {
+    if (isset($params['chua_hoan_thanh']) && $params['chua_hoan_thanh'] == "true") {
       $query->whereRaw('da_thanh_toan < tong_tien');
     }
-    return $query->select('id as value', DB::raw("CONCAT(ma_phieu_nhap_kho, ' (Công nợ: ', REPLACE(FORMAT(tong_tien - da_thanh_toan, 0), ',', '.'), ' đ)') as label"))->get();
+    return $query->select(
+      'id as value',
+      'id',
+      DB::raw("CONCAT(ma_phieu_nhap_kho, ' (Công nợ: ', REPLACE(FORMAT(tong_tien - da_thanh_toan, 0), ',', '.'), ' đ)') as label"),
+      'ma_phieu_nhap_kho',
+      'tong_tien',
+      'da_thanh_toan',
+      DB::raw("(tong_tien - da_thanh_toan) as cong_no")
+    )->get();
   }
 
   /**

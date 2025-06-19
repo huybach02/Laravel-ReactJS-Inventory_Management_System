@@ -23,7 +23,7 @@ import {
 import { API_ROUTE_CONFIG } from "../../configs/api-route-config";
 import dayjs from "dayjs";
 import { getDataById, getDataSelect } from "../../services/getData.api";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 const FormPhieuChi = ({
     form,
@@ -34,10 +34,13 @@ const FormPhieuChi = ({
     isDetail?: boolean;
     chiTietPhieuChi?: any;
 }) => {
+    console.log(chiTietPhieuChi);
     const nhaCungCapId = Form.useWatch("nha_cung_cap_id", form);
     const loaiPhieuChi = Form.useWatch("loai_phieu_chi", form);
     const phuongThucThanhToan = Form.useWatch("phuong_thuc_thanh_toan", form);
     const phieuNhapKhoId = Form.useWatch("phieu_nhap_kho_id", form);
+
+    const [nhieuPhieuNhapKho, setNhieuPhieuNhapKho] = useState<any[]>([]);
 
     const fetchInfoPhieuNhapKho = async () => {
         const response = await getDataById(
@@ -59,20 +62,40 @@ const FormPhieuChi = ({
         form.setFieldValue("so_tien_can_thanh_toan", response);
     };
 
-    const fetchTongTienCanThanhToanTheoNhieuPhieuNhapKho = async () => {
+    const fetchNhieuPhieuNhapKhoTheoNhaCungCap = useCallback(async () => {
         const response = await getDataSelect(
             API_ROUTE_CONFIG.PHIEU_NHAP_KHO +
-                "/tong-tien-can-thanh-toan-theo-nhieu-phieu-nhap-kho",
+                "/options-by-nha-cung-cap/" +
+                nhaCungCapId,
             {
-                phieu_nhap_kho_ids: form
-                    .getFieldValue("phieu_nhap_kho_ids")
-                    .join(","),
+                chua_hoan_thanh: isDetail ? false : true,
             }
         );
-        form.setFieldValue("so_tien_can_thanh_toan", response);
-    };
-
-    const phieuNhapKhoIds = Form.useWatch("phieu_nhap_kho_ids", form);
+        setNhieuPhieuNhapKho(
+            !isDetail
+                ? response.map((item: any) => ({
+                      ...item,
+                      so_tien_thanh_toan: 0,
+                  }))
+                : response
+                      .filter((item: any) =>
+                          chiTietPhieuChi?.find(
+                              (item2: any) =>
+                                  item2.ma_phieu_nhap_kho ==
+                                      item.ma_phieu_nhap_kho &&
+                                  item2.tong_tien_da_thanh_toan > 0
+                          )
+                      )
+                      .map((item: any) => ({
+                          ...item,
+                          so_tien_thanh_toan: chiTietPhieuChi?.find(
+                              (item: any) =>
+                                  item.ma_phieu_nhap_kho ==
+                                  item.ma_phieu_nhap_kho
+                          )?.tong_tien_da_thanh_toan,
+                      }))
+        );
+    }, [nhaCungCapId]);
 
     useEffect(() => {
         if (phieuNhapKhoId && loaiPhieuChi === 1) {
@@ -81,40 +104,79 @@ const FormPhieuChi = ({
         if (nhaCungCapId && loaiPhieuChi === 2) {
             fetchTongTienCanThanhToanTheoNhaCungCap();
         }
-        if (
-            loaiPhieuChi === 4 &&
-            phieuNhapKhoIds &&
-            phieuNhapKhoIds.length > 0
-        ) {
-            fetchTongTienCanThanhToanTheoNhieuPhieuNhapKho();
+        if (loaiPhieuChi === 4 && nhaCungCapId) {
+            fetchNhieuPhieuNhapKhoTheoNhaCungCap();
         }
-    }, [phieuNhapKhoId, loaiPhieuChi, nhaCungCapId, phieuNhapKhoIds]);
+    }, [phieuNhapKhoId, loaiPhieuChi, nhaCungCapId]);
 
     const columns = [
         {
             title: "Phiếu nhập kho",
-            dataIndex: "ma_phieu_nhap_kho",
+            dataIndex: !isDetail ? "label" : "ma_phieu_nhap_kho",
             key: "phieu_nhap_kho",
         },
         {
-            title: "Số tiền cần thanh toán",
-            dataIndex: "tong_tien_can_thanh_toan",
-            key: "tong_tien_can_thanh_toan",
-            render: (text: string) => formatter(text) + " đ",
-        },
-        {
-            title: "Số tiền đã thanh toán",
-            dataIndex: "tong_tien_da_thanh_toan",
-            key: "tong_tien_da_thanh_toan",
-            render: (text: string) => formatter(text) + " đ",
+            title: "Số tiền thanh toán",
+            dataIndex: "so_tien_thanh_toan",
+            key: "so_tien_thanh_toan",
+            render: (text: string, record: any) => {
+                return (
+                    <InputNumber
+                        placeholder="Nhập số tiền chi"
+                        style={{ width: "100%" }}
+                        formatter={formatter}
+                        parser={parser}
+                        addonAfter="đ"
+                        disabled={isDetail}
+                        onChange={(value) => {
+                            const updatedPhieuNhapKho = nhieuPhieuNhapKho.map(
+                                (item) =>
+                                    item.id === record.id
+                                        ? { ...item, so_tien_thanh_toan: value }
+                                        : item
+                            );
+
+                            setNhieuPhieuNhapKho(updatedPhieuNhapKho);
+                            form.setFieldValue(
+                                "phieu_nhap_kho_ids",
+                                updatedPhieuNhapKho.filter(
+                                    (item) => item.so_tien_thanh_toan > 0
+                                )
+                            );
+
+                            const tongTien = updatedPhieuNhapKho.reduce(
+                                (acc, item) =>
+                                    acc + (item.so_tien_thanh_toan || 0),
+                                0
+                            );
+
+                            form.setFieldValue("so_tien", tongTien);
+                        }}
+                        defaultValue={
+                            chiTietPhieuChi?.find(
+                                (item: any) =>
+                                    item.ma_phieu_nhap_kho ==
+                                    record.ma_phieu_nhap_kho
+                            )?.tong_tien_da_thanh_toan
+                        }
+                    />
+                );
+            },
         },
         {
             title: "Số tiền còn lại",
             dataIndex: "so_tien_con_lai",
             key: "so_tien_con_lai",
-            render: (text: string) => formatter(text) + " đ",
+            hidden: isDetail,
+            render: (text: string, record: any) => {
+                return record.so_tien_thanh_toan > 0
+                    ? formatter(
+                          record.cong_no - (record.so_tien_thanh_toan || 0)
+                      ) + " đ"
+                    : "0 đ";
+            },
         },
-    ];
+    ].filter((column) => !column.hidden);
 
     return (
         <Row gutter={[10, 10]}>
@@ -201,6 +263,8 @@ const FormPhieuChi = ({
                             // Reset phiếu nhập kho khi thay đổi nhà cung cấp
                             form.setFieldValue("phieu_nhap_kho_id", undefined);
                             form.setFieldValue("so_tien_can_thanh_toan", 0);
+                            form.setFieldValue("phieu_nhap_kho_ids", []);
+                            setNhieuPhieuNhapKho([]);
                         }}
                         disabled={isDetail}
                     />
@@ -233,59 +297,49 @@ const FormPhieuChi = ({
                     />
                 </Col>
             )}
-            {loaiPhieuChi === 4 && !isDetail && (
+            {(loaiPhieuChi === 1 || loaiPhieuChi === 2) && !isDetail && (
                 <Col span={12}>
-                    <SelectFormApi
-                        mode="multiple"
-                        name="phieu_nhap_kho_ids"
-                        label="Phiếu một hoặc nhiều nhập kho"
-                        path={
-                            nhaCungCapId
-                                ? API_ROUTE_CONFIG.PHIEU_NHAP_KHO +
-                                  "/options-by-nha-cung-cap/" +
-                                  nhaCungCapId
-                                : ""
-                        }
-                        filter={{
-                            chua_hoan_thanh: true,
-                        }}
-                        reload={nhaCungCapId}
-                        placeholder="Chọn phiếu nhập kho"
-                        rules={[
-                            {
-                                required: loaiPhieuChi === 4,
-                                message: "Phiếu nhập kho không được bỏ trống!",
-                            },
-                        ]}
-                        disabled={isDetail}
-                    />
+                    <Form.Item
+                        name="so_tien_can_thanh_toan"
+                        label="Số tiền cần thanh toán"
+                    >
+                        <InputNumber
+                            placeholder="Nhập số tiền cần thanh toán"
+                            style={{ width: "100%" }}
+                            formatter={formatter}
+                            parser={parser}
+                            addonAfter="đ"
+                            disabled
+                        />
+                    </Form.Item>
                 </Col>
             )}
-            {(loaiPhieuChi === 1 || loaiPhieuChi === 2 || loaiPhieuChi === 4) &&
-                !isDetail && (
-                    <Col span={12}>
-                        <Form.Item
-                            name="so_tien_can_thanh_toan"
-                            label="Số tiền cần thanh toán"
-                        >
-                            <InputNumber
-                                placeholder="Nhập số tiền cần thanh toán"
-                                style={{ width: "100%" }}
-                                formatter={formatter}
-                                parser={parser}
-                                addonAfter="đ"
-                                disabled
-                            />
+
+            {loaiPhieuChi === 4 &&
+                nhaCungCapId &&
+                nhieuPhieuNhapKho.length > 0 && (
+                    <Col span={24}>
+                        <Table
+                            columns={columns}
+                            dataSource={nhieuPhieuNhapKho}
+                            rowKey="id"
+                            pagination={false}
+                            bordered
+                            style={{ marginBottom: 20 }}
+                        />
+                        <Form.Item name="phieu_nhap_kho_ids" hidden>
+                            <Input />
                         </Form.Item>
                     </Col>
                 )}
+
             <Col span={12}>
                 <Form.Item
                     name="so_tien"
                     label="Số tiền chi"
                     rules={[
                         {
-                            required: true,
+                            required: loaiPhieuChi === 4 ? false : true,
                             message: "Số tiền chi không được bỏ trống!",
                         },
                     ]}
@@ -297,12 +351,12 @@ const FormPhieuChi = ({
                         formatter={formatter}
                         parser={parser}
                         addonAfter="đ"
-                        disabled={isDetail}
+                        disabled={isDetail || loaiPhieuChi === 4}
                     />
                 </Form.Item>
             </Col>
 
-            <Col span={24}>
+            {/* <Col span={24}>
                 {isDetail && chiTietPhieuChi && chiTietPhieuChi.length > 0 && (
                     <>
                         <Typography.Title level={5}>
@@ -317,7 +371,7 @@ const FormPhieuChi = ({
                         />
                     </>
                 )}
-            </Col>
+            </Col> */}
 
             <Col span={12}>
                 <Form.Item

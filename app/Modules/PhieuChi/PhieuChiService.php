@@ -160,11 +160,14 @@ class PhieuChiService
           break;
         case 4: // chi thanh toán cho nhiều phiếu nhập kho chỉ định
           if (empty($data['phieu_nhap_kho_ids'])) {
-            return CustomResponse::error('Phiếu nhập kho không được để trống');
+            return CustomResponse::error('Danh sách phiếu nhập kho không được để trống');
           }
 
+          $phieuNhapKhoIds = collect($data['phieu_nhap_kho_ids'])->map(function ($item) {
+            return (int) $item['id'];
+          })->toArray();
           // Lấy các phiếu nhập kho chưa thanh toán đủ
-          $phieuNhapKhos = PhieuNhapKho::whereIn('id', $data['phieu_nhap_kho_ids'])
+          $phieuNhapKhos = PhieuNhapKho::whereIn('id', $phieuNhapKhoIds)
             ->whereRaw('da_thanh_toan < tong_tien')
             ->orderBy('id', 'asc')
             ->get();
@@ -173,42 +176,37 @@ class PhieuChiService
             return CustomResponse::error('Không tìm thấy công nợ của nhà cung cấp này');
           }
 
-          // Tính tổng số tiền cần thanh toán
-          $tongTienCanThanhToan = $phieuNhapKhos->sum(function ($phieu) {
-            return $phieu->tong_tien - $phieu->da_thanh_toan;
-          });
-
-          $soTienThanhToan = $data['so_tien'];
-
-          if ($tongTienCanThanhToan < $soTienThanhToan) {
-            return CustomResponse::error('Số tiền thanh toán nhiều hơn số tiền cần thanh toán nhà cung cấp');
-          }
+          // Lưu lại danh sách phiếu nhập kho trước khi unset
+          $phieuNhapKhoList = $data['phieu_nhap_kho_ids'];
 
           // Tạo phiếu chi
           unset($data['phieu_nhap_kho_ids']);
           $phieuChi = PhieuChi::create($data);
 
-          // Phân bổ tiền thanh toán cho từng phiếu
+          // Phân bổ tiền thanh toán cho từng phiếu nhập kho
           foreach ($phieuNhapKhos as $phieu) {
-            if ($soTienThanhToan <= 0) break;
+            // Tìm số tiền thanh toán từ dữ liệu đầu vào
+            $soTienThanhToan = 0;
+            foreach ($phieuNhapKhoList as $item) {
+              if ((int)$item['id'] === $phieu->id && isset($item['so_tien_thanh_toan'])) {
+                $soTienThanhToan = $item['so_tien_thanh_toan'];
+                break;
+              }
+            }
 
-            $soTienCanThanhToan = $phieu->tong_tien - $phieu->da_thanh_toan;
-            $soTienThanhToanPhieu = min($soTienCanThanhToan, $soTienThanhToan);
-
-            $daThanhToanMoi = $phieu->da_thanh_toan + $soTienThanhToanPhieu;
-            $trangThaiMoi = $this->getTrangThaiThanhToan($daThanhToanMoi, $phieu->tong_tien);
+            if ($soTienThanhToan <= 0) {
+              continue; // Bỏ qua nếu không có số tiền thanh toán
+            }
 
             $phieu->update([
-              'da_thanh_toan' => $daThanhToanMoi,
-              'trang_thai' => $trangThaiMoi
+              'da_thanh_toan' => $phieu->da_thanh_toan + $soTienThanhToan,
+              'trang_thai' => $this->getTrangThaiThanhToan($phieu->da_thanh_toan + $soTienThanhToan, $phieu->tong_tien),
             ]);
-
-            $soTienThanhToan -= $soTienThanhToanPhieu;
 
             ChiTietPhieuChi::create([
               'phieu_chi_id' => $phieuChi->id,
               'phieu_nhap_kho_id' => $phieu->id,
-              'so_tien' => $soTienThanhToanPhieu
+              'so_tien' => $soTienThanhToan
             ]);
           }
           break;
@@ -244,6 +242,8 @@ class PhieuChiService
         return CustomResponse::error('Chỉ được xóa phiếu chi trong ngày hôm nay');
       }
 
+      DB::beginTransaction();
+
       switch ($model->loai_phieu_chi) {
 
         case 1: // chi thanh toán cho phiếu nhập kho
@@ -252,7 +252,8 @@ class PhieuChiService
             'da_thanh_toan' => $phieuNhapKho->da_thanh_toan - $model->so_tien,
           ]);
           break;
-        case 2: // thanh toán công nợ
+        case 2:
+        case 4: // thanh toán công nợ
           $chiTietPhieuChi = ChiTietPhieuChi::where('phieu_chi_id', $id)->get();
           foreach ($chiTietPhieuChi as $chiTiet) {
             $phieuNhapKho = PhieuNhapKho::find($chiTiet->phieu_nhap_kho_id);
@@ -267,14 +268,14 @@ class PhieuChiService
           break;
         case 3: // chi khác
           break;
-        case 4: // chi thanh toán cho nhiều phiếu nhập kho chỉ định
-
-          break;
         default:
           return CustomResponse::error('Loại phiếu chi không hợp lệ');
       }
-      return $model->delete();
+      $model->delete();
+      DB::commit();
+      return $model;
     } catch (Exception $e) {
+      DB::rollBack();
       return CustomResponse::error($e->getMessage());
     }
   }

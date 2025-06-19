@@ -54,7 +54,7 @@ const ThemPhieuChi = ({ path, title }: { path: string; title: string }) => {
             <Modal
                 title={`Thêm ${title}`}
                 open={isModalOpen}
-                width={1000}
+                width={1200}
                 onCancel={handleCancel}
                 maskClosable={false}
                 centered
