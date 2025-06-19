@@ -11,6 +11,7 @@ import {
     DatePicker,
     Table,
     Typography,
+    Tooltip,
 } from "antd";
 import { formatter, parser } from "../../utils/utils";
 import SelectFormApi from "../../components/select/SelectFormApi";
@@ -24,6 +25,7 @@ import { API_ROUTE_CONFIG } from "../../configs/api-route-config";
 import dayjs from "dayjs";
 import { getDataById, getDataSelect } from "../../services/getData.api";
 import { useCallback, useEffect, useState } from "react";
+import { WarningOutlined } from "@ant-design/icons";
 
 const FormPhieuChi = ({
     form,
@@ -169,11 +171,38 @@ const FormPhieuChi = ({
             key: "so_tien_con_lai",
             hidden: isDetail,
             render: (text: string, record: any) => {
-                return record.so_tien_thanh_toan > 0
-                    ? formatter(
-                          record.cong_no - (record.so_tien_thanh_toan || 0)
-                      ) + " đ"
-                    : "0 đ";
+                if (record.so_tien_thanh_toan > 0) {
+                    const soTienConLai =
+                        record.cong_no - (record.so_tien_thanh_toan || 0);
+                    return (
+                        <div style={{ display: "flex", alignItems: "center" }}>
+                            <span>{formatter(soTienConLai) + " đ"}</span>
+                            {record.so_tien_thanh_toan > record.cong_no && (
+                                <Tooltip
+                                    title="Số tiền thanh toán vượt quá công nợ"
+                                    color="#ff4d4f"
+                                    placement="top"
+                                >
+                                    <WarningOutlined
+                                        style={{
+                                            color: "#ff4d4f",
+                                            marginLeft: "8px",
+                                            fontSize: "20px",
+                                        }}
+                                    />
+                                </Tooltip>
+                            )}
+                        </div>
+                    );
+                } else if (record.so_tien_thanh_toan == 0) {
+                    return (
+                        formatter(
+                            record.cong_no - (record.so_tien_thanh_toan || 0)
+                        ) + " đ"
+                    );
+                } else {
+                    return "-";
+                }
             },
         },
     ].filter((column) => !column.hidden);

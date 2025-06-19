@@ -187,8 +187,12 @@ class PhieuChiService
           foreach ($phieuNhapKhos as $phieu) {
             // Tìm số tiền thanh toán từ dữ liệu đầu vào
             $soTienThanhToan = 0;
+
             foreach ($phieuNhapKhoList as $item) {
               if ((int)$item['id'] === $phieu->id && isset($item['so_tien_thanh_toan'])) {
+                if ($phieu->tong_tien - $phieu->da_thanh_toan < $item['so_tien_thanh_toan']) {
+                  return CustomResponse::error('Số tiền thanh toán nhiều hơn số tiền công nợ');
+                }
                 $soTienThanhToan = $item['so_tien_thanh_toan'];
                 break;
               }
