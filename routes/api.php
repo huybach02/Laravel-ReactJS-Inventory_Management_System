@@ -194,4 +194,17 @@ Route::group([
     Route::delete('/{id}', [\App\Modules\PhieuChi\PhieuChiController::class, 'destroy']);
     Route::post('/import-excel', [\App\Modules\PhieuChi\PhieuChiController::class, 'importExcel']);
   });
+
+  // QuanLyBanHang
+  Route::prefix('quan-ly-ban-hang')->group(function () {
+    Route::get('/', [\App\Modules\QuanLyBanHang\QuanLyBanHangController::class, 'index']);
+    Route::get('/get-gia-ban-san-pham', [\App\Modules\QuanLyBanHang\QuanLyBanHangController::class, 'getGiaBanSanPham']);
+    Route::get('/options', [\App\Modules\QuanLyBanHang\QuanLyBanHangController::class, 'getOptions']);
+    Route::get('/download-template-excel', [\App\Modules\QuanLyBanHang\QuanLyBanHangController::class, 'downloadTemplateExcel']);
+    Route::post('/', [\App\Modules\QuanLyBanHang\QuanLyBanHangController::class, 'store']);
+    Route::get('/{id}', [\App\Modules\QuanLyBanHang\QuanLyBanHangController::class, 'show']);
+    Route::put('/{id}', [\App\Modules\QuanLyBanHang\QuanLyBanHangController::class, 'update']);
+    Route::delete('/{id}', [\App\Modules\QuanLyBanHang\QuanLyBanHangController::class, 'destroy']);
+    Route::post('/import-excel', [\App\Modules\QuanLyBanHang\QuanLyBanHangController::class, 'importExcel']);
+  });
 });

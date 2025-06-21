@@ -2,6 +2,18 @@
 
 return [
   [
+    "name" => "quan-ly-ban-hang",
+    "actions" => [
+      "index" => true,
+      "create" => true,
+      "show" => true,
+      "edit" => true,
+      "delete" => true,
+      "export" => true,
+      "showMenu" => true
+    ]
+  ],
+  [
     "name" => "phieu-chi",
     "actions" => [
       "index" => true,

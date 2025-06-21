@@ -47,7 +47,11 @@ class KhachHangService
    */
   public function getById($id)
   {
-    return KhachHang::with('images')->find($id);
+    $data = KhachHang::with('images')->find($id);
+    if (!$data) {
+      return CustomResponse::error('Dữ liệu không tồn tại');
+    }
+    return $data;
   }
 
   /**
@@ -119,6 +123,6 @@ class KhachHangService
    */
   public function getOptions()
   {
-    return KhachHang::select('id as value', 'ten_khach_hang as label')->get();
+    return KhachHang::select('id as value', DB::raw('CONCAT(ten_khach_hang, " - ", so_dien_thoai) as label'))->get();
   }
 }

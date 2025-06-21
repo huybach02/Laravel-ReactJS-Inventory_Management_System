@@ -123,6 +123,7 @@ const LoginPage = () => {
                     { required: true, message: "Vui lòng nhập email!" },
                     { type: "email", message: "Email không hợp lệ!" },
                 ]}
+                initialValue={"huybach2002ct@gmail.com"}
             >
                 <Input prefix={<MailOutlined />} placeholder="Nhập email" />
             </Form.Item>
@@ -136,6 +137,7 @@ const LoginPage = () => {
                         message: "Vui lòng nhập mật khẩu!",
                     },
                 ]}
+                initialValue={"password"}
             >
                 <Input.Password
                     prefix={<LockOutlined />}

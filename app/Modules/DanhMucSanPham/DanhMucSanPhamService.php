@@ -47,7 +47,11 @@ class DanhMucSanPhamService
    */
   public function getById($id)
   {
-    return DanhMucSanPham::with('images')->find($id);
+    $data = DanhMucSanPham::with('images')->find($id);
+    if (!$data) {
+      return CustomResponse::error('Dữ liệu không tồn tại');
+    }
+    return $data;
   }
 
   /**

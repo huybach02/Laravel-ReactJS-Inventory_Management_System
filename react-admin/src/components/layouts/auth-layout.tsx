@@ -1,4 +1,5 @@
 import { Card, Flex, Tag, Typography } from "antd";
+import { DATA_CONSTANTS } from "../../utils/constant";
 
 const AuthLayout = ({
     children,
@@ -40,7 +41,7 @@ const AuthLayout = ({
                         }}
                     /> */}
                     <Typography.Title level={1} style={{ margin: 0 }}>
-                        BOILERPLATE
+                        {DATA_CONSTANTS.WEBSITE_NAME}
                     </Typography.Title>
                     <Tag
                         style={{

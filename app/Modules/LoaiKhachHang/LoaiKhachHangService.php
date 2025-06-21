@@ -47,7 +47,11 @@ class LoaiKhachHangService
    */
   public function getById($id)
   {
-    return LoaiKhachHang::with('images')->find($id);
+    $data = LoaiKhachHang::with('images')->find($id);
+    if (!$data) {
+      return CustomResponse::error('Dữ liệu không tồn tại');
+    }
+    return $data;
   }
 
   /**

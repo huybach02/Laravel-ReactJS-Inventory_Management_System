@@ -48,7 +48,7 @@ class SanPhamService
    */
   public function getById($id)
   {
-    return SanPham::with([
+    $data = SanPham::with([
       'images',
       'donViTinhs' => function ($query) {
         $query->withoutGlobalScope('withUserNames')->select('don_vi_tinhs.id as value', 'ten_don_vi as label');
@@ -58,6 +58,10 @@ class SanPhamService
       },
       'danhMuc'
     ])->find($id);
+    if (!$data) {
+      return CustomResponse::error('Dữ liệu không tồn tại');
+    }
+    return $data;
   }
 
   /**

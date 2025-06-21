@@ -69,6 +69,10 @@ class PhieuChiService
       $phieuChi->chi_tiet_phieu_chi = $data;
     }
 
+    if (!$phieuChi) {
+      return CustomResponse::error('Dữ liệu không tồn tại');
+    }
+
     return $phieuChi;
   }
 

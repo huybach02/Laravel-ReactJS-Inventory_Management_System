@@ -33,6 +33,10 @@ class PhieuChiController extends Controller
 
     $result = $this->phieuChiService->getAll($params);
 
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
+    }
+
     return CustomResponse::success([
       'collection' => $result['data'],
       'total' => $result['total'],
@@ -58,6 +62,11 @@ class PhieuChiController extends Controller
   public function show($id)
   {
     $result = $this->phieuChiService->getById($id);
+
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
+    }
+
     return CustomResponse::success($result);
   }
 
@@ -87,12 +96,22 @@ class PhieuChiController extends Controller
   public function getOptions()
   {
     $result = $this->phieuChiService->getOptions();
+
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
+    }
+
     return CustomResponse::success($result);
   }
 
   public function downloadTemplateExcel()
   {
     $path = public_path('mau-excel/PhieuChi.xlsx');
+
+    if (!file_exists($path)) {
+      return CustomResponse::error('File không tồn tại');
+    }
+
     return response()->download($path);
   }
 

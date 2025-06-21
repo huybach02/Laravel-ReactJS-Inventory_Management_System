@@ -33,6 +33,10 @@ class LoaiKhachHangController extends Controller
 
     $result = $this->loaiKhachHangService->getAll($params);
 
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
+    }
+
     return CustomResponse::success([
       'collection' => $result['data'],
       'total' => $result['total'],
@@ -46,6 +50,11 @@ class LoaiKhachHangController extends Controller
   public function store(CreateLoaiKhachHangRequest $request)
   {
     $result = $this->loaiKhachHangService->create($request->validated());
+
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
+    }
+
     return CustomResponse::success($result, 'Tạo mới thành công');
   }
 
@@ -55,6 +64,11 @@ class LoaiKhachHangController extends Controller
   public function show($id)
   {
     $result = $this->loaiKhachHangService->getById($id);
+
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
+    }
+
     return CustomResponse::success($result);
   }
 
@@ -64,6 +78,11 @@ class LoaiKhachHangController extends Controller
   public function update(UpdateLoaiKhachHangRequest $request, $id)
   {
     $result = $this->loaiKhachHangService->update($id, $request->validated());
+
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
+    }
+
     return CustomResponse::success($result, 'Cập nhật thành công');
   }
 
@@ -73,18 +92,33 @@ class LoaiKhachHangController extends Controller
   public function destroy($id)
   {
     $result = $this->loaiKhachHangService->delete($id);
+
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
+    }
+
     return CustomResponse::success([], 'Xóa thành công');
   }
 
   public function getOptions()
   {
     $result = $this->loaiKhachHangService->getOptions();
+
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
+    }
+
     return CustomResponse::success($result);
   }
 
   public function downloadTemplateExcel()
   {
     $path = public_path('mau-excel/LoaiKhachHang.xlsx');
+
+    if (!file_exists($path)) {
+      return CustomResponse::error('File không tồn tại');
+    }
+
     return response()->download($path);
   }
 

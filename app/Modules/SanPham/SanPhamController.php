@@ -38,6 +38,10 @@ class SanPhamController extends Controller
 
     $result = $this->sanPhamService->getAll($params);
 
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
+    }
+
     return CustomResponse::success([
       'collection' => $result['data'],
       'total' => $result['total'],
@@ -51,6 +55,11 @@ class SanPhamController extends Controller
   public function store(CreateSanPhamRequest $request)
   {
     $result = $this->sanPhamService->create($request->validated());
+
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
+    }
+
     return CustomResponse::success($result, 'Tạo mới thành công');
   }
 
@@ -60,6 +69,11 @@ class SanPhamController extends Controller
   public function show($id)
   {
     $result = $this->sanPhamService->getById($id);
+
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
+    }
+
     return CustomResponse::success($result);
   }
 
@@ -69,6 +83,11 @@ class SanPhamController extends Controller
   public function update(UpdateSanPhamRequest $request, $id)
   {
     $result = $this->sanPhamService->update($id, $request->validated());
+
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
+    }
+
     return CustomResponse::success($result, 'Cập nhật thành công');
   }
 
@@ -78,6 +97,11 @@ class SanPhamController extends Controller
   public function destroy($id)
   {
     $result = $this->sanPhamService->delete($id);
+
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
+    }
+
     return CustomResponse::success([], 'Xóa thành công');
   }
 
@@ -87,18 +111,33 @@ class SanPhamController extends Controller
   public function getOptions()
   {
     $result = $this->sanPhamService->getOptions();
+
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
+    }
+
     return CustomResponse::success($result);
   }
 
   public function getOptionsByNhaCungCap($nhaCungCapId)
   {
     $result = $this->sanPhamService->getOptionsByNhaCungCap($nhaCungCapId);
+
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
+    }
+
     return CustomResponse::success($result);
   }
 
   public function downloadTemplateExcel()
   {
     $path = public_path('mau-excel/SanPham.xlsx');
+
+    if (!file_exists($path)) {
+      return CustomResponse::error('File không tồn tại');
+    }
+
     return response()->download($path);
   }
 

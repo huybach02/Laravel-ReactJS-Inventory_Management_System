@@ -32,6 +32,10 @@ class NguoiDungController extends Controller
 
       $result = $this->nguoiDungService->getAll($params);
 
+      if ($result instanceof \Illuminate\Http\JsonResponse) {
+        return $result;
+      }
+
       return CustomResponse::success([
         'collection' => $result['data'],
         'total' => $result['total'],
@@ -50,6 +54,11 @@ class NguoiDungController extends Controller
     $validated = $request->validated();
     unset($validated['confirm_password']);
     $result = $this->nguoiDungService->create($validated);
+
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
+    }
+
     return CustomResponse::success($result, 'Tạo mới thành công');
   }
 
@@ -59,6 +68,11 @@ class NguoiDungController extends Controller
   public function show($id)
   {
     $result = $this->nguoiDungService->getById($id);
+
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
+    }
+
     return CustomResponse::success($result);
   }
 
@@ -68,6 +82,11 @@ class NguoiDungController extends Controller
   public function update(UpdateNguoiDungRequest $request, $id)
   {
     $result = $this->nguoiDungService->update($id, $request->validated());
+
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
+    }
+
     return CustomResponse::success($result, 'Cập nhật thành công');
   }
 
@@ -77,15 +96,23 @@ class NguoiDungController extends Controller
   public function destroy($id)
   {
     $result = $this->nguoiDungService->delete($id);
-    if ($result) {
-      return CustomResponse::success([], 'Xóa thành công');
+
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
     }
+
+    return CustomResponse::success([], 'Xóa thành công');
     return CustomResponse::error('Không thể xóa tài khoản đang đăng nhập');
   }
 
   public function changeStatusNgoaiGio($id, Request $request)
   {
     $result = $this->nguoiDungService->changeStatusNgoaiGio($id, $request->all());
+
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
+    }
+
     return CustomResponse::success($result, 'Cập nhật thành công');
   }
 }

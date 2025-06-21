@@ -1,28 +1,28 @@
 <?php
 
-namespace App\Modules\NhaCungCap;
+namespace App\Modules\QuanLyBanHang;
 
 use App\Http\Controllers\Controller;
-use App\Modules\NhaCungCap\Validates\CreateNhaCungCapRequest;
-use App\Modules\NhaCungCap\Validates\UpdateNhaCungCapRequest;
+use App\Modules\QuanLyBanHang\Validates\CreateQuanLyBanHangRequest;
+use App\Modules\QuanLyBanHang\Validates\UpdateQuanLyBanHangRequest;
 use App\Class\CustomResponse;
 use App\Class\Helper;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Imports\NhaCungCapImport;
+use App\Imports\QuanLyBanHangImport;
 use Illuminate\Support\Str;
 
-class NhaCungCapController extends Controller
+class QuanLyBanHangController extends Controller
 {
-  protected $nhaCungCapService;
+  protected $quanLyBanHangService;
 
-  public function __construct(NhaCungCapService $nhaCungCapService)
+  public function __construct(QuanLyBanHangService $quanLyBanHangService)
   {
-    $this->nhaCungCapService = $nhaCungCapService;
+    $this->quanLyBanHangService = $quanLyBanHangService;
   }
 
   /**
-   * Lấy danh sách NhaCungCaps
+   * Lấy danh sách QuanLyBanHangs
    */
   public function index(Request $request)
   {
@@ -31,7 +31,7 @@ class NhaCungCapController extends Controller
     // Xử lý và validate parameters
     $params = Helper::validateFilterParams($params);
 
-    $result = $this->nhaCungCapService->getAll($params);
+    $result = $this->quanLyBanHangService->getAll($params);
 
     if ($result instanceof \Illuminate\Http\JsonResponse) {
       return $result;
@@ -44,26 +44,12 @@ class NhaCungCapController extends Controller
     ]);
   }
 
-  /**
-   * Tạo mới NhaCungCap
-   */
-  public function store(CreateNhaCungCapRequest $request)
+  public function getGiaBanSanPham(Request $request)
   {
-    $result = $this->nhaCungCapService->create($request->validated());
+    $sanPhamId = $request->san_pham_id;
+    $donViTinhId = $request->don_vi_tinh_id;
 
-    if ($result instanceof \Illuminate\Http\JsonResponse) {
-      return $result;
-    }
-
-    return CustomResponse::success($result, 'Tạo mới thành công');
-  }
-
-  /**
-   * Lấy thông tin NhaCungCap
-   */
-  public function show($id)
-  {
-    $result = $this->nhaCungCapService->getById($id);
+    $result = $this->quanLyBanHangService->getGiaBanSanPham($sanPhamId, $donViTinhId);
 
     if ($result instanceof \Illuminate\Http\JsonResponse) {
       return $result;
@@ -73,11 +59,39 @@ class NhaCungCapController extends Controller
   }
 
   /**
-   * Cập nhật NhaCungCap
+   * Tạo mới QuanLyBanHang
    */
-  public function update(UpdateNhaCungCapRequest $request, $id)
+  public function store(CreateQuanLyBanHangRequest $request)
   {
-    $result = $this->nhaCungCapService->update($id, $request->validated());
+    $result = $this->quanLyBanHangService->create($request->validated());
+
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
+    }
+
+    return CustomResponse::success($result, 'Tạo mới thành công');
+  }
+
+  /**
+   * Lấy thông tin QuanLyBanHang
+   */
+  public function show($id)
+  {
+    $result = $this->quanLyBanHangService->getById($id);
+
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
+    }
+
+    return CustomResponse::success($result);
+  }
+
+  /**
+   * Cập nhật QuanLyBanHang
+   */
+  public function update(UpdateQuanLyBanHangRequest $request, $id)
+  {
+    $result = $this->quanLyBanHangService->update($id, $request->validated());
 
     if ($result instanceof \Illuminate\Http\JsonResponse) {
       return $result;
@@ -87,11 +101,11 @@ class NhaCungCapController extends Controller
   }
 
   /**
-   * Xóa NhaCungCap
+   * Xóa QuanLyBanHang
    */
   public function destroy($id)
   {
-    $result = $this->nhaCungCapService->delete($id);
+    $result = $this->quanLyBanHangService->delete($id);
 
     if ($result instanceof \Illuminate\Http\JsonResponse) {
       return $result;
@@ -101,11 +115,11 @@ class NhaCungCapController extends Controller
   }
 
   /**
-   * Lấy danh sách NhaCungCap dạng option
+   * Lấy danh sách QuanLyBanHang dạng option
    */
   public function getOptions()
   {
-    $result = $this->nhaCungCapService->getOptions();
+    $result = $this->quanLyBanHangService->getOptions();
 
     if ($result instanceof \Illuminate\Http\JsonResponse) {
       return $result;
@@ -116,7 +130,7 @@ class NhaCungCapController extends Controller
 
   public function downloadTemplateExcel()
   {
-    $path = public_path('mau-excel/NhaCungCap.xlsx');
+    $path = public_path('mau-excel/QuanLyBanHang.xlsx');
 
     if (!file_exists($path)) {
       return CustomResponse::error('File không tồn tại');
@@ -135,9 +149,8 @@ class NhaCungCapController extends Controller
       $data = $request->file('file');
       $filename = Str::random(10) . '.' . $data->getClientOriginalExtension();
       $path = $data->move(public_path('excel'), $filename);
-      logger()->info('Path: ' . $path);
 
-      $import = new NhaCungCapImport($path);
+      $import = new QuanLyBanHangImport();
       Excel::import($import, $path);
 
       $thanhCong = $import->getThanhCong();

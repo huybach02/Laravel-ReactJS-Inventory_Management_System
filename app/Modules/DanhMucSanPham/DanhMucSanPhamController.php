@@ -14,88 +14,122 @@ use Illuminate\Support\Str;
 
 class DanhMucSanPhamController extends Controller
 {
-    protected $danhMucSanPhamService;
-    
-    public function __construct(DanhMucSanPhamService $danhMucSanPhamService)
-    {
-        $this->danhMucSanPhamService = $danhMucSanPhamService;
-    }
-    
-    /**
-     * Lấy danh sách DanhMucSanPhams
-     */
-    public function index(Request $request)
-    {
-        $params = $request->all();
+  protected $danhMucSanPhamService;
 
-        // Xử lý và validate parameters
-        $params = Helper::validateFilterParams($params);
+  public function __construct(DanhMucSanPhamService $danhMucSanPhamService)
+  {
+    $this->danhMucSanPhamService = $danhMucSanPhamService;
+  }
 
-        $result = $this->danhMucSanPhamService->getAll($params);
+  /**
+   * Lấy danh sách DanhMucSanPhams
+   */
+  public function index(Request $request)
+  {
+    $params = $request->all();
 
-        return CustomResponse::success([
-          'collection' => $result['data'],
-          'total' => $result['total'],
-          'pagination' => $result['pagination'] ?? null
-        ]);
-    }
-    
-    /**
-     * Tạo mới DanhMucSanPham
-     */
-    public function store(CreateDanhMucSanPhamRequest $request)
-    {
-        $result = $this->danhMucSanPhamService->create($request->validated());
-        return CustomResponse::success($result, 'Tạo mới thành công');
-    }
-    
-    /**
-     * Lấy thông tin DanhMucSanPham
-     */
-    public function show($id)
-    {
-        $result = $this->danhMucSanPhamService->getById($id);
-        return CustomResponse::success($result);
-    }
-    
-    /**
-     * Cập nhật DanhMucSanPham
-     */
-    public function update(UpdateDanhMucSanPhamRequest $request, $id)
-    {
-        $result = $this->danhMucSanPhamService->update($id, $request->validated());
-        return CustomResponse::success($result, 'Cập nhật thành công');
-    }
-    
-    /**
-     * Xóa DanhMucSanPham
-     */
-    public function destroy($id)
-    {
-        $result = $this->danhMucSanPhamService->delete($id);
-        return CustomResponse::success([], 'Xóa thành công');
+    // Xử lý và validate parameters
+    $params = Helper::validateFilterParams($params);
+
+    $result = $this->danhMucSanPhamService->getAll($params);
+
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
     }
 
-    /**
-     * Lấy danh sách DanhMucSanPham dạng option
-     */
-    public function getOptions()
-    {
-      $result = $this->danhMucSanPhamService->getOptions();
-      return CustomResponse::success($result);
+    return CustomResponse::success([
+      'collection' => $result['data'],
+      'total' => $result['total'],
+      'pagination' => $result['pagination'] ?? null
+    ]);
+  }
+
+  /**
+   * Tạo mới DanhMucSanPham
+   */
+  public function store(CreateDanhMucSanPhamRequest $request)
+  {
+    $result = $this->danhMucSanPhamService->create($request->validated());
+
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
     }
 
-    public function downloadTemplateExcel()
-    {
-      $path = public_path('mau-excel/DanhMucSanPham.xlsx');
-      return response()->download($path);
+    return CustomResponse::success($result, 'Tạo mới thành công');
+  }
+
+  /**
+   * Lấy thông tin DanhMucSanPham
+   */
+  public function show($id)
+  {
+    $result = $this->danhMucSanPhamService->getById($id);
+
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
     }
 
-    public function importExcel(Request $request)
-    {
-      $request->validate([
-        'file' => 'required|file|mimes:xlsx,xls,csv',
-      ]);
+    return CustomResponse::success($result);
+  }
+
+  /**
+   * Cập nhật DanhMucSanPham
+   */
+  public function update(UpdateDanhMucSanPhamRequest $request, $id)
+  {
+    $result = $this->danhMucSanPhamService->update($id, $request->validated());
+
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
+    }
+
+    return CustomResponse::success($result, 'Cập nhật thành công');
+  }
+
+  /**
+   * Xóa DanhMucSanPham
+   */
+  public function destroy($id)
+  {
+    $result = $this->danhMucSanPhamService->delete($id);
+
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
+    }
+
+    return CustomResponse::success([], 'Xóa thành công');
+  }
+
+  /**
+   * Lấy danh sách DanhMucSanPham dạng option
+   */
+  public function getOptions()
+  {
+    $result = $this->danhMucSanPhamService->getOptions();
+
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
+    }
+
+    return CustomResponse::success($result);
+  }
+
+  public function downloadTemplateExcel()
+  {
+    $path = public_path('mau-excel/DanhMucSanPham.xlsx');
+
+    if (!file_exists($path)) {
+      return CustomResponse::error('File không tồn tại');
+    }
+
+    return response()->download($path);
+  }
+
+  public function importExcel(Request $request)
+  {
+    $request->validate([
+      'file' => 'required|file|mimes:xlsx,xls,csv',
+    ]);
 
     try {
       $data = $request->file('file');

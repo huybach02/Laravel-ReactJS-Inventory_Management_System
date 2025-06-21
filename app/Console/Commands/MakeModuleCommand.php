@@ -193,6 +193,10 @@ class {$moduleName}Controller extends Controller
 
         \$result = \$this->{$variableName}Service->getAll(\$params);
 
+        if (\$result instanceof \Illuminate\Http\JsonResponse) {
+          return \$result;
+        }
+
         return CustomResponse::success([
           'collection' => \$result['data'],
           'total' => \$result['total'],
@@ -206,6 +210,11 @@ class {$moduleName}Controller extends Controller
     public function store(Create{$moduleName}Request \$request)
     {
         \$result = \$this->{$variableName}Service->create(\$request->validated());
+
+        if (\$result instanceof \Illuminate\Http\JsonResponse) {
+          return \$result;
+        }
+
         return CustomResponse::success(\$result, 'Tạo mới thành công');
     }
     
@@ -215,6 +224,11 @@ class {$moduleName}Controller extends Controller
     public function show(\$id)
     {
         \$result = \$this->{$variableName}Service->getById(\$id);
+
+        if (\$result instanceof \Illuminate\Http\JsonResponse) {
+          return \$result;
+        }
+
         return CustomResponse::success(\$result);
     }
     
@@ -224,6 +238,11 @@ class {$moduleName}Controller extends Controller
     public function update(Update{$moduleName}Request \$request, \$id)
     {
         \$result = \$this->{$variableName}Service->update(\$id, \$request->validated());
+
+        if (\$result instanceof \Illuminate\Http\JsonResponse) {
+          return \$result;
+        }
+
         return CustomResponse::success(\$result, 'Cập nhật thành công');
     }
     
@@ -233,6 +252,11 @@ class {$moduleName}Controller extends Controller
     public function destroy(\$id)
     {
         \$result = \$this->{$variableName}Service->delete(\$id);
+
+        if (\$result instanceof \Illuminate\Http\JsonResponse) {
+          return \$result;
+        }
+
         return CustomResponse::success([], 'Xóa thành công');
     }
 
@@ -242,12 +266,22 @@ class {$moduleName}Controller extends Controller
     public function getOptions()
     {
       \$result = \$this->{$variableName}Service->getOptions();
+
+      if (\$result instanceof \Illuminate\Http\JsonResponse) {
+        return \$result;
+      }
+
       return CustomResponse::success(\$result);
     }
 
     public function downloadTemplateExcel()
     {
       \$path = public_path('mau-excel/{$moduleName}.xlsx');
+
+      if (!file_exists(\$path)) {
+        return CustomResponse::error('File không tồn tại');
+      }
+
       return response()->download(\$path);
     }
 
@@ -341,7 +375,11 @@ class {$moduleName}Service
      */
     public function getById(\$id)
     {
-        return {$modelName}::with('images')->find(\$id);
+        \$data = {$modelName}::with('images')->find(\$id);
+        if (!\$data) {
+          return CustomResponse::error('Dữ liệu không tồn tại');
+        }
+        return \$data;
     }
     
     /**

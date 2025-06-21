@@ -36,6 +36,10 @@ class QuanLyTonKhoController extends Controller
 
     $result = $this->quanLyTonKhoService->getAll($params, 1);
 
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
+    }
+
     return CustomResponse::success([
       'collection' => $result['data'],
       'total' => $result['total'],
@@ -55,6 +59,10 @@ class QuanLyTonKhoController extends Controller
 
     $result = $this->quanLyTonKhoService->getAll($params, 2);
 
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
+    }
+
     return CustomResponse::success([
       'collection' => $result['data'],
       'total' => $result['total'],
@@ -68,6 +76,11 @@ class QuanLyTonKhoController extends Controller
   public function store(CreateQuanLyTonKhoRequest $request)
   {
     $result = $this->quanLyTonKhoService->create($request->validated());
+
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
+    }
+
     return CustomResponse::success($result, 'Tạo mới thành công');
   }
 
@@ -77,6 +90,11 @@ class QuanLyTonKhoController extends Controller
   public function show($id)
   {
     $result = $this->quanLyTonKhoService->getById($id);
+
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
+    }
+
     return CustomResponse::success($result);
   }
 
@@ -86,6 +104,11 @@ class QuanLyTonKhoController extends Controller
   public function update(UpdateQuanLyTonKhoRequest $request, $id)
   {
     $result = $this->quanLyTonKhoService->update($id, $request->validated());
+
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
+    }
+
     return CustomResponse::success($result, 'Cập nhật thành công');
   }
 
@@ -95,6 +118,11 @@ class QuanLyTonKhoController extends Controller
   public function destroy($id)
   {
     $result = $this->quanLyTonKhoService->delete($id);
+
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
+    }
+
     return CustomResponse::success([], 'Xóa thành công');
   }
 
@@ -104,12 +132,22 @@ class QuanLyTonKhoController extends Controller
   public function getOptions()
   {
     $result = $this->quanLyTonKhoService->getOptions();
+
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
+    }
+
     return CustomResponse::success($result);
   }
 
   public function downloadTemplateExcel()
   {
     $path = public_path('mau-excel/QuanLyTonKho.xlsx');
+
+    if (!file_exists($path)) {
+      return CustomResponse::error('File không tồn tại');
+    }
+
     return response()->download($path);
   }
 

@@ -36,6 +36,10 @@ class KhachHangController extends Controller
 
     $result = $this->khachHangService->getAll($params);
 
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
+    }
+
     return CustomResponse::success([
       'collection' => $result['data'],
       'total' => $result['total'],
@@ -49,6 +53,11 @@ class KhachHangController extends Controller
   public function store(CreateKhachHangRequest $request)
   {
     $result = $this->khachHangService->create($request->validated());
+
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
+    }
+
     return CustomResponse::success($result, 'Tạo mới thành công');
   }
 
@@ -58,6 +67,11 @@ class KhachHangController extends Controller
   public function show($id)
   {
     $result = $this->khachHangService->getById($id);
+
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
+    }
+
     return CustomResponse::success($result);
   }
 
@@ -67,6 +81,11 @@ class KhachHangController extends Controller
   public function update(UpdateKhachHangRequest $request, $id)
   {
     $result = $this->khachHangService->update($id, $request->validated());
+
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
+    }
+
     return CustomResponse::success($result, 'Cập nhật thành công');
   }
 
@@ -76,18 +95,33 @@ class KhachHangController extends Controller
   public function destroy($id)
   {
     $result = $this->khachHangService->delete($id);
+
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
+    }
+
     return CustomResponse::success([], 'Xóa thành công');
   }
 
   public function getOptions()
   {
     $result = $this->khachHangService->getOptions();
+
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
+    }
+
     return CustomResponse::success($result);
   }
 
   public function downloadTemplateExcel()
   {
     $path = public_path('mau-excel/KhachHang.xlsx');
+
+    if (!file_exists($path)) {
+      return CustomResponse::error('File không tồn tại');
+    }
+
     return response()->download($path);
   }
 
@@ -166,7 +200,6 @@ class KhachHangController extends Controller
 
       // Download file
       return response()->download($tempPath, $fileName . '.xlsx')->deleteFileAfterSend(true);
-
     } catch (\Exception $e) {
       return CustomResponse::error('Lỗi tạo file Excel: ' . $e->getMessage(), 500);
     }

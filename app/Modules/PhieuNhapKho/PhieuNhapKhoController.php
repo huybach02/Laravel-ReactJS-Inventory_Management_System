@@ -33,6 +33,10 @@ class PhieuNhapKhoController extends Controller
 
     $result = $this->phieuNhapKhoService->getAll($params);
 
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
+    }
+
     return CustomResponse::success([
       'collection' => $result['data'],
       'total' => $result['total'],
@@ -46,6 +50,11 @@ class PhieuNhapKhoController extends Controller
   public function store(CreatePhieuNhapKhoRequest $request)
   {
     $result = $this->phieuNhapKhoService->create($request->validated());
+
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
+    }
+
     return CustomResponse::success($result, 'Tạo mới thành công');
   }
 
@@ -55,6 +64,11 @@ class PhieuNhapKhoController extends Controller
   public function show($id)
   {
     $result = $this->phieuNhapKhoService->getById($id);
+
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
+    }
+
     return CustomResponse::success($result);
   }
 
@@ -64,6 +78,11 @@ class PhieuNhapKhoController extends Controller
   public function update(UpdatePhieuNhapKhoRequest $request, $id)
   {
     $result = $this->phieuNhapKhoService->update($id, $request->validated());
+
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
+    }
+
     return CustomResponse::success($result, 'Cập nhật thành công');
   }
 
@@ -73,6 +92,11 @@ class PhieuNhapKhoController extends Controller
   public function destroy($id)
   {
     $result = $this->phieuNhapKhoService->delete($id);
+
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
+    }
+
     return CustomResponse::success([], 'Xóa thành công');
   }
 
@@ -82,6 +106,11 @@ class PhieuNhapKhoController extends Controller
   public function getOptions()
   {
     $result = $this->phieuNhapKhoService->getOptions();
+
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
+    }
+
     return CustomResponse::success($result);
   }
 
@@ -92,6 +121,11 @@ class PhieuNhapKhoController extends Controller
   {
     $params = $request->all();
     $result = $this->phieuNhapKhoService->getOptionsByNhaCungCap($nhaCungCapId, $params);
+
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
+    }
+
     return CustomResponse::success($result);
   }
 
@@ -101,6 +135,11 @@ class PhieuNhapKhoController extends Controller
   public function getTongTienCanThanhToanTheoNhaCungCap($nhaCungCapId)
   {
     $result = $this->phieuNhapKhoService->getTongTienCanThanhToanTheoNhaCungCap($nhaCungCapId);
+
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
+    }
+
     return CustomResponse::success($result);
   }
 
@@ -111,12 +150,22 @@ class PhieuNhapKhoController extends Controller
   {
     $phieuNhapKhoIds = $request->query('phieu_nhap_kho_ids');
     $result = $this->phieuNhapKhoService->getTongTienCanThanhToanTheoNhieuPhieuNhapKho($phieuNhapKhoIds);
+
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
+    }
+
     return CustomResponse::success($result);
   }
 
   public function downloadTemplateExcel()
   {
     $path = public_path('mau-excel/PhieuNhapKho.xlsx');
+
+    if (!file_exists($path)) {
+      return CustomResponse::error('File không tồn tại');
+    }
+
     return response()->download($path);
   }
 

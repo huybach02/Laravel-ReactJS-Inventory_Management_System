@@ -20,6 +20,7 @@ import {
     Package2,
     Wallet,
     PanelBottomOpen,
+    HandCoins,
 } from "lucide-react";
 
 const iconStyle = {
@@ -178,6 +179,13 @@ export const sidebarConfig = (navigate: NavigateFunction) => {
                     onClick: () => navigate(URL_CONSTANTS.PHIEU_CHI),
                 },
             ],
+        },
+
+        {
+            key: "quan-ly-ban-hang",
+            label: "Quản lý bán hàng",
+            icon: React.createElement(HandCoins, { style: iconStyle }),
+            onClick: () => navigate(URL_CONSTANTS.QUAN_LY_BAN_HANG),
         },
     ];
 };

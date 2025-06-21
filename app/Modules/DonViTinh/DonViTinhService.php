@@ -47,7 +47,11 @@ class DonViTinhService
    */
   public function getById($id)
   {
-    return DonViTinh::with('images')->find($id);
+    $data = DonViTinh::with('images')->find($id);
+    if (!$data) {
+      return CustomResponse::error('Dữ liệu không tồn tại');
+    }
+    return $data;
   }
 
   /**

@@ -28,6 +28,8 @@ export const API_ROUTE_CONFIG = {
     QUAN_LY_TON_KHO: "/quan-ly-ton-kho",
 
     PHIEU_CHI: "/phieu-chi",
+
+    QUAN_LY_BAN_HANG: "/quan-ly-ban-hang",
 };
 export const URL_CONSTANTS = {
     LOGIN: "/admin",
@@ -52,4 +54,6 @@ export const URL_CONSTANTS = {
     QUAN_LY_TON_KHO: "/admin/quan-ly-kho/quan-ly-ton-kho",
 
     PHIEU_CHI: "/admin/quan-ly-thu-chi/phieu-chi",
+
+    QUAN_LY_BAN_HANG: "/admin/quan-ly-ban-hang",
 };

@@ -80,7 +80,12 @@ class QuanLyTonKhoService
         "chi_tiet_phieu_nhap_khos.*",
       );
 
-    return $query->find($id);
+    $data = $query->find($id);
+    if (!$data) {
+      return CustomResponse::error('Dữ liệu không tồn tại');
+    }
+
+    return $data;
   }
 
   /**

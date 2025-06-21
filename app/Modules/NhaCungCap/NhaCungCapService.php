@@ -54,6 +54,10 @@ class NhaCungCapService
     $nhaCungCap = NhaCungCap::with('images')->find($id);
     $nhaCungCap->cong_no = $congNo;
 
+    if (!$nhaCungCap) {
+      return CustomResponse::error('Dữ liệu không tồn tại');
+    }
+
     return $nhaCungCap;
   }
 

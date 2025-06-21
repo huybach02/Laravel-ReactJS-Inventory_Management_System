@@ -22,6 +22,7 @@ import SanPham from "../pages/san-pham/SanPham";
 import PhieuNhapKho from "../pages/phieu-nhap-kho/PhieuNhapKho";
 import QuanLyTonKho from "../pages/quan-ly-ton-kho/QuanLyTonKho";
 import PhieuChi from "../pages/phieu-chi/PhieuChi";
+import QuanLyBanHang from "../pages/quan-ly-ban-hang/QuanLyBanHang";
 
 export const router = createBrowserRouter([
     {
@@ -193,6 +194,12 @@ export const router = createBrowserRouter([
                         children: [{ index: true, element: <PhieuChi /> }],
                     },
                 ],
+            },
+        
+            {
+                path: "quan-ly-ban-hang",
+                element: <MainLayout />,
+                children: [{ index: true, element: <QuanLyBanHang /> }],
             },
         ],
     },

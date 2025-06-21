@@ -33,6 +33,10 @@ class DonViTinhController extends Controller
 
     $result = $this->donViTinhService->getAll($params);
 
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
+    }
+
     return CustomResponse::success([
       'collection' => $result['data'],
       'total' => $result['total'],
@@ -46,6 +50,11 @@ class DonViTinhController extends Controller
   public function store(CreateDonViTinhRequest $request)
   {
     $result = $this->donViTinhService->create($request->validated());
+
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
+    }
+
     return CustomResponse::success($result, 'Tạo mới thành công');
   }
 
@@ -55,6 +64,11 @@ class DonViTinhController extends Controller
   public function show($id)
   {
     $result = $this->donViTinhService->getById($id);
+
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
+    }
+
     return CustomResponse::success($result);
   }
 
@@ -64,6 +78,11 @@ class DonViTinhController extends Controller
   public function update(UpdateDonViTinhRequest $request, $id)
   {
     $result = $this->donViTinhService->update($id, $request->validated());
+
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
+    }
+
     return CustomResponse::success($result, 'Cập nhật thành công');
   }
 
@@ -73,6 +92,11 @@ class DonViTinhController extends Controller
   public function destroy($id)
   {
     $result = $this->donViTinhService->delete($id);
+
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
+    }
+
     return CustomResponse::success([], 'Xóa thành công');
   }
 
@@ -82,18 +106,33 @@ class DonViTinhController extends Controller
   public function getOptions()
   {
     $result = $this->donViTinhService->getOptions();
+
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
+    }
+
     return CustomResponse::success($result);
   }
 
   public function getOptionsBySanPham($sanPhamId)
   {
     $result = $this->donViTinhService->getOptionsBySanPham($sanPhamId);
+
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
+    }
+
     return CustomResponse::success($result);
   }
 
   public function downloadTemplateExcel()
   {
     $path = public_path('mau-excel/DonViTinh.xlsx');
+
+    if (!file_exists($path)) {
+      return CustomResponse::error('File không tồn tại');
+    }
+
     return response()->download($path);
   }
 

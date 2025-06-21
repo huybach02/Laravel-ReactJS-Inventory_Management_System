@@ -49,7 +49,11 @@ class NguoiDungService
    */
   public function getById($id)
   {
-    return User::with('images')->find($id);
+    $data = User::with('images')->find($id);
+    if (!$data) {
+      return CustomResponse::error('Dữ liệu không tồn tại');
+    }
+    return $data;
   }
 
   /**
