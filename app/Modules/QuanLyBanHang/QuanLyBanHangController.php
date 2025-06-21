@@ -168,4 +168,18 @@ class QuanLyBanHangController extends Controller
       return CustomResponse::error('Lỗi import: ' . $e->getMessage(), 500);
     }
   }
+
+  /**
+   * Xem trước hóa đơn HTML
+   */
+  public function xemTruocHoaDon($id)
+  {
+    $result = $this->quanLyBanHangService->xemTruocHoaDon($id);
+
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
+    }
+
+    return $result; // Trả về view HTML
+  }
 }

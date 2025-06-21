@@ -11,6 +11,7 @@ use App\Models\ChiTietDonHang;
 use App\Models\ChiTietPhieuNhapKho;
 use App\Models\KhachHang;
 use App\Models\SanPham;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class QuanLyBanHangService
 {
@@ -220,6 +221,9 @@ class QuanLyBanHangService
     return DonHang::select('id as value', 'ten_quan_ly_ban_hang as label')->get();
   }
 
+  /**
+   * Lấy giá bán sản phẩm
+   */
   public function getGiaBanSanPham($sanPhamId, $donViTinhId)
   {
     $loSanPham = ChiTietPhieuNhapKho::where('san_pham_id', $sanPhamId)->where('don_vi_tinh_id', $donViTinhId)->orderBy('id', 'asc')->first();
@@ -235,5 +239,23 @@ class QuanLyBanHangService
     }
 
     return null;
+  }
+
+  /**
+   * Xem trước hóa đơn (HTML)
+   */
+  public function xemTruocHoaDon($id)
+  {
+    try {
+      $donHang = $this->getById($id);
+
+      if (!$donHang) {
+        return CustomResponse::error('Đơn hàng không tồn tại');
+      }
+
+      return view('hoa-don.template', compact('donHang'));
+    } catch (Exception $e) {
+      return CustomResponse::error('Lỗi khi xem trước hóa đơn: ' . $e->getMessage());
+    }
   }
 }

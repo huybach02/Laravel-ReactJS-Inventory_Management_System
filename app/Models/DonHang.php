@@ -40,4 +40,9 @@ class DonHang extends Model
   {
     return $this->hasMany(ChiTietDonHang::class);
   }
+
+  public function nguoiTao()
+  {
+    return $this->belongsTo(User::class, 'nguoi_tao');
+  }
 }

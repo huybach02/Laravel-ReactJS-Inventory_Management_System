@@ -25,6 +25,7 @@ import {
 import dayjs from "dayjs";
 import ImportExcel from "../../components/ImportExcel";
 import ChiTietQuanLyBanHang from "./ChiTietQuanLyBanHang";
+import InHoaDon from "../../components/InHoaDon";
 
 const DanhSachQuanLyBanHang = ({
     path,
@@ -88,6 +89,12 @@ const DanhSachQuanLyBanHang = ({
                                 path={path}
                                 id={id}
                                 title={title}
+                            />
+                        )}
+                        {permission.show && (
+                            <InHoaDon
+                                donHangId={id}
+                                disabled={!permission.show}
                             />
                         )}
                         {permission.edit && (
