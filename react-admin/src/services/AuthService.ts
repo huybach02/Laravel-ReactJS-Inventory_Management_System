@@ -106,17 +106,17 @@ export const AuthService = {
             );
             if (res.success) {
                 toast.success(res.message);
-                if (res.data.access_token) {
+                if (res?.data?.access_token) {
                     localStorage.setItem("token", res.data.access_token);
                 }
-                if (res.data.refresh_token) {
+                if (res?.data?.refresh_token) {
                     localStorage.setItem(
                         "refresh_token",
-                        res.data.refresh_token
+                        res?.data?.refresh_token
                     );
                 }
-                if (res.data.device_id) {
-                    localStorage.setItem("device_id", res.data.device_id);
+                if (res?.data?.device_id) {
+                    localStorage.setItem("device_id", res?.data?.device_id);
                 }
                 return res;
             }

@@ -41,6 +41,14 @@ export type LoginResponseError = ApiResponseError & {
 };
 
 export type VerifyOTPResponse = ApiResponseError & {
+    data?: {
+        access_token: string;
+        refresh_token?: string;
+        device_id?: string;
+        user_id?: string;
+        is_2fa?: boolean;
+        user?: User;
+    };
     errors?: {
         is_navigate_to_login?: boolean;
     };
