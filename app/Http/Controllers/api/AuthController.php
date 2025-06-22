@@ -32,6 +32,7 @@ class AuthController extends Controller
 {
   public function login(AuthRequest $request)
   {
+    $deviceId = null;
     $email = $request->input('email');
 
     $cauHinhChung = CauHinhChung::getAllConfig();
@@ -73,13 +74,13 @@ class AuthController extends Controller
     if ($cauHinhChung['XAC_THUC_2_YEU_TO'] == config('constant.XAC_THUC_2_YEU_TO.KICH_HOAT')) {
       $deviceId = $this->handle2FA($request);
       if ($deviceId) {
-        return $this->handleTokenResponse($token, $deviceId);
+        return $this->handleTokenResponse($token, $request, $deviceId);
       } else {
         return $this->send2FAOTP();
       }
     }
 
-    return $this->handleTokenResponse($token, $request);
+    return $this->handleTokenResponse($token, $request, $deviceId);
   }
 
   public function me()
@@ -287,7 +288,7 @@ class AuthController extends Controller
 
     $token = Auth::login($user);
 
-    return $this->handleTokenResponse($token, $deviceId);
+    return $this->handleTokenResponse($token, $request, $deviceId);
   }
 
   protected function checkLoginAttempts($email, $lockoutKey)
