@@ -24,9 +24,13 @@ class JWT
   public function handle(Request $request, Closure $next): Response
   {
     try {
-      if ($request->hasCookie('access_token')) {
-        $token = $request->cookie('access_token');
-        $request->headers->set('Authorization', 'Bearer ' . $token);
+      $token = $request->header('Authorization');
+
+      if ($token) {
+        if (strpos($token, 'Bearer ') !== 0) {
+          $token = 'Bearer ' . $token;
+          $request->headers->set('Authorization', $token);
+        }
       }
 
       $user = JWTAuth::parseToken()->authenticate();

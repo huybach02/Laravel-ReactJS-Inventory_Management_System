@@ -26,6 +26,32 @@ const processQueue = (error: any) => {
     failedQueue = [];
 };
 
+// Thêm token vào mọi request
+axios.interceptors.request.use(
+    (config) => {
+        const token = localStorage.getItem("token");
+        const refreshToken = localStorage.getItem("refresh_token");
+        const deviceId = localStorage.getItem("device_id");
+
+        if (token) {
+            config.headers["Authorization"] = `Bearer ${token}`;
+        }
+
+        if (refreshToken) {
+            config.headers["Refresh-Token"] = refreshToken;
+        }
+
+        if (deviceId) {
+            config.headers["Device-Id"] = deviceId;
+        }
+
+        return config;
+    },
+    (error) => {
+        return Promise.reject(error);
+    }
+);
+
 axios.interceptors.response.use(
     (response) => {
         return response.data ? response.data : response;
@@ -55,12 +81,24 @@ axios.interceptors.response.use(
 
             try {
                 // Gọi API để làm mới token
-                await axios.get("/auth/refresh", { withCredentials: true });
+                const response = await axios.get("/auth/refresh");
 
-                // Token mới đã được tự động đặt vào cookie bởi server
-                const response = await axios(originalRequest);
+                // Lưu token mới vào localStorage
+                if (response && response.data && response.data.success) {
+                    localStorage.setItem(
+                        "token",
+                        response.data.data.access_token
+                    );
+                    if (response.data.data.refresh_token) {
+                        localStorage.setItem(
+                            "refresh_token",
+                            response.data.data.refresh_token
+                        );
+                    }
+                }
+
                 processQueue(null);
-                return response;
+                return axios(originalRequest);
             } catch (refreshError) {
                 processQueue(refreshError);
                 return Promise.reject(refreshError);
@@ -83,13 +121,14 @@ axios.interceptors.response.use(
                     window.location.href = URL_CONSTANTS.LOGIN;
                 }
                 localStorage.removeItem("token");
+                localStorage.removeItem("refresh_token");
+                localStorage.removeItem("device_id");
             }
         }
         return Promise.reject(error);
     }
 );
 
-axios.defaults.withCredentials = true;
 axios.defaults.baseURL = import.meta.env.VITE_API_URL;
 axios.defaults.headers.common["Content-Type"] = "application/json";
 axios.defaults.headers.common["Accept"] = "application/json";

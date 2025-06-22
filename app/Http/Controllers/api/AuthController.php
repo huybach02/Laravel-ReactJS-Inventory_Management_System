@@ -73,13 +73,13 @@ class AuthController extends Controller
     if ($cauHinhChung['XAC_THUC_2_YEU_TO'] == config('constant.XAC_THUC_2_YEU_TO.KICH_HOAT')) {
       $deviceId = $this->handle2FA($request);
       if ($deviceId) {
-        return $this->handleCookie($token, $request, $deviceId);
+        return $this->handleTokenResponse($token, $deviceId);
       } else {
         return $this->send2FAOTP();
       }
     }
 
-    return $this->handleCookie($token, $request);
+    return $this->handleTokenResponse($token);
   }
 
   public function me()
@@ -110,11 +110,6 @@ class AuthController extends Controller
   public function logout()
   {
     Cache::forget('otp:user:' . Auth::user()->id);
-
-    Cookie::forget('access_token');
-    Cookie::forget('refresh_token');
-    Cookie::forget('device_id');
-
     Auth::logout();
 
     return CustomResponse::success([], 'Đăng xuất thành công', Response::HTTP_OK);
@@ -123,28 +118,30 @@ class AuthController extends Controller
   public function refresh(Request $request)
   {
     try {
-      // Trường hợp 1: access token còn hạn
-      if ($request->hasCookie('access_token')) {
-        $token = $request->cookie('access_token');
+      $token = $request->header('Authorization');
+
+      if ($token) {
+        // Xóa "Bearer " từ token
+        $token = str_replace('Bearer ', '', $token);
         $request->headers->set('Authorization', 'Bearer ' . $token);
       }
 
-      $user = JWTAuth::parseToken()->authenticate();
+      try {
+        $user = JWTAuth::parseToken()->authenticate();
+      } catch (TokenExpiredException $e) {
+        // Token đã hết hạn, kiểm tra refresh token
+        $refreshToken = $request->header('Refresh-Token');
+        if ($refreshToken) {
+          return $this->handleRefreshToken($refreshToken);
+        }
 
-      // Xử lý refresh token (dùng Auth::refresh)
-      if ($request->hasCookie('refresh_token')) {
-        return $this->handleRefreshToken($request, false);
-      }
-    } catch (TokenExpiredException $e) {
-      // Trường hợp 2: access token hết hạn, dùng Auth::login
-      if ($request->hasCookie('refresh_token')) {
-        return $this->handleRefreshToken($request, true);
+        return response()->json([
+          'error' => 'Token đã hết hạn',
+          'error_code' => 'TOKEN_EXPIRED'
+        ], Response::HTTP_UNAUTHORIZED);
       }
 
-      return response()->json([
-        'error' => 'Token đã hết hạn',
-        'error_code' => 'TOKEN_EXPIRED'
-      ], Response::HTTP_UNAUTHORIZED);
+      return $this->respondWithToken(Auth::refresh());
     } catch (TokenInvalidException $e) {
       return response()->json([
         'error' => 'Token không hợp lệ',
@@ -218,48 +215,36 @@ class AuthController extends Controller
     return CustomResponse::success([], 'Đổi mật khẩu thành công', Response::HTTP_OK);
   }
 
-  protected function handleRefreshToken(Request $request, $loginInsteadOfRefresh = false)
+  protected function handleRefreshToken($refreshToken)
   {
-    $refreshToken = $request->cookie('refresh_token');
-    $refreshTokenData = JWTAuth::getJWTProvider()->decode($refreshToken);
+    try {
+      $refreshTokenData = JWTAuth::getJWTProvider()->decode($refreshToken);
 
-    if (time() > $refreshTokenData['expired_at']) {
+      if (time() > $refreshTokenData['expired_at']) {
+        return response()->json([
+          'error' => 'Refresh token đã hết hạn',
+          'error_code' => 'REFRESH_TOKEN_EXPIRED'
+        ], Response::HTTP_UNAUTHORIZED);
+      }
+
+      $userId = $refreshTokenData['user_id'];
+      $user = User::find($userId);
+
+      if (!$user) {
+        return response()->json([
+          'error' => 'Không tìm thấy người dùng',
+          'error_code' => 'USER_NOT_FOUND'
+        ], Response::HTTP_NOT_FOUND);
+      }
+
+      $newToken = Auth::login($user);
+      return $this->respondWithToken($newToken);
+    } catch (Exception $e) {
       return response()->json([
-        'error' => 'Refresh token đã hết hạn',
-        'error_code' => 'REFRESH_TOKEN_EXPIRED'
+        'error' => 'Refresh token không hợp lệ',
+        'error_code' => 'INVALID_REFRESH_TOKEN'
       ], Response::HTTP_UNAUTHORIZED);
     }
-
-    $userId = $refreshTokenData['user_id'];
-    $user = User::find($userId);
-
-    if (!$user) {
-      return response()->json([
-        'error' => 'Không tìm thấy người dùng',
-        'error_code' => 'USER_NOT_FOUND'
-      ], Response::HTTP_NOT_FOUND);
-    }
-
-    if ($loginInsteadOfRefresh) {
-      $newToken = Auth::login($user);
-    } else {
-      $newToken = Auth::refresh();
-      Auth::invalidate(true);
-    }
-
-    $cookie = Cookie::make(
-      'access_token',
-      $newToken,
-      Auth::factory()->getTTL() * 60 * 24, // 1 day
-      '/',
-      null,
-      true,
-      true,
-      false,
-      'None'
-    );
-
-    return $this->respondWithToken($newToken)->withCookie($cookie);
   }
 
   public function verifyOTP(Request $request)
@@ -302,7 +287,7 @@ class AuthController extends Controller
 
     $token = Auth::login($user);
 
-    return $this->handleCookie($token, $request, $deviceId);
+    return $this->handleTokenResponse($token, $deviceId);
   }
 
   protected function checkLoginAttempts($email, $lockoutKey)
@@ -348,66 +333,38 @@ class AuthController extends Controller
     return CustomResponse::error('Email hoặc mật khẩu không đúng. Bạn còn lại ' . $maxAttempts - $attempts . ' lần đăng nhập', [], Response::HTTP_UNAUTHORIZED);
   }
 
-  protected function handleCookie($token, $request, $deviceId = null)
+  protected function handleTokenResponse($token, $deviceId = null)
   {
     $user = Auth::user();
     $cauHinhChung = CauHinhChung::getAllConfig();
+
+    // Tạo refresh token
     $refreshTokenData = [
       'user_id' => $user->id,
-      'expired_at' => time() + (int) config('jwt.refresh_ttl') * 60 * ($request->input('remember_me') ? 2 : 1) // 1209600 giây = 2 tuần
+      'expired_at' => time() + (int) config('jwt.refresh_ttl') * 60 // Thời hạn refresh token
     ];
 
     $refreshToken = JWTAuth::getJWTProvider()->encode($refreshTokenData);
 
-    // Tạo cookie cho access token
-    $cookie = Cookie::make(
-      'access_token',
-      $token,
-      Auth::factory()->getTTL() * 60 * 24, // 1 day
-      '/',
-      null,
-      true,
-      true,
-      false,
-      'None'
-    );
-
-    // Tạo cookie cho refresh token
-    $refreshCookie = Cookie::make(
-      'refresh_token',
-      $refreshToken,
-      config('jwt.refresh_ttl') * ($request->input('remember_me') ? 2 : 1) + 24, // > 2 weeks 
-      '/',
-      null,
-      true,
-      true,
-      false,
-      'None'
-    );
-
-    $deviceIdCookie = Cookie::make(
-      'device_id',
-      $deviceId,
-      (int) $cauHinhChung['THOI_HAN_XAC_THUC_LAI_THIET_BI'] * 24 * 60, // 90 ngày tính bằng phút
-      '/',
-      null,
-      true,
-      true,
-      false,
-      'None'
-    );
+    $response = [
+      'user' => new UserResource(Auth::user()),
+      'access_token' => $token,
+      'refresh_token' => $refreshToken,
+      'token_type' => 'bearer',
+      'expires_in' => Auth::factory()->getTTL() * 60,
+    ];
 
     if ($deviceId) {
-      return $this->respondWithToken($token)->withCookie($cookie)->withCookie($refreshCookie)->withCookie($deviceIdCookie);
+      $response['device_id'] = $deviceId;
     }
 
-    return $this->respondWithToken($token)->withCookie($cookie)->withCookie($refreshCookie);
+    return CustomResponse::success($response, 'Đăng nhập thành công', Response::HTTP_OK);
   }
 
   protected function handle2FA($request)
   {
     $user = Auth::user();
-    $deviceId = $request->cookie('device_id') ?: "";
+    $deviceId = $request->header('Device-Id') ?: "";
 
     $thietBi = ThietBi::where([
       'user_id' => $user->id,
@@ -459,11 +416,22 @@ class AuthController extends Controller
 
   protected function respondWithToken($token)
   {
+    $user = Auth::user();
+
+    // Tạo refresh token
+    $refreshTokenData = [
+      'user_id' => $user->id,
+      'expired_at' => time() + (int) config('jwt.refresh_ttl') * 60 // Thời hạn refresh token
+    ];
+
+    $refreshToken = JWTAuth::getJWTProvider()->encode($refreshTokenData);
+
     return CustomResponse::success([
       'user' => new UserResource(Auth::user()),
       'access_token' => $token,
+      'refresh_token' => $refreshToken,
       'token_type' => 'bearer',
       'expires_in' => Auth::factory()->getTTL() * 60,
-    ], 'Đang nhập thành công', Response::HTTP_OK);
+    ], 'Đăng nhập thành công', Response::HTTP_OK);
   }
 }

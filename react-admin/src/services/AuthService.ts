@@ -25,6 +25,15 @@ export const AuthService = {
             if (res.success) {
                 toast.success(res.message);
                 localStorage.setItem("token", res.data.access_token);
+                if (res.data.refresh_token) {
+                    localStorage.setItem(
+                        "refresh_token",
+                        res.data.refresh_token
+                    );
+                }
+                if (res.data.device_id) {
+                    localStorage.setItem("device_id", res.data.device_id);
+                }
                 return res;
             }
         } catch (error) {
@@ -39,6 +48,8 @@ export const AuthService = {
             if (res.success) {
                 toast.success(res.message);
                 localStorage.removeItem("token");
+                localStorage.removeItem("refresh_token");
+                localStorage.removeItem("device_id");
                 return res;
             }
         } catch (error) {
@@ -95,6 +106,18 @@ export const AuthService = {
             );
             if (res.success) {
                 toast.success(res.message);
+                if (res.data.access_token) {
+                    localStorage.setItem("token", res.data.access_token);
+                }
+                if (res.data.refresh_token) {
+                    localStorage.setItem(
+                        "refresh_token",
+                        res.data.refresh_token
+                    );
+                }
+                if (res.data.device_id) {
+                    localStorage.setItem("device_id", res.data.device_id);
+                }
                 return res;
             }
         } catch (error) {

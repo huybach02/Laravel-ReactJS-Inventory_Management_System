@@ -1,4 +1,4 @@
-import type { ApiResponseError } from "./index.type";
+import type { ApiResponseError, ApiResponseSuccess } from "./index.type";
 import type { User } from "./user.type";
 
 export interface LoginForm {
@@ -9,11 +9,13 @@ export interface LoginForm {
 
 export interface LoginData {
     access_token: string;
+    refresh_token?: string;
     token_type: string;
     expires_in: number;
     user: User;
     is_2fa?: boolean;
     user_id?: string;
+    device_id?: string;
 }
 
 export interface ForgotPasswordForm {
@@ -38,7 +40,7 @@ export type LoginResponseError = ApiResponseError & {
     };
 };
 
-export type VerifyOTPResponse = ApiResponseError & {
+export type VerifyOTPResponse = ApiResponseSuccess<LoginData> & {
     errors?: {
         is_navigate_to_login?: boolean;
     };
