@@ -79,7 +79,7 @@ class AuthController extends Controller
       }
     }
 
-    return $this->handleTokenResponse($token);
+    return $this->handleTokenResponse($token, $request);
   }
 
   public function me()
@@ -333,7 +333,7 @@ class AuthController extends Controller
     return CustomResponse::error('Email hoặc mật khẩu không đúng. Bạn còn lại ' . $maxAttempts - $attempts . ' lần đăng nhập', [], Response::HTTP_UNAUTHORIZED);
   }
 
-  protected function handleTokenResponse($token, $deviceId = null)
+  protected function handleTokenResponse($token, $request, $deviceId = null)
   {
     $user = Auth::user();
     $cauHinhChung = CauHinhChung::getAllConfig();
@@ -341,7 +341,7 @@ class AuthController extends Controller
     // Tạo refresh token
     $refreshTokenData = [
       'user_id' => $user->id,
-      'expired_at' => time() + (int) config('jwt.refresh_ttl') * 60 // Thời hạn refresh token
+      'expired_at' => time() + (int) config('jwt.refresh_ttl') * 60 * ($request->input('remember_me') ? 2 : 1) // 1209600 giây = 2 tuần
     ];
 
     $refreshToken = JWTAuth::getJWTProvider()->encode($refreshTokenData);
