@@ -16,6 +16,9 @@ Route::post('/auth/forgot-password', [AuthController::class, 'forgotPassword'])-
 Route::post('/auth/reset-password', [AuthController::class, 'resetPassword'])->name('reset-password');
 Route::post('/auth/verify-otp', [AuthController::class, 'verifyOTP'])->name('verify-otp');
 
+// Route công khai không cần xác thực
+Route::get('/quan-ly-ban-hang/xem-truoc-hoa-don/{id}', [\App\Modules\QuanLyBanHang\QuanLyBanHangController::class, 'xemTruocHoaDon']);
+
 Route::group([
 
   'middleware' => ['jwt', 'permission'],
@@ -201,7 +204,7 @@ Route::group([
     Route::get('/get-gia-ban-san-pham', [\App\Modules\QuanLyBanHang\QuanLyBanHangController::class, 'getGiaBanSanPham']);
     Route::get('/options', [\App\Modules\QuanLyBanHang\QuanLyBanHangController::class, 'getOptions']);
     Route::get('/download-template-excel', [\App\Modules\QuanLyBanHang\QuanLyBanHangController::class, 'downloadTemplateExcel']);
-    Route::get('/xem-truoc-hoa-don/{id}', [\App\Modules\QuanLyBanHang\QuanLyBanHangController::class, 'xemTruocHoaDon']);
+    // Route xem trước hóa đơn đã được đặt bên ngoài middleware JWT
     Route::post('/', [\App\Modules\QuanLyBanHang\QuanLyBanHangController::class, 'store']);
     Route::get('/{id}', [\App\Modules\QuanLyBanHang\QuanLyBanHangController::class, 'show']);
     Route::put('/{id}', [\App\Modules\QuanLyBanHang\QuanLyBanHangController::class, 'update']);
