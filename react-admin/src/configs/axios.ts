@@ -84,15 +84,12 @@ axios.interceptors.response.use(
                 const response = await axios.get("/auth/refresh");
 
                 // Lưu token mới vào localStorage
-                if (response && response.data && response.data.success) {
-                    localStorage.setItem(
-                        "token",
-                        response.data.data.access_token
-                    );
-                    if (response.data.data.refresh_token) {
+                if (response && response.data && (response as any).success) {
+                    localStorage.setItem("token", response.data.access_token);
+                    if (response.data.refresh_token) {
                         localStorage.setItem(
                             "refresh_token",
-                            response.data.data.refresh_token
+                            response.data.refresh_token
                         );
                     }
                 }
