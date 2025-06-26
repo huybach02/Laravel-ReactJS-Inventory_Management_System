@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Exception;
 use App\Class\CustomResponse;
 use App\Class\FilterWithPagination;
+use App\Models\KhoTong;
 
 class SanPhamService
 {
@@ -195,5 +196,24 @@ class SanPhamService
       ->withoutGlobalScope('withUserNames')
       ->select('san_phams.id as value', 'san_phams.ten_san_pham as label')
       ->get();
+  }
+
+  /**
+   * Lấy danh sách LoSanPham dạng option theo SanPham
+   */
+  public function getOptionsLoSanPhamBySanPhamId($sanPhamId)
+  {
+    $loSanPham = KhoTong::where('kho_tongs.san_pham_id', $sanPhamId)
+      ->leftJoin('chi_tiet_phieu_nhap_khos', 'kho_tongs.ma_lo_san_pham', '=', 'chi_tiet_phieu_nhap_khos.ma_lo_san_pham')
+      ->withoutGlobalScope('withUserNames')
+      ->select(
+        'kho_tongs.ma_lo_san_pham as value',
+        DB::raw('CONCAT(kho_tongs.ma_lo_san_pham, " - NSX: ", DATE_FORMAT(chi_tiet_phieu_nhap_khos.ngay_san_xuat, "%d/%m/%Y"), " - HSD: ", DATE_FORMAT(chi_tiet_phieu_nhap_khos.ngay_het_han, "%d/%m/%Y"), " - SL Tồn: ", kho_tongs.so_luong_ton, " - HSD Còn lại: ", DATEDIFF(chi_tiet_phieu_nhap_khos.ngay_het_han, CURDATE()), " ngày") as label'),
+        DB::raw('DATEDIFF(chi_tiet_phieu_nhap_khos.ngay_het_han, CURDATE()) as hsd_con_lai')
+      )
+      ->orderBy('hsd_con_lai', 'asc')
+      ->get();
+
+    return $loSanPham;
   }
 }

@@ -218,7 +218,7 @@ class QuanLyBanHangService
    */
   public function getOptions()
   {
-    return DonHang::select('id as value', 'ten_quan_ly_ban_hang as label')->get();
+    return DonHang::select('id as value', 'ma_don_hang as label')->get();
   }
 
   /**
@@ -257,5 +257,10 @@ class QuanLyBanHangService
     } catch (Exception $e) {
       return CustomResponse::error('Lỗi khi xem trước hóa đơn: ' . $e->getMessage());
     }
+  }
+
+  public function getSanPhamByDonHangId($donHangId)
+  {
+    return DonHang::with('chiTietDonHangs.sanPham', 'chiTietDonHangs.donViTinh')->where('id', $donHangId)->first();
   }
 }

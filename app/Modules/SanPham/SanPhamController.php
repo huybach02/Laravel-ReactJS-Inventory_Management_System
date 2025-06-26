@@ -130,6 +130,17 @@ class SanPhamController extends Controller
     return CustomResponse::success($result);
   }
 
+  public function getOptionsLoSanPhamBySanPhamId($sanPhamId)
+  {
+    $result = $this->sanPhamService->getOptionsLoSanPhamBySanPhamId($sanPhamId);
+
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
+    }
+
+    return CustomResponse::success($result);
+  }
+
   public function downloadTemplateExcel()
   {
     $path = public_path('mau-excel/SanPham.xlsx');

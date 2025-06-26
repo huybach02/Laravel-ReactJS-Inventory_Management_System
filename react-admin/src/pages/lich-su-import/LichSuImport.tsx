@@ -46,7 +46,11 @@ const LichSuImport = () => {
 
     const handleDownloadFile = (id: number) => {
         console.log(id);
-        window.open(`${apiURL}${path}/download-file/${id}`);
+        window.open(
+            `${
+                apiURL.endsWith("/") ? apiURL.slice(0, -1) : apiURL
+            }${path}/download-file/${id}`
+        );
     };
 
     const defaultColumns: any = [
