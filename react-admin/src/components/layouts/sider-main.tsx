@@ -40,6 +40,7 @@ const SiderMain = ({
             onCollapse={(collapsed) => {
                 setCollapsed(collapsed);
             }}
+            className="custom-sidebar-scrollbar"
             style={{
                 height: "100vh",
                 position: "fixed",
@@ -49,6 +50,7 @@ const SiderMain = ({
                 boxShadow: "2px 0 8px rgba(0,0,0,0.15)",
                 zIndex: 1001,
                 background: "#001529",
+                overflowY: "auto",
             }}
         >
             <Flex
@@ -96,9 +98,12 @@ const SiderMain = ({
                 defaultSelectedKeys={["1"]}
                 defaultOpenKeys={defaultOpenKeys}
                 items={sidebar}
+                className="custom-sidebar-menu-scrollbar"
                 style={{
                     fontSize: "15px",
                     borderRight: "none",
+                    maxHeight: "calc(100vh - 126px)",
+                    overflowY: "auto",
                 }}
             />
         </Layout.Sider>

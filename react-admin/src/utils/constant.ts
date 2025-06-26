@@ -32,6 +32,12 @@ export const OPTIONS_LOAI_PHIEU_NHAP = [
     { value: 3, label: "Nhập từ sản xuất" },
 ];
 
+export const OPTIONS_LOAI_PHIEU_XUAT = [
+    { value: 1, label: "Xuất theo đơn hàng" },
+    { value: 2, label: "Xuất hủy" },
+    { value: 3, label: "Xuất nguyên liệu sản xuất" },
+];
+
 export const OPTIONS_LOAI_PHIEU_CHI = [
     { value: 1, label: "Thanh toán phiếu nhập kho" },
     { value: 4, label: "Thanh toán nhiều phiếu nhập kho" },

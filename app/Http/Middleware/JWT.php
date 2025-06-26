@@ -23,6 +23,10 @@ class JWT
    */
   public function handle(Request $request, Closure $next): Response
   {
+    if (strpos($request->url(), 'download-template-excel') !== false) {
+      return $next($request);
+    }
+
     try {
       $token = $request->header('Authorization');
 

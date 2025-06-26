@@ -204,8 +204,9 @@ label {
 /* Input disabled */
 .ant-input[disabled] {
     color: rgba(0, 0, 0, 0.88) !important;
-    background-color: #ffffff !important;
-    border-color: #d9d9d9 !important;
+    background-color: #f9f9f9 !important;
+    border: none !important;
+    box-shadow: none !important;
     cursor: not-allowed !important;
     opacity: 1 !important;
 }
@@ -213,22 +214,25 @@ label {
 /* Input.TextArea disabled */
 .ant-input[disabled].ant-input {
     color: rgba(0, 0, 0, 0.88) !important;
-    background-color: #ffffff !important;
+    background-color: #f9f9f9 !important;
     cursor: not-allowed !important;
+    border: none !important;
+    box-shadow: none !important;
 }
 
 /* InputNumber disabled */
 .ant-input-number-disabled {
     color: rgba(0, 0, 0, 0.88) !important;
-    background-color: #ffffff !important;
-    border-color: #d9d9d9 !important;
+    background-color: #f9f9f9 !important;
+    border: none !important;
+    box-shadow: none !important;
     cursor: not-allowed !important;
     opacity: 1 !important;
 }
 
 .ant-input-number-disabled .ant-input-number-input[disabled] {
     color: rgba(0, 0, 0, 0.88) !important;
-    background-color: transparent !important;
+    background-color: #f9f9f9 !important;
     cursor: not-allowed !important;
 }
 
@@ -236,8 +240,9 @@ label {
 .ant-select-disabled.ant-select:not(.ant-select-customize-input)
     .ant-select-selector {
     color: rgba(0, 0, 0, 0.88) !important;
-    background-color: #ffffff !important;
-    border-color: #d9d9d9 !important;
+    background-color: #f9f9f9 !important;
+    border: none !important;
+    box-shadow: none !important;
     cursor: not-allowed !important;
     opacity: 1 !important;
 }
@@ -250,11 +255,16 @@ label {
     color: rgba(0, 0, 0, 0.25) !important;
 }
 
+/* Ẩn mũi tên của Select khi disabled */
+.ant-select-disabled .ant-select-arrow {
+    display: none !important;
+}
+
 /* Multiple Select disabled */
 .ant-select-multiple.ant-select-disabled .ant-select-selection-item {
     color: rgba(0, 0, 0, 0.88) !important;
     background-color: #f5f5f5 !important;
-    border-color: #d9d9d9 !important;
+    border: none !important;
 }
 
 .ant-select-multiple.ant-select-disabled .ant-select-selection-item-remove {
@@ -266,8 +276,7 @@ label {
 .ant-input-number-disabled,
 .ant-input-number-disabled .ant-input-number-input,
 .ant-select-disabled .ant-select-selector,
-.ant-select-disabled .ant-select-selection-search-input,
-.ant-select-disabled .ant-select-arrow {
+.ant-select-disabled .ant-select-selection-search-input {
     cursor: not-allowed !important;
 }
 
@@ -275,7 +284,8 @@ label {
 .ant-input[disabled]:hover,
 .ant-input-number-disabled:hover,
 .ant-select-disabled:hover .ant-select-selector {
-    border-color: #d9d9d9 !important;
+    border: none !important;
+    box-shadow: none !important;
     cursor: not-allowed !important;
 }
 
@@ -283,9 +293,101 @@ label {
 .ant-input[disabled]:focus,
 .ant-input-number-disabled:focus,
 .ant-select-disabled:focus .ant-select-selector {
-    border-color: #d9d9d9 !important;
+    border: none !important;
     box-shadow: none !important;
     cursor: not-allowed !important;
+}
+
+/* Ẩn các nút tăng giảm của InputNumber khi disabled */
+.ant-input-number-disabled .ant-input-number-handler-wrap {
+    display: none !important;
+}
+
+/* Xóa bỏ hoàn toàn border cho input-number-affix-wrapper khi disabled */
+.ant-input-number-affix-wrapper-disabled {
+    border: none !important;
+    box-shadow: none !important;
+    background-color: #f9f9f9 !important;
+}
+
+/* Đảm bảo không có border cho các trường hợp đặc biệt của Select */
+.ant-select-disabled.ant-select-focused .ant-select-selector {
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* Đảm bảo không có border cho các trường hợp đặc biệt của Input */
+.ant-input-affix-wrapper-disabled {
+    border: none !important;
+    box-shadow: none !important;
+    background-color: #f9f9f9 !important;
+}
+
+/* Xử lý trường hợp đặc biệt cho InputNumber với suffix */
+.ant-input-number-group-wrapper-disabled,
+.ant-input-number-group-wrapper-disabled .ant-input-number-group-addon,
+.ant-input-number-group-wrapper-disabled .ant-input-number-disabled {
+    border: none !important;
+    box-shadow: none !important;
+    background-color: #f9f9f9 !important;
+}
+
+/* Xử lý trường hợp đặc biệt cho các nút trong InputNumber */
+.ant-input-number-disabled .ant-input-number-handler-down-inner,
+.ant-input-number-disabled .ant-input-number-handler-up-inner {
+    display: none !important;
+}
+
+/* Xử lý trường hợp đặc biệt cho các addon của InputNumber */
+.ant-input-number-group-addon {
+    border: none !important;
+}
+
+/* Xử lý trường hợp InputNumber có border */
+.ant-input-number-wrapper-disabled,
+.ant-input-number-group-wrapper-disabled .ant-input-number-group,
+.ant-input-number-group-wrapper-disabled .ant-input-number-group-addon {
+    border: none !important;
+    background-color: #f9f9f9 !important;
+}
+
+/* Xử lý mọi trường hợp có border khi disabled */
+*[disabled],
+*.ant-input-disabled,
+*.ant-select-disabled,
+*.ant-input-number-disabled,
+*.ant-input-affix-wrapper-disabled,
+*.ant-input-number-affix-wrapper-disabled,
+*.ant-input-number-group-wrapper-disabled {
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* Xử lý DatePicker khi disabled */
+.ant-picker-disabled {
+    background: #f9f9f9 !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.ant-picker-disabled .ant-picker-input > input[disabled] {
+    color: rgba(0, 0, 0, 0.88) !important;
+    background: #f9f9f9 !important;
+    cursor: not-allowed !important;
+}
+
+.ant-picker-disabled .ant-picker-suffix {
+    color: rgba(0, 0, 0, 0.25) !important;
+    display: none !important;
+}
+
+/* Làm đậm kí tự phía bên phải (suffix) của input khi disabled */
+.ant-input-number-group-addon,
+.ant-input-number-group-wrapper-disabled .ant-input-number-group-addon,
+.ant-input-affix-wrapper-disabled .ant-input-suffix,
+.ant-input-number-affix-wrapper-disabled .ant-input-number-suffix {
+    font-weight: 400 !important;
+    color: rgba(0, 0, 0, 0.692) !important;
 }
 
 /* Image component disabled */
@@ -310,4 +412,46 @@ label {
     .product-row {
         min-width: 1200px !important;
     }
+}
+
+/* Tùy chỉnh thanh cuộn cho sidebar */
+.custom-sidebar-scrollbar::-webkit-scrollbar,
+.custom-sidebar-menu-scrollbar::-webkit-scrollbar {
+    width: 5px;
+}
+
+.custom-sidebar-scrollbar::-webkit-scrollbar-track,
+.custom-sidebar-menu-scrollbar::-webkit-scrollbar-track {
+    background: #001529;
+}
+
+.custom-sidebar-scrollbar::-webkit-scrollbar-thumb,
+.custom-sidebar-menu-scrollbar::-webkit-scrollbar-thumb {
+    background-color: rgba(160, 160, 160, 0.4);
+    border-radius: 10px;
+}
+
+.custom-sidebar-scrollbar::-webkit-scrollbar-thumb:hover,
+.custom-sidebar-menu-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(160, 160, 160, 0.6);
+}
+
+/* Firefox */
+.custom-sidebar-scrollbar,
+.custom-sidebar-menu-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(160, 160, 160, 0.4) #001529;
+}
+
+/* Ẩn thanh cuộn khi không sử dụng */
+.custom-sidebar-scrollbar,
+.custom-sidebar-menu-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: thin; /* Firefox */
+}
+
+/* Hiện thanh cuộn khi hover */
+.custom-sidebar-scrollbar:hover,
+.custom-sidebar-menu-scrollbar:hover {
+    scrollbar-width: thin;
 }

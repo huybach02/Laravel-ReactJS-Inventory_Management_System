@@ -18,6 +18,7 @@ Route::post('/auth/verify-otp', [AuthController::class, 'verifyOTP'])->name('ver
 
 // Route công khai không cần xác thực
 Route::get('/quan-ly-ban-hang/xem-truoc-hoa-don/{id}', [\App\Modules\QuanLyBanHang\QuanLyBanHangController::class, 'xemTruocHoaDon']);
+Route::get('lich-su-import/download-file/{id}', [LichSuImportController::class, 'downloadFile']);
 
 Route::group([
 
@@ -61,7 +62,6 @@ Route::group([
 
   // Lịch sử import
   Route::get('lich-su-import', [LichSuImportController::class, 'index']);
-  Route::get('lich-su-import/download-file/{id}', [LichSuImportController::class, 'downloadFile']);
 
   // NguoiDung
   Route::prefix('nguoi-dung')->group(function () {
@@ -139,6 +139,7 @@ Route::group([
     Route::get('/', [\App\Modules\SanPham\SanPhamController::class, 'index']);
     Route::get('/options', [\App\Modules\SanPham\SanPhamController::class, 'getOptions']);
     Route::get('/options-by-nha-cung-cap/{nhaCungCapId}', [\App\Modules\SanPham\SanPhamController::class, 'getOptionsByNhaCungCap']);
+    Route::get('/options-lo-san-pham-by-san-pham/{sanPhamId}', [\App\Modules\SanPham\SanPhamController::class, 'getOptionsLoSanPhamBySanPhamId']);
     Route::get('/download-template-excel', [\App\Modules\SanPham\SanPhamController::class, 'downloadTemplateExcelWithRelations']);
     Route::post('/', [\App\Modules\SanPham\SanPhamController::class, 'store']);
     Route::get('/{id}', [\App\Modules\SanPham\SanPhamController::class, 'show']);
@@ -203,6 +204,7 @@ Route::group([
     Route::get('/', [\App\Modules\QuanLyBanHang\QuanLyBanHangController::class, 'index']);
     Route::get('/get-gia-ban-san-pham', [\App\Modules\QuanLyBanHang\QuanLyBanHangController::class, 'getGiaBanSanPham']);
     Route::get('/options', [\App\Modules\QuanLyBanHang\QuanLyBanHangController::class, 'getOptions']);
+    Route::get('/get-san-pham-by-don-hang-id/{donHangId}', [\App\Modules\QuanLyBanHang\QuanLyBanHangController::class, 'getSanPhamByDonHangId']);
     Route::get('/download-template-excel', [\App\Modules\QuanLyBanHang\QuanLyBanHangController::class, 'downloadTemplateExcel']);
     // Route xem trước hóa đơn đã được đặt bên ngoài middleware JWT
     Route::post('/', [\App\Modules\QuanLyBanHang\QuanLyBanHangController::class, 'store']);
@@ -210,5 +212,17 @@ Route::group([
     Route::put('/{id}', [\App\Modules\QuanLyBanHang\QuanLyBanHangController::class, 'update']);
     Route::delete('/{id}', [\App\Modules\QuanLyBanHang\QuanLyBanHangController::class, 'destroy']);
     Route::post('/import-excel', [\App\Modules\QuanLyBanHang\QuanLyBanHangController::class, 'importExcel']);
+  });
+
+  // PhieuXuatKho
+  Route::prefix('phieu-xuat-kho')->group(function () {
+    Route::get('/', [\App\Modules\PhieuXuatKho\PhieuXuatKhoController::class, 'index']);
+    Route::get('/options', [\App\Modules\PhieuXuatKho\PhieuXuatKhoController::class, 'getOptions']);
+    Route::get('/download-template-excel', [\App\Modules\PhieuXuatKho\PhieuXuatKhoController::class, 'downloadTemplateExcel']);
+    Route::post('/', [\App\Modules\PhieuXuatKho\PhieuXuatKhoController::class, 'store']);
+    Route::get('/{id}', [\App\Modules\PhieuXuatKho\PhieuXuatKhoController::class, 'show']);
+    Route::put('/{id}', [\App\Modules\PhieuXuatKho\PhieuXuatKhoController::class, 'update']);
+    Route::delete('/{id}', [\App\Modules\PhieuXuatKho\PhieuXuatKhoController::class, 'destroy']);
+    Route::post('/import-excel', [\App\Modules\PhieuXuatKho\PhieuXuatKhoController::class, 'importExcel']);
   });
 });

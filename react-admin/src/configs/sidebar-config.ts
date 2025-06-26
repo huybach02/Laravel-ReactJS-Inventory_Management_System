@@ -158,6 +158,14 @@ export const sidebarConfig = (navigate: NavigateFunction) => {
                     onClick: () => navigate(URL_CONSTANTS.PHIEU_NHAP_KHO),
                 },
                 {
+                    key: "phieu-xuat-kho",
+                    label: "Phiếu xuất kho",
+                    icon: React.createElement(NotepadText, {
+                        style: iconStyle,
+                    }),
+                    onClick: () => navigate(URL_CONSTANTS.PHIEU_XUAT_KHO),
+                },
+                {
                     key: "quan-ly-ton-kho",
                     label: "Quản lý tồn kho",
                     icon: React.createElement(Package2, { style: iconStyle }),

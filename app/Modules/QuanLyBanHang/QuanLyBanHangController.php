@@ -128,6 +128,17 @@ class QuanLyBanHangController extends Controller
     return CustomResponse::success($result);
   }
 
+  public function getSanPhamByDonHangId($donHangId)
+  {
+    $result = $this->quanLyBanHangService->getSanPhamByDonHangId($donHangId);
+
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
+    }
+
+    return CustomResponse::success($result);
+  }
+
   public function downloadTemplateExcel()
   {
     $path = public_path('mau-excel/QuanLyBanHang.xlsx');
