@@ -32,7 +32,7 @@ const HeaderMain = ({
         token: { colorBgContainer },
     } = theme.useToken();
 
-    const { mobileOnly, isMobile } = useResponsive();
+    const { mobileOnly, isDesktop } = useResponsive();
 
     return (
         <Header
@@ -54,12 +54,12 @@ const HeaderMain = ({
             }}
         >
             <Flex
-                justify={!isMobile ? "space-between" : "flex-end"}
+                justify={isDesktop ? "space-between" : "flex-end"}
                 align="center"
                 style={{ height: "100%" }}
                 gap={20}
             >
-                {!isMobile && (
+                {isDesktop && (
                     <Button
                         type="default"
                         icon={

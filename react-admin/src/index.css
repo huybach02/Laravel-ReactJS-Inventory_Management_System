@@ -417,7 +417,7 @@ label {
 /* Tùy chỉnh thanh cuộn cho sidebar */
 .custom-sidebar-scrollbar::-webkit-scrollbar,
 .custom-sidebar-menu-scrollbar::-webkit-scrollbar {
-    width: 5px;
+    width: 1px !important; /* Giảm từ 2px xuống 1px */
 }
 
 .custom-sidebar-scrollbar::-webkit-scrollbar-track,
