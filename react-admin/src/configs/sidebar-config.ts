@@ -21,6 +21,7 @@ import {
     Wallet,
     PanelBottomOpen,
     HandCoins,
+    PanelTopOpen,
 } from "lucide-react";
 
 const iconStyle = {
@@ -178,6 +179,14 @@ export const sidebarConfig = (navigate: NavigateFunction) => {
             label: "Quản lý thu chi",
             icon: React.createElement(Wallet, { style: iconStyle }),
             children: [
+                {
+                    key: "phieu-thu",
+                    label: "Phiếu thu",
+                    icon: React.createElement(PanelTopOpen, {
+                        style: iconStyle,
+                    }),
+                    onClick: () => navigate(URL_CONSTANTS.PHIEU_THU),
+                },
                 {
                     key: "phieu-chi",
                     label: "Phiếu chi",

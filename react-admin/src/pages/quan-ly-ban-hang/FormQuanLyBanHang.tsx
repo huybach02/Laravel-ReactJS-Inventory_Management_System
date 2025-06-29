@@ -294,7 +294,7 @@ const FormQuanLyBanHang = ({
             </Col>
             <Col
                 span={5}
-                xs={25}
+                xs={24}
                 sm={12}
                 md={5}
                 lg={5}

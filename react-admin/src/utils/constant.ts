@@ -71,3 +71,10 @@ export const OPTIONS_TRANG_THAI_XUAT_KHO = [
     { value: 1, label: "Đã có xuất kho" },
     { value: 2, label: "Đã hoàn thành" },
 ];
+
+export const OPTIONS_LOAI_PHIEU_THU = [
+    { value: 1, label: "Thu cho đơn hàng" },
+    { value: 2, label: "Thu cho nhiều đơn hàng theo khách hàng" },
+    { value: 3, label: "Thu công nợ khách hàng" },
+    { value: 4, label: "Thu khác" },
+];

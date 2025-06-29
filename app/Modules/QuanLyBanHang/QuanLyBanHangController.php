@@ -117,9 +117,13 @@ class QuanLyBanHangController extends Controller
   /**
    * Lấy danh sách QuanLyBanHang dạng option
    */
-  public function getOptions()
+  public function getOptions(Request $request)
   {
-    $result = $this->quanLyBanHangService->getOptions();
+    $params = $request->all();
+
+    $params = Helper::validateFilterParams($params);
+
+    $result = $this->quanLyBanHangService->getOptions($params);
 
     if ($result instanceof \Illuminate\Http\JsonResponse) {
       return $result;
@@ -131,6 +135,28 @@ class QuanLyBanHangController extends Controller
   public function getSanPhamByDonHangId($donHangId)
   {
     $result = $this->quanLyBanHangService->getSanPhamByDonHangId($donHangId);
+
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
+    }
+
+    return CustomResponse::success($result);
+  }
+
+  public function getSoTienCanThanhToan($donHangId)
+  {
+    $result = $this->quanLyBanHangService->getSoTienCanThanhToan($donHangId);
+
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
+    }
+
+    return CustomResponse::success($result);
+  }
+
+  public function getDonHangByKhachHangId($khachHangId)
+  {
+    $result = $this->quanLyBanHangService->getDonHangByKhachHangId($khachHangId);
 
     if ($result instanceof \Illuminate\Http\JsonResponse) {
       return $result;

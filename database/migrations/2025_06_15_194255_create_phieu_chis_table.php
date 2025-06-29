@@ -15,7 +15,7 @@ return new class extends Migration
       $table->id();
       $table->string('ma_phieu_chi')->unique();
       $table->date('ngay_chi');
-      $table->tinyInteger('loai_phieu_chi')->comment('1: chi thanh toán cho phiếu nhập kho, 2: thanh toán công nợ, 3: chi khác');
+      $table->tinyInteger('loai_phieu_chi')->comment('1: chi thanh toán cho phiếu nhập kho,2: chi thanh toán nhiều phiếu nhập kho theo nhà cung cấp, 3: thanh toán công nợ, 4: chi khác');
       $table->integer('nha_cung_cap_id')->nullable();
       $table->integer('phieu_nhap_kho_id')->nullable();
       $table->integer('so_tien');

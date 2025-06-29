@@ -319,11 +319,20 @@ class FilterWithPagination
   private static function applyBetweenFilter($query, string $field, $value): void
   {
     $values = self::parseArrayValue($value);
-    if (count($values) === 2) {
-      $query->whereBetween($field, $values);
-    } else {
+    if (count($values) !== 2) {
       throw new \InvalidArgumentException('BETWEEN cần 2 giá trị');
     }
+
+    $startValue = $values[0];
+    $endValue = $values[1];
+
+    // Kiểm tra xem có phải trường ngày tháng không
+    if (self::isDateTimeField($field) && self::isDateTimeString($endValue)) {
+      // Với trường ngày tháng: chuyển ngày kết thúc thành cuối ngày
+      $endValue = Carbon::parse($endValue)->endOfDay()->format('Y-m-d H:i:s');
+    }
+
+    $query->whereBetween($field, [$startValue, $endValue]);
   }
 
   /**
@@ -402,6 +411,31 @@ class FilterWithPagination
    */
   private static function isDateString(string $value): bool
   {
+    return preg_match('/^\d{4}-\d{2}-\d{2}$/', $value) === 1;
+  }
+
+  /**
+   * Kiểm tra xem field có phải là trường ngày tháng không
+   */
+  private static function isDateTimeField(string $field): bool
+  {
+    // Loại bỏ table prefix nếu có
+    $fieldName = str_contains($field, '.') ? explode('.', $field)[1] : $field;
+
+    return preg_match('/ngay|created_at|updated_at|date|time/', $fieldName) === 1;
+  }
+
+  /**
+   * Kiểm tra chuỗi có phải format datetime không (YYYY-MM-DD hoặc YYYY-MM-DD HH:MM:SS)
+   */
+  private static function isDateTimeString(string $value): bool
+  {
+    // Kiểm tra format YYYY-MM-DD HH:MM:SS
+    if (preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/', $value) === 1) {
+      return true;
+    }
+
+    // Kiểm tra format YYYY-MM-DD
     return preg_match('/^\d{4}-\d{2}-\d{2}$/', $value) === 1;
   }
 
