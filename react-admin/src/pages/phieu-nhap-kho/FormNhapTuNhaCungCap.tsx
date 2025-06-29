@@ -203,7 +203,7 @@ const FormNhapTuNhaCungCap = ({
             <Col span={24} style={{ marginBottom: 20 }}>
                 <DanhSachSanPham form={form} isDetail={isDetail} />
             </Col>
-            <Col span={5} xs={25} sm={12} md={5} lg={5} xl={5}>
+            <Col span={5} xs={24} sm={12} md={5} lg={5} xl={5}>
                 <Typography.Title level={5}>Tổng tiền hàng</Typography.Title>
                 <Typography.Text style={{ fontSize: 20 }}>
                     {formatter(tongTienHang) || 0} đ
@@ -278,9 +278,9 @@ const FormNhapTuNhaCungCap = ({
                 </Form.Item>
             </Col>
             <Col
-                span={5}
-                xs={25}
-                sm={12}
+                span={24}
+                xs={24}
+                sm={24}
                 md={5}
                 lg={5}
                 xl={5}

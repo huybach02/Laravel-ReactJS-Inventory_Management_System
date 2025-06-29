@@ -32,6 +32,8 @@ export const API_ROUTE_CONFIG = {
     QUAN_LY_BAN_HANG: "/quan-ly-ban-hang",
 
     PHIEU_XUAT_KHO: "/phieu-xuat-kho",
+
+    PHIEU_THU: "/phieu-thu",
 };
 export const URL_CONSTANTS = {
     LOGIN: "/admin",
@@ -60,4 +62,6 @@ export const URL_CONSTANTS = {
     QUAN_LY_BAN_HANG: "/admin/quan-ly-ban-hang",
 
     PHIEU_XUAT_KHO: "/admin/quan-ly-kho/phieu-xuat-kho",
+
+    PHIEU_THU: "/admin/quan-ly-thu-chi/phieu-thu",
 };

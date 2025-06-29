@@ -205,6 +205,8 @@ Route::group([
     Route::get('/get-gia-ban-san-pham', [\App\Modules\QuanLyBanHang\QuanLyBanHangController::class, 'getGiaBanSanPham']);
     Route::get('/options', [\App\Modules\QuanLyBanHang\QuanLyBanHangController::class, 'getOptions']);
     Route::get('/get-san-pham-by-don-hang-id/{donHangId}', [\App\Modules\QuanLyBanHang\QuanLyBanHangController::class, 'getSanPhamByDonHangId']);
+    Route::get('/get-so-tien-can-thanh-toan/{donHangId}', [\App\Modules\QuanLyBanHang\QuanLyBanHangController::class, 'getSoTienCanThanhToan']);
+    Route::get('/get-don-hang-by-khach-hang-id/{khachHangId}', [\App\Modules\QuanLyBanHang\QuanLyBanHangController::class, 'getDonHangByKhachHangId']);
     Route::get('/download-template-excel', [\App\Modules\QuanLyBanHang\QuanLyBanHangController::class, 'downloadTemplateExcel']);
     // Route xem trước hóa đơn đã được đặt bên ngoài middleware JWT
     Route::post('/', [\App\Modules\QuanLyBanHang\QuanLyBanHangController::class, 'store']);
@@ -224,5 +226,17 @@ Route::group([
     Route::put('/{id}', [\App\Modules\PhieuXuatKho\PhieuXuatKhoController::class, 'update']);
     Route::delete('/{id}', [\App\Modules\PhieuXuatKho\PhieuXuatKhoController::class, 'destroy']);
     Route::post('/import-excel', [\App\Modules\PhieuXuatKho\PhieuXuatKhoController::class, 'importExcel']);
+  });
+
+  // PhieuThu
+  Route::prefix('phieu-thu')->group(function () {
+    Route::get('/', [\App\Modules\PhieuThu\PhieuThuController::class, 'index']);
+    Route::get('/options', [\App\Modules\PhieuThu\PhieuThuController::class, 'getOptions']);
+    Route::get('/download-template-excel', [\App\Modules\PhieuThu\PhieuThuController::class, 'downloadTemplateExcel']);
+    Route::post('/', [\App\Modules\PhieuThu\PhieuThuController::class, 'store']);
+    Route::get('/{id}', [\App\Modules\PhieuThu\PhieuThuController::class, 'show']);
+    Route::put('/{id}', [\App\Modules\PhieuThu\PhieuThuController::class, 'update']);
+    Route::delete('/{id}', [\App\Modules\PhieuThu\PhieuThuController::class, 'destroy']);
+    Route::post('/import-excel', [\App\Modules\PhieuThu\PhieuThuController::class, 'importExcel']);
   });
 });

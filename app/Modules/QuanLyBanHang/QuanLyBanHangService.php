@@ -216,9 +216,17 @@ class QuanLyBanHangService
   /**
    * Lấy danh sách QuanLyBanHang dạng option
    */
-  public function getOptions()
+  public function getOptions(array $params = [])
   {
-    return DonHang::select('id as value', 'ma_don_hang as label')->get();
+    $query = DonHang::query();
+
+    $result = FilterWithPagination::findWithPagination(
+      $query,
+      $params,
+      ['don_hangs.id as value', 'don_hangs.ma_don_hang as label']
+    );
+
+    return $result['collection'];
   }
 
   /**
@@ -262,5 +270,17 @@ class QuanLyBanHangService
   public function getSanPhamByDonHangId($donHangId)
   {
     return DonHang::with('chiTietDonHangs.sanPham', 'chiTietDonHangs.donViTinh')->where('id', $donHangId)->first();
+  }
+
+  public function getDonHangByKhachHangId($khachHangId)
+  {
+    return DonHang::with('khachHang')->where('khach_hang_id', $khachHangId)->where('trang_thai_thanh_toan', 0)->get();
+  }
+
+  public function getSoTienCanThanhToan($donHangId)
+  {
+    $donHang = $this->getById($donHangId);
+
+    return $donHang->tong_tien_can_thanh_toan - $donHang->so_tien_da_thanh_toan;
   }
 }

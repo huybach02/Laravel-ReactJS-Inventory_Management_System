@@ -263,9 +263,13 @@ class {$moduleName}Controller extends Controller
     /**
      * Lấy danh sách {$singularName} dạng option
      */
-    public function getOptions()
+    public function getOptions(Request \$request)
     {
-      \$result = \$this->{$variableName}Service->getOptions();
+      \$params = \$request->all();
+
+      \$params = Helper::validateFilterParams(\$params);
+
+      \$result = \$this->{$variableName}Service->getOptions(\$params);
 
       if (\$result instanceof \Illuminate\Http\JsonResponse) {
         return \$result;
@@ -449,9 +453,17 @@ class {$moduleName}Service
     /**
      * Lấy danh sách {$singularName} dạng option
      */
-    public function getOptions()
+    public function getOptions(array \$params = [])
     {
-      return {$modelName}::select('id as value', 'ten_{$snakeName} as label')->get();
+      \$query = {$modelName}::query();
+
+      \$result = FilterWithPagination::findWithPagination(
+        \$query,
+        \$params,
+        ['{$snakeNamePlural}.id as value', '{$snakeNamePlural}.ten_{$snakeName} as label']
+      );
+
+      return \$result['collection'];
     }
 }
 ";
