@@ -78,3 +78,9 @@ export const OPTIONS_LOAI_PHIEU_THU = [
     { value: 3, label: "Thu công nợ khách hàng" },
     { value: 4, label: "Thu khác" },
 ];
+
+export const OPTIONS_LOAI_SAN_PHAM = [
+    { value: "SP_NHA_CUNG_CAP", label: "Sản phẩm nhà cung cấp" },
+    { value: "SP_SAN_XUAT", label: "Sản phẩm sản xuất" },
+    { value: "NGUYEN_LIEU", label: "Nguyên liệu" },
+];

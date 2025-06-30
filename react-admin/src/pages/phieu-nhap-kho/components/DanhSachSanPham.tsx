@@ -4,6 +4,7 @@ import {
     Card,
     Col,
     DatePicker,
+    Divider,
     Form,
     InputNumber,
     Row,
@@ -87,6 +88,7 @@ const DanhSachSanPham = ({
                 <Typography.Title level={4}>
                     Danh sách nhập sản phẩm/nguyên vật liệu
                 </Typography.Title>
+                <Divider />
                 <div
                     className="product-list-container"
                     style={{

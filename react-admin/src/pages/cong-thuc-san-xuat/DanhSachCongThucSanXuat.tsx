@@ -4,12 +4,9 @@ import { useEffect, useState } from "react";
 import type { User } from "../../types/user.type";
 import useColumnSearch from "../../hooks/useColumnSearch";
 import { getListData } from "../../services/getData.api";
-import {
-    createFilterQueryFromArray,
-    formatVietnameseCurrency,
-} from "../../utils/utils";
-import { Col, Row, Space, Tag, Flex, Image } from "antd";
-import SuaSanPham from "./SuaSanPham";
+import { createFilterQueryFromArray } from "../../utils/utils";
+import { Col, Row, Space, Tag, Flex } from "antd";
+import SuaCongThucSanXuat from "./SuaCongThucSanXuat";
 import Delete from "../../components/Delete";
 import { useDispatch, useSelector } from "react-redux";
 import CustomTable from "../../components/CustomTable";
@@ -17,13 +14,12 @@ import type { RootState } from "../../redux/store";
 import { usePagination } from "../../hooks/usePagination";
 import type { Actions } from "../../types/main.type";
 import ExportTableToExcel from "../../components/ExportTableToExcel";
-import { OPTIONS_LOAI_SAN_PHAM, OPTIONS_STATUS } from "../../utils/constant";
+import { OPTIONS_STATUS } from "../../utils/constant";
 import dayjs from "dayjs";
 import ImportExcel from "../../components/ImportExcel";
-import ChiTietSanPham from "./ChiTietSanPham";
-import { API_ROUTE_CONFIG } from "../../configs/api-route-config";
+import LichSuCapNhatCongThucSanXuat from "./LichSuCapNhatCongThucSanXuat";
 
-const DanhSachSanPham = ({
+const DanhSachCongThucSanXuat = ({
     path,
     permission,
     title,
@@ -54,16 +50,7 @@ const DanhSachSanPham = ({
 
     const getDanhSach = async () => {
         setIsLoading(true);
-        const params = {
-            ...filter,
-            ...createFilterQueryFromArray([
-                {
-                    field: "loai_san_pham",
-                    operator: "not_equal",
-                    value: "NGUYEN_LIEU",
-                },
-            ]),
-        };
+        const params = { ...filter, ...createFilterQueryFromArray(query) };
         const danhSach = await getListData(path, params);
         if (danhSach) {
             setIsLoading(false);
@@ -86,14 +73,22 @@ const DanhSachSanPham = ({
             title: "Thao tác",
             dataIndex: "id",
             align: "center",
-            render: (id: number) => {
+            render: (id: number, record: any) => {
                 return (
                     <Space size={0}>
                         {permission.show && (
-                            <ChiTietSanPham path={path} id={id} title={title} />
+                            <LichSuCapNhatCongThucSanXuat
+                                path={path}
+                                id={id}
+                                title={record.ten_san_pham}
+                            />
                         )}
                         {permission.edit && (
-                            <SuaSanPham path={path} id={id} title={title} />
+                            <SuaCongThucSanXuat
+                                path={path}
+                                id={id}
+                                title={title}
+                            />
                         )}
                         {permission.delete && (
                             <Delete path={path} id={id} onShow={getDanhSach} />
@@ -103,130 +98,26 @@ const DanhSachSanPham = ({
             },
         },
         {
-            title: "Ảnh sản phẩm",
-            dataIndex: "images",
-            align: "center",
-            maxWidth: 120,
-            render: (images: any[]) => {
-                const image = images && images.length > 0 ? images[0].path : "";
-                return (
-                    <Image
-                        src={image}
-                        alt="Ảnh sản phẩm"
-                        width={50}
-                        height={50}
-                    />
-                );
-            },
-            exportData: (record: any) => {
-                return record.images && record.images.length > 0
-                    ? record.images[0].path
-                    : "";
-            },
-        },
-        {
-            title: "Mã sản phẩm",
-            dataIndex: "ma_san_pham",
-            ...inputSearch({
-                dataIndex: "ma_san_pham",
-                operator: "contain",
-                nameColumn: "Mã sản phẩm",
-            }),
-        },
-        {
             title: "Tên sản phẩm",
             dataIndex: "ten_san_pham",
             ...inputSearch({
-                dataIndex: "ten_san_pham",
+                dataIndex: "san_phams.ten_san_pham",
                 operator: "contain",
                 nameColumn: "Tên sản phẩm",
             }),
         },
         {
-            title: "Danh mục",
-            dataIndex: "danh_muc",
-            render: (record: { ten_danh_muc: string }) => {
-                return record?.ten_danh_muc;
-            },
-            ...selectSearch({
-                dataIndex: "danh_muc_id",
-                path: API_ROUTE_CONFIG.DANH_MUC_SAN_PHAM + "/options",
-                operator: "equal",
-                nameColumn: "Danh mục",
+            title: "Số lượng",
+            dataIndex: "so_luong",
+        },
+        {
+            title: "Đơn vị tính",
+            dataIndex: "ten_don_vi",
+            ...inputSearch({
+                dataIndex: "don_vi_tinhs.ten_don_vi",
+                operator: "contain",
+                nameColumn: "Đơn vị tính",
             }),
-        },
-        {
-            title: "Loại sản phẩm",
-            dataIndex: "loai_san_pham",
-            render: (record: string) => {
-                return (
-                    <Tag
-                        color={
-                            OPTIONS_LOAI_SAN_PHAM.find(
-                                (item) => item.value === record
-                            )?.value === "SP_NHA_CUNG_CAP"
-                                ? "blue"
-                                : "green"
-                        }
-                    >
-                        {
-                            OPTIONS_LOAI_SAN_PHAM.filter(
-                                (item) => item.value !== "NGUYEN_LIEU"
-                            ).find((item) => item.value === record)?.label
-                        }
-                    </Tag>
-                );
-            },
-            ...selectSearchWithOutApi({
-                dataIndex: "loai_san_pham",
-                operator: "equal",
-                nameColumn: "Loại sản phẩm",
-                options: OPTIONS_LOAI_SAN_PHAM.filter(
-                    (item) => item.value !== "NGUYEN_LIEU"
-                ),
-            }),
-        },
-        {
-            title: "Giá nhập mặc định",
-            dataIndex: "gia_nhap_mac_dinh",
-            render: (record: number) => {
-                return formatVietnameseCurrency(record);
-            },
-        },
-        {
-            title: "Tỷ lệ chiết khấu",
-            dataIndex: "ty_le_chiet_khau",
-            render: (record: number) => {
-                return record + " %";
-            },
-        },
-        {
-            title: "Mức lợi nhuận",
-            dataIndex: "muc_loi_nhuan",
-            render: (record: number) => {
-                return record + " %";
-            },
-        },
-        {
-            title: "Tổng số lượng nhập",
-            dataIndex: "tong_so_luong_nhap",
-            render: (record: number) => {
-                return record;
-            },
-        },
-        {
-            title: "Tổng số lượng thực tế",
-            dataIndex: "tong_so_luong_thuc_te",
-            render: (record: number) => {
-                return record;
-            },
-        },
-        {
-            title: "Số lượng cảnh báo",
-            dataIndex: "so_luong_canh_bao",
-            render: (record: number) => {
-                return record;
-            },
         },
         {
             title: "Trạng thái",
@@ -299,14 +190,14 @@ const DanhSachSanPham = ({
                                 params={{}}
                             />
                         )}
-                        {permission.create && <ImportExcel path={path} />}
+                        {/* {permission.create && <ImportExcel path={path} />} */}
                     </Row>
                     <CustomTable
                         rowKey="id"
                         dataTable={danhSach?.data}
                         defaultColumns={defaultColumns}
                         filter={filter}
-                        scroll={{ x: 2400 }}
+                        scroll={{ x: 1000 }}
                         handlePageChange={handlePageChange}
                         handleLimitChange={handleLimitChange}
                         total={danhSach?.total}
@@ -318,4 +209,4 @@ const DanhSachSanPham = ({
     );
 };
 
-export default DanhSachSanPham;
+export default DanhSachCongThucSanXuat;

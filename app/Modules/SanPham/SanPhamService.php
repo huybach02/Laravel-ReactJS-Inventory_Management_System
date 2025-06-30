@@ -18,14 +18,27 @@ class SanPhamService
   public function getAll(array $params = [])
   {
     try {
-      // Tạo query cơ bản
-      $query = SanPham::query()->with('images', 'danhMuc:id,ten_danh_muc');
+      // Tạo query cơ bản với JOIN và GROUP BY
+      $query = SanPham::query()
+        ->withoutGlobalScopes(['withUserNames'])
+        ->with('images', 'danhMuc:id,ten_danh_muc')
+        ->leftJoin('users as nguoi_tao', 'san_phams.nguoi_tao', '=', 'nguoi_tao.id')
+        ->leftJoin('users as nguoi_cap_nhat', 'san_phams.nguoi_cap_nhat', '=', 'nguoi_cap_nhat.id')
+        ->leftJoin('chi_tiet_phieu_nhap_khos', 'san_phams.id', '=', 'chi_tiet_phieu_nhap_khos.san_pham_id')
+        ->leftJoin('kho_tongs', 'san_phams.id', '=', 'kho_tongs.san_pham_id')
+        ->groupBy('san_phams.id');
 
       // Sử dụng FilterWithPagination để xử lý filter và pagination
       $result = FilterWithPagination::findWithPagination(
         $query,
         $params,
-        ['san_phams.*'] // Columns cần select
+        [
+          'san_phams.*',
+          'nguoi_tao.name as ten_nguoi_tao',
+          'nguoi_cap_nhat.name as ten_nguoi_cap_nhat',
+          DB::raw('COALESCE(SUM(chi_tiet_phieu_nhap_khos.so_luong_nhap), 0) as tong_so_luong_nhap'),
+          DB::raw('COALESCE(SUM(kho_tongs.so_luong_ton), 0) as tong_so_luong_thuc_te')
+        ]
       );
 
       return [
@@ -79,6 +92,7 @@ class SanPhamService
         'ty_le_chiet_khau' => $data['ty_le_chiet_khau'],
         'muc_loi_nhuan' => $data['muc_loi_nhuan'],
         'so_luong_canh_bao' => $data['so_luong_canh_bao'],
+        'loai_san_pham' => $data['loai_san_pham'],
         'ghi_chu' => $data['ghi_chu'] ?? null,
         'trang_thai' => $data['trang_thai'],
       ]);
@@ -179,9 +193,17 @@ class SanPhamService
   /**
    * Lấy danh sách SanPham dạng option
    */
-  public function getOptions()
+  public function getOptions(array $params = [])
   {
-    return SanPham::select('id as value', 'ten_san_pham as label')->get();
+    $query = SanPham::query();
+
+    $result = FilterWithPagination::findWithPagination(
+      $query,
+      $params,
+      ['san_phams.id as value', DB::raw('CONCAT(san_phams.ten_san_pham, " (", san_phams.loai_san_pham, ")") as label')]
+    );
+
+    return $result['collection'];
   }
 
   /**
@@ -191,10 +213,11 @@ class SanPhamService
   {
     return SanPham::whereHas('nhaCungCaps', function ($query) use ($nhaCungCapId) {
       $query->withoutGlobalScope('withUserNames')
-        ->where('nha_cung_caps.id', $nhaCungCapId);
+        ->where('nha_cung_caps.id', $nhaCungCapId)
+        ->where('san_phams.loai_san_pham', '!=', 'SP_SAN_XUAT');
     })
       ->withoutGlobalScope('withUserNames')
-      ->select('san_phams.id as value', 'san_phams.ten_san_pham as label')
+      ->select('san_phams.id as value', DB::raw('CONCAT(san_phams.ten_san_pham, " (", san_phams.loai_san_pham, ")") as label'))
       ->get();
   }
 

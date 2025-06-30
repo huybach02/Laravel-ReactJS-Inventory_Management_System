@@ -1,44 +1,18 @@
-import { Col, Flex, Row, Tabs } from "antd";
+import { Col, Flex, Row } from "antd";
 import Heading from "../../components/heading";
-import DanhSachSanPham from "./DanhSachSanPham";
+import DanhSachCongThucSanXuat from "./DanhSachCongThucSanXuat";
 import { API_ROUTE_CONFIG } from "../../configs/api-route-config";
-import ThemSanPham from "./ThemSanPham";
+import ThemCongThucSanXuat from "./ThemCongThucSanXuat";
 import { useResponsive } from "../../hooks/useReponsive";
 import usePermission from "../../hooks/usePermission";
-import DanhSachNguyenLieu from "./DanhSachNguyenLieu";
 
-const path = API_ROUTE_CONFIG.SAN_PHAM;
-const title = "Sản phẩm/Nguyên liệu";
+const path = API_ROUTE_CONFIG.CONG_THUC_SAN_XUAT;
+const title = "Công thức sản xuất";
 
-const SanPham = () => {
+const CongThucSanXuat = () => {
     const { isMobile } = useResponsive();
 
     const permission = usePermission(path);
-
-    const items = [
-        {
-            key: "1",
-            label: "Danh sách sản phẩm",
-            children: (
-                <DanhSachSanPham
-                    path={path}
-                    permission={permission}
-                    title={title}
-                />
-            ),
-        },
-        {
-            key: "2",
-            label: "Danh sách nguyên liệu",
-            children: (
-                <DanhSachNguyenLieu
-                    path={path}
-                    permission={permission}
-                    title={title}
-                />
-            ),
-        },
-    ];
 
     return (
         <>
@@ -67,13 +41,19 @@ const SanPham = () => {
                           />
                       )} */}
                         {permission.create && (
-                            <ThemSanPham path={path} title={title} />
+                            <ThemCongThucSanXuat path={path} title={title} />
                         )}
                     </Col>
                 </Flex>
                 <Row>
                     <Col span={24}>
-                        {permission.index && <Tabs type="card" items={items} />}
+                        {permission.index && (
+                            <DanhSachCongThucSanXuat
+                                path={path}
+                                permission={permission}
+                                title={title}
+                            />
+                        )}
                     </Col>
                 </Row>
             </div>
@@ -81,4 +61,4 @@ const SanPham = () => {
     );
 };
 
-export default SanPham;
+export default CongThucSanXuat;

@@ -16,6 +16,7 @@ import SelectFormApi from "../../components/select/SelectFormApi";
 import { trangThaiSelect } from "../../configs/select-config";
 import ImageUploadSingle from "../../components/upload/ImageUploadSingle";
 import { API_ROUTE_CONFIG } from "../../configs/api-route-config";
+import { OPTIONS_LOAI_SAN_PHAM } from "../../utils/constant";
 
 const FormSanPham = ({
     form,
@@ -24,6 +25,8 @@ const FormSanPham = ({
     form: FormInstance;
     isDetail?: boolean;
 }) => {
+    const loaiSanPham = Form.useWatch("loai_san_pham", form);
+
     return (
         <Row gutter={[10, 10]}>
             <Col span={24}>
@@ -89,6 +92,24 @@ const FormSanPham = ({
                 />
             </Col>
             <Col span={12}>
+                <Form.Item
+                    name="loai_san_pham"
+                    label="Loại sản phẩm"
+                    rules={[
+                        {
+                            required: true,
+                            message: "Loại sản phẩm không được bỏ trống!",
+                        },
+                    ]}
+                >
+                    <Select
+                        options={OPTIONS_LOAI_SAN_PHAM}
+                        disabled={isDetail}
+                        placeholder="Chọn loại sản phẩm"
+                    />
+                </Form.Item>
+            </Col>
+            <Col span={12}>
                 <SelectFormApi
                     mode="multiple"
                     name="don_vi_tinh_id"
@@ -105,23 +126,28 @@ const FormSanPham = ({
                     disabled={isDetail}
                 />
             </Col>
-            <Col span={24}>
-                <SelectFormApi
-                    mode="multiple"
-                    name="nha_cung_cap_id"
-                    label="Nhà cung cấp"
-                    path={API_ROUTE_CONFIG.NHA_CUNG_CAP + "/options"}
-                    placeholder="Chọn nhà cung cấp"
-                    filter={createFilterQuery(1, "trang_thai", "equal", 1)}
-                    rules={[
-                        {
-                            required: true,
-                            message: "Nhà cung cấp không được bỏ trống!",
-                        },
-                    ]}
-                    disabled={isDetail}
-                />
-            </Col>
+            {(loaiSanPham === "SP_NHA_CUNG_CAP" ||
+                loaiSanPham === "NGUYEN_LIEU") && (
+                <Col span={24}>
+                    <SelectFormApi
+                        mode="multiple"
+                        name="nha_cung_cap_id"
+                        label="Nhà cung cấp"
+                        path={API_ROUTE_CONFIG.NHA_CUNG_CAP + "/options"}
+                        placeholder="Chọn nhà cung cấp"
+                        filter={createFilterQuery(1, "trang_thai", "equal", 1)}
+                        rules={[
+                            {
+                                required:
+                                    loaiSanPham === "SP_NHA_CUNG_CAP" ||
+                                    loaiSanPham === "NGUYEN_LIEU",
+                                message: "Nhà cung cấp không được bỏ trống!",
+                            },
+                        ]}
+                        disabled={isDetail}
+                    />
+                </Col>
+            )}
             <Col span={12}>
                 <Form.Item
                     name="gia_nhap_mac_dinh"
@@ -143,66 +169,73 @@ const FormSanPham = ({
                     />
                 </Form.Item>
             </Col>
-            <Col span={12}>
-                <Form.Item
-                    name="ty_le_chiet_khau"
-                    label={
-                        <span>
-                            Tỷ lệ chiết khấu{" "}
-                            <Tooltip title="Tỷ lệ chiết khấu từ nhà cung cấp cho sản phẩm này.">
-                                <QuestionCircleOutlined
-                                    style={{ color: "#1890ff" }}
-                                />
-                            </Tooltip>
-                        </span>
-                    }
-                    rules={[
-                        {
-                            required: true,
-                            message: "Tỷ lệ chiết khấu không được bỏ trống!",
-                        },
-                    ]}
-                >
-                    <InputNumber
-                        placeholder="Nhập tỷ lệ chiết khấu"
-                        addonAfter="%"
-                        style={{ width: "100%" }}
-                        min={0}
-                        max={100}
-                        disabled={isDetail}
-                    />
-                </Form.Item>
-            </Col>
-            <Col span={12}>
-                <Form.Item
-                    name="muc_loi_nhuan"
-                    label={
-                        <span>
-                            Mức lợi nhuận{" "}
-                            <Tooltip title="Mức lợi nhuận khi bán lẻ sản phẩm này.">
-                                <QuestionCircleOutlined
-                                    style={{ color: "#1890ff" }}
-                                />
-                            </Tooltip>
-                        </span>
-                    }
-                    rules={[
-                        {
-                            required: true,
-                            message: "Mức lợi nhuận không được bỏ trống!",
-                        },
-                    ]}
-                >
-                    <InputNumber
-                        placeholder="Nhập mức lợi nhuận"
-                        addonAfter="%"
-                        style={{ width: "100%" }}
-                        min={0}
-                        max={100}
-                        disabled={isDetail}
-                    />
-                </Form.Item>
-            </Col>
+            {(loaiSanPham === "SP_SAN_XUAT" ||
+                loaiSanPham === "SP_NHA_CUNG_CAP") && (
+                <Col span={12}>
+                    <Form.Item
+                        name="ty_le_chiet_khau"
+                        label={
+                            <span>
+                                Tỷ lệ chiết khấu{" "}
+                                <Tooltip title="Tỷ lệ chiết khấu từ nhà cung cấp cho sản phẩm này.">
+                                    <QuestionCircleOutlined
+                                        style={{ color: "#1890ff" }}
+                                    />
+                                </Tooltip>
+                            </span>
+                        }
+                        rules={[
+                            {
+                                required: true,
+                                message:
+                                    "Tỷ lệ chiết khấu không được bỏ trống!",
+                            },
+                        ]}
+                    >
+                        <InputNumber
+                            placeholder="Nhập tỷ lệ chiết khấu"
+                            addonAfter="%"
+                            style={{ width: "100%" }}
+                            min={0}
+                            max={100}
+                            disabled={isDetail}
+                        />
+                    </Form.Item>
+                </Col>
+            )}
+            {(loaiSanPham === "SP_SAN_XUAT" ||
+                loaiSanPham === "SP_NHA_CUNG_CAP") && (
+                <Col span={12}>
+                    <Form.Item
+                        name="muc_loi_nhuan"
+                        label={
+                            <span>
+                                Mức lợi nhuận{" "}
+                                <Tooltip title="Mức lợi nhuận khi bán lẻ sản phẩm này.">
+                                    <QuestionCircleOutlined
+                                        style={{ color: "#1890ff" }}
+                                    />
+                                </Tooltip>
+                            </span>
+                        }
+                        rules={[
+                            {
+                                required: true,
+                                message: "Mức lợi nhuận không được bỏ trống!",
+                            },
+                        ]}
+                    >
+                        <InputNumber
+                            placeholder="Nhập mức lợi nhuận"
+                            addonAfter="%"
+                            style={{ width: "100%" }}
+                            min={0}
+                            max={100}
+                            disabled={isDetail}
+                        />
+                    </Form.Item>
+                </Col>
+            )}
             <Col span={12}>
                 <Form.Item
                     name="so_luong_canh_bao"

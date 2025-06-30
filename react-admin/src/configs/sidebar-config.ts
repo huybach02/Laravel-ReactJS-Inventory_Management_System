@@ -22,6 +22,8 @@ import {
     PanelBottomOpen,
     HandCoins,
     PanelTopOpen,
+    Factory,
+    Waypoints,
 } from "lucide-react";
 
 const iconStyle = {
@@ -138,7 +140,7 @@ export const sidebarConfig = (navigate: NavigateFunction) => {
                 },
                 {
                     key: "san-pham",
-                    label: "Sản phẩm",
+                    label: "Sản phẩm/Nguyên liệu",
                     icon: React.createElement(SquareMenu, { style: iconStyle }),
                     onClick: () => navigate(URL_CONSTANTS.SAN_PHAM),
                 },
@@ -197,12 +199,24 @@ export const sidebarConfig = (navigate: NavigateFunction) => {
                 },
             ],
         },
-
         {
             key: "quan-ly-ban-hang",
             label: "Quản lý bán hàng",
             icon: React.createElement(HandCoins, { style: iconStyle }),
             onClick: () => navigate(URL_CONSTANTS.QUAN_LY_BAN_HANG),
+        },
+        {
+            key: "quan-ly-san-xuat",
+            label: "Quản lý sản xuất",
+            icon: React.createElement(Factory, { style: iconStyle }),
+            children: [
+                {
+                    key: "cong-thuc-san-xuat",
+                    label: "Công thức sản xuất",
+                    icon: React.createElement(Waypoints, { style: iconStyle }),
+                    onClick: () => navigate(URL_CONSTANTS.CONG_THUC_SAN_XUAT),
+                },
+            ],
         },
     ];
 };

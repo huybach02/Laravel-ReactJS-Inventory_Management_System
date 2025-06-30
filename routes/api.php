@@ -239,4 +239,17 @@ Route::group([
     Route::delete('/{id}', [\App\Modules\PhieuThu\PhieuThuController::class, 'destroy']);
     Route::post('/import-excel', [\App\Modules\PhieuThu\PhieuThuController::class, 'importExcel']);
   });
+
+  // CongThucSanXuat
+  Route::prefix('cong-thuc-san-xuat')->group(function () {
+    Route::get('/', [\App\Modules\CongThucSanXuat\CongThucSanXuatController::class, 'index']);
+    Route::get('/options', [\App\Modules\CongThucSanXuat\CongThucSanXuatController::class, 'getOptions']);
+    Route::get('/lich-su-cap-nhat/{id}', [\App\Modules\CongThucSanXuat\CongThucSanXuatController::class, 'getLichSuCapNhat']);
+    Route::get('/download-template-excel', [\App\Modules\CongThucSanXuat\CongThucSanXuatController::class, 'downloadTemplateExcel']);
+    Route::post('/', [\App\Modules\CongThucSanXuat\CongThucSanXuatController::class, 'store']);
+    Route::get('/{id}', [\App\Modules\CongThucSanXuat\CongThucSanXuatController::class, 'show']);
+    Route::put('/{id}', [\App\Modules\CongThucSanXuat\CongThucSanXuatController::class, 'update']);
+    Route::delete('/{id}', [\App\Modules\CongThucSanXuat\CongThucSanXuatController::class, 'destroy']);
+    Route::post('/import-excel', [\App\Modules\CongThucSanXuat\CongThucSanXuatController::class, 'importExcel']);
+  });
 });
