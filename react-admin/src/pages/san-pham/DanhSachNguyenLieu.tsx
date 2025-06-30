@@ -17,13 +17,13 @@ import type { RootState } from "../../redux/store";
 import { usePagination } from "../../hooks/usePagination";
 import type { Actions } from "../../types/main.type";
 import ExportTableToExcel from "../../components/ExportTableToExcel";
-import { OPTIONS_LOAI_SAN_PHAM, OPTIONS_STATUS } from "../../utils/constant";
+import { OPTIONS_STATUS } from "../../utils/constant";
 import dayjs from "dayjs";
 import ImportExcel from "../../components/ImportExcel";
 import ChiTietSanPham from "./ChiTietSanPham";
 import { API_ROUTE_CONFIG } from "../../configs/api-route-config";
 
-const DanhSachSanPham = ({
+const DanhSachNguyenLieu = ({
     path,
     permission,
     title,
@@ -59,7 +59,7 @@ const DanhSachSanPham = ({
             ...createFilterQueryFromArray([
                 {
                     field: "loai_san_pham",
-                    operator: "not_equal",
+                    operator: "equal",
                     value: "NGUYEN_LIEU",
                 },
             ]),
@@ -153,37 +153,6 @@ const DanhSachSanPham = ({
                 path: API_ROUTE_CONFIG.DANH_MUC_SAN_PHAM + "/options",
                 operator: "equal",
                 nameColumn: "Danh mục",
-            }),
-        },
-        {
-            title: "Loại sản phẩm",
-            dataIndex: "loai_san_pham",
-            render: (record: string) => {
-                return (
-                    <Tag
-                        color={
-                            OPTIONS_LOAI_SAN_PHAM.find(
-                                (item) => item.value === record
-                            )?.value === "SP_NHA_CUNG_CAP"
-                                ? "blue"
-                                : "green"
-                        }
-                    >
-                        {
-                            OPTIONS_LOAI_SAN_PHAM.filter(
-                                (item) => item.value !== "NGUYEN_LIEU"
-                            ).find((item) => item.value === record)?.label
-                        }
-                    </Tag>
-                );
-            },
-            ...selectSearchWithOutApi({
-                dataIndex: "loai_san_pham",
-                operator: "equal",
-                nameColumn: "Loại sản phẩm",
-                options: OPTIONS_LOAI_SAN_PHAM.filter(
-                    (item) => item.value !== "NGUYEN_LIEU"
-                ),
             }),
         },
         {
@@ -318,4 +287,4 @@ const DanhSachSanPham = ({
     );
 };
 
-export default DanhSachSanPham;
+export default DanhSachNguyenLieu;

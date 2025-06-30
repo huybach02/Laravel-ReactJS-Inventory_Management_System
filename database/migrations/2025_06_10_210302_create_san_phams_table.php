@@ -22,6 +22,7 @@ return new class extends Migration
       $table->integer('tong_so_luong_nhap')->default(0);
       $table->integer('tong_so_luong_thuc_te')->default(0);
       $table->integer('so_luong_canh_bao')->default(0);
+      $table->string('loai_san_pham')->comment('SP_NHA_CUNG_CAP, SP_SAN_XUAT, NGUYEN_LIEU');
       $table->string('ghi_chu')->nullable();
       $table->tinyInteger('trang_thai')->default(1);
 

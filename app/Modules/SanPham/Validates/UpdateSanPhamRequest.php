@@ -28,13 +28,14 @@ class UpdateSanPhamRequest extends FormRequest
       'image' => 'nullable|string',
       'danh_muc_id' => 'sometimes|required|integer',
       'don_vi_tinh_id' => 'sometimes|required|array|min:1',
-      'nha_cung_cap_id' => 'sometimes|required|array|min:1',
+      'nha_cung_cap_id' => 'sometimes|nullable|array|min:1',
       'gia_nhap_mac_dinh' => 'sometimes|required|numeric',
-      'ty_le_chiet_khau' => 'sometimes|required|numeric|min:0|max:100',
-      'muc_loi_nhuan' => 'sometimes|required|numeric|min:0|max:100',
+      'ty_le_chiet_khau' => 'sometimes|nullable|numeric|min:0|max:100',
+      'muc_loi_nhuan' => 'sometimes|nullable|numeric|min:0|max:100',
       'so_luong_canh_bao' => 'sometimes|required|numeric|min:0',
       'ghi_chu' => 'nullable|string',
       'trang_thai' => 'sometimes|required|integer|in:0,1',
+      'loai_san_pham' => 'sometimes|required|string|in:SP_NHA_CUNG_CAP,SP_SAN_XUAT,NGUYEN_LIEU',
     ];
   }
 
@@ -56,7 +57,6 @@ class UpdateSanPhamRequest extends FormRequest
       'don_vi_tinh_id.required' => 'Đơn vị tính là bắt buộc',
       'don_vi_tinh_id.array' => 'Đơn vị tính phải là mảng',
       'don_vi_tinh_id.min' => 'Đơn vị tính phải có ít nhất 1 phần tử',
-      'nha_cung_cap_id.required' => 'Nhà cung cấp là bắt buộc',
       'nha_cung_cap_id.array' => 'Nhà cung cấp phải là mảng',
       'nha_cung_cap_id.min' => 'Nhà cung cấp phải có ít nhất 1 phần tử',
       'gia_nhap_mac_dinh.required' => 'Giá nhập mặc định là bắt buộc',
@@ -75,6 +75,9 @@ class UpdateSanPhamRequest extends FormRequest
       'trang_thai.required' => 'Trạng thái là bắt buộc',
       'trang_thai.integer' => 'Trạng thái phải là số nguyên',
       'trang_thai.in' => 'Trạng thái phải là 0 hoặc 1',
+      'loai_san_pham.required' => 'Loại sản phẩm là bắt buộc',
+      'loai_san_pham.string' => 'Loại sản phẩm phải là chuỗi',
+      'loai_san_pham.in' => 'Loại sản phẩm phải là SP_NHA_CUNG_CAP, SP_SAN_XUAT hoặc NGUYEN_LIEU',
     ];
   }
 }

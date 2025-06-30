@@ -123,7 +123,10 @@ class QuanLyBanHangController extends Controller
 
     $params = Helper::validateFilterParams($params);
 
-    $result = $this->quanLyBanHangService->getOptions($params);
+    $result = $this->quanLyBanHangService->getOptions([
+      ...$params,
+      'limit' => -1,
+    ]);
 
     if ($result instanceof \Illuminate\Http\JsonResponse) {
       return $result;

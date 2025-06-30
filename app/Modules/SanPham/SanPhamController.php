@@ -108,9 +108,16 @@ class SanPhamController extends Controller
   /**
    * Lấy danh sách SanPham dạng option
    */
-  public function getOptions()
+  public function getOptions(Request $request)
   {
-    $result = $this->sanPhamService->getOptions();
+    $params = $request->all();
+
+    $params = Helper::validateFilterParams($params);
+
+    $result = $this->sanPhamService->getOptions([
+      ...$params,
+      'limit' => -1,
+    ]);
 
     if ($result instanceof \Illuminate\Http\JsonResponse) {
       return $result;

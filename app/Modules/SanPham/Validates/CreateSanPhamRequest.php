@@ -31,13 +31,14 @@ class CreateSanPhamRequest extends FormRequest
       'image' => 'nullable|string',
       'danh_muc_id' => 'required|integer|exists:danh_muc_san_phams,id',
       'don_vi_tinh_id' => 'required|array',
-      'nha_cung_cap_id' => 'required|array',
+      'nha_cung_cap_id' => 'nullable|array',
       'gia_nhap_mac_dinh' => 'required|numeric',
-      'ty_le_chiet_khau' => 'required|numeric|min:0|max:100',
-      'muc_loi_nhuan' => 'required|numeric|min:0|max:100',
+      'ty_le_chiet_khau' => 'nullable|numeric|min:0|max:100',
+      'muc_loi_nhuan' => 'nullable|numeric|min:0|max:100',
       'so_luong_canh_bao' => 'required|numeric|min:0',
       'ghi_chu' => 'nullable|string',
       'trang_thai' => 'required|integer|in:0,1',
+      'loai_san_pham' => 'required|string|in:SP_NHA_CUNG_CAP,SP_SAN_XUAT,NGUYEN_LIEU',
     ];
   }
 
@@ -65,9 +66,10 @@ class CreateSanPhamRequest extends FormRequest
         }
       }
 
-      // Validate nhà cung cấp
+      // Validate nhà cung cấp (chỉ khi loại sản phẩm là SP_NHA_CUNG_CAP hoặc NGUYEN_LIEU)
+      $loaiSanPham = $this->loai_san_pham;
       $nhaCungCapId = $this->nha_cung_cap_id;
-      if (!empty($nhaCungCapId)) {
+      if (in_array($loaiSanPham, ['SP_NHA_CUNG_CAP', 'NGUYEN_LIEU']) && !empty($nhaCungCapId)) {
         // Chuyển đổi tất cả các phần tử trong mảng ID thành số nguyên
         $nhaCungCapIds = array_map('intval', $nhaCungCapId);
         $existingNhaCungCapIds = NhaCungCap::whereIn('id', $nhaCungCapIds)->pluck('id')->toArray();
@@ -100,16 +102,13 @@ class CreateSanPhamRequest extends FormRequest
       'don_vi_tinh_id.required' => 'Đơn vị tính là bắt buộc',
       'don_vi_tinh_id.array' => 'Đơn vị tính phải là mảng',
       'don_vi_tinh_id.min' => 'Đơn vị tính phải có ít nhất 1 phần tử',
-      'nha_cung_cap_id.required' => 'Nhà cung cấp là bắt buộc',
       'nha_cung_cap_id.array' => 'Nhà cung cấp phải là mảng',
       'nha_cung_cap_id.min' => 'Nhà cung cấp phải có ít nhất 1 phần tử',
       'gia_nhap_mac_dinh.required' => 'Giá nhập mặc định là bắt buộc',
       'gia_nhap_mac_dinh.numeric' => 'Giá nhập mặc định phải là số',
-      'ty_le_chiet_khau.required' => 'Tỷ lệ chiết khấu là bắt buộc',
       'ty_le_chiet_khau.numeric' => 'Tỷ lệ chiết khấu phải là số',
       'ty_le_chiet_khau.min' => 'Tỷ lệ chiết khấu phải lớn hơn 0',
       'ty_le_chiet_khau.max' => 'Tỷ lệ chiết khấu phải nhỏ hơn 100',
-      'muc_loi_nhuan.required' => 'Mức lợi nhuận là bắt buộc',
       'muc_loi_nhuan.numeric' => 'Mức lợi nhuận phải là số',
       'muc_loi_nhuan.min' => 'Mức lợi nhuận phải lớn hơn 0',
       'muc_loi_nhuan.max' => 'Mức lợi nhuận phải nhỏ hơn 100',
@@ -119,6 +118,9 @@ class CreateSanPhamRequest extends FormRequest
       'trang_thai.required' => 'Trạng thái là bắt buộc',
       'trang_thai.integer' => 'Trạng thái phải là số nguyên',
       'trang_thai.in' => 'Trạng thái phải là 0 hoặc 1',
+      'loai_san_pham.required' => 'Loại sản phẩm là bắt buộc',
+      'loai_san_pham.string' => 'Loại sản phẩm phải là chuỗi',
+      'loai_san_pham.in' => 'Loại sản phẩm phải là SP_NHA_CUNG_CAP, SP_SAN_XUAT hoặc NGUYEN_LIEU',
     ];
   }
 }

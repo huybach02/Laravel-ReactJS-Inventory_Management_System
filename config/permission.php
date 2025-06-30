@@ -1,7 +1,19 @@
 <?php
 
 return [
-      [
+        [
+    "name" => "cong-thuc-san-xuat",
+    "actions" => [
+      "index" => true,
+      "create" => true,
+      "show" => true,
+      "edit" => true,
+      "delete" => true,
+      "export" => true,
+      "showMenu" => true
+    ]
+  ],
+[
     "name" => "phieu-thu",
     "actions" => [
       "index" => true,

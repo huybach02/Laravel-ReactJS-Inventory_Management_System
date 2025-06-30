@@ -52,6 +52,10 @@ class SanPham extends Model
     return $this->belongsTo(DanhMucSanPham::class);
   }
 
+  public function chiTietPhieuNhapKhos(): HasMany
+  {
+    return $this->hasMany(ChiTietPhieuNhapKho::class);
+  }
 
   // Kết nối sẵn với bảng images để lưu ảnh
   public function images()
