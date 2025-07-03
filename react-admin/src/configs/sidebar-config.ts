@@ -24,6 +24,7 @@ import {
     PanelTopOpen,
     Factory,
     Waypoints,
+    PackagePlus,
 } from "lucide-react";
 
 const iconStyle = {
@@ -215,6 +216,14 @@ export const sidebarConfig = (navigate: NavigateFunction) => {
                     label: "Công thức sản xuất",
                     icon: React.createElement(Waypoints, { style: iconStyle }),
                     onClick: () => navigate(URL_CONSTANTS.CONG_THUC_SAN_XUAT),
+                },
+                {
+                    key: "san-xuat",
+                    label: "Sản xuất",
+                    icon: React.createElement(PackagePlus, {
+                        style: iconStyle,
+                    }),
+                    onClick: () => navigate(URL_CONSTANTS.SAN_XUAT),
                 },
             ],
         },

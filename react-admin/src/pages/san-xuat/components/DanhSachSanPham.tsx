@@ -10,11 +10,11 @@ import {
     Typography,
     type FormInstance,
 } from "antd";
-import { useCallback } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import SelectFormApi from "../../../components/select/SelectFormApi";
 import { API_ROUTE_CONFIG } from "../../../configs/api-route-config";
 import { createFilterQuery } from "../../../utils/utils";
-import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
+import { PlusOutlined } from "@ant-design/icons";
 
 const DanhSachSanPham = ({
     form,
@@ -24,6 +24,13 @@ const DanhSachSanPham = ({
     isDetail: boolean;
 }) => {
     const danhSachSanPham = Form.useWatch("chi_tiet_cong_thucs", form) || [];
+    const soLuongSanXuat = Form.useWatch("so_luong", form);
+
+    // Memoize filter object để tránh re-render không cần thiết
+    const sanPhamFilter = useMemo(
+        () => createFilterQuery(0, "loai_san_pham", "equal", "NGUYEN_LIEU"),
+        []
+    );
 
     const handleChangeSanPham = useCallback(
         (name: number) => {
@@ -40,6 +47,21 @@ const DanhSachSanPham = ({
         [form]
     );
 
+    // Tự động cập nhật số lượng thực tế khi số lượng công thức hoặc số lượng sản xuất thay đổi
+    useEffect(() => {
+        if (danhSachSanPham && soLuongSanXuat) {
+            danhSachSanPham.forEach((item: any, index: number) => {
+                if (item?.so_luong) {
+                    const soLuongThucTe = item.so_luong * soLuongSanXuat;
+                    form.setFieldValue(
+                        ["chi_tiet_cong_thucs", index, "so_luong_thuc_te"],
+                        soLuongThucTe
+                    );
+                }
+            });
+        }
+    }, [danhSachSanPham, soLuongSanXuat, form]);
+
     return (
         <>
             <Card>
@@ -55,7 +77,7 @@ const DanhSachSanPham = ({
                     }}
                 >
                     <Form.List name="chi_tiet_cong_thucs">
-                        {(fields, { add, remove }) => (
+                        {(fields, { add }) => (
                             <>
                                 <Row
                                     gutter={[8, 8]}
@@ -74,14 +96,14 @@ const DanhSachSanPham = ({
                                             Đơn vị tính
                                         </Typography.Text>
                                     </Col>
-                                    <Col span={5}>
+                                    <Col span={3}>
                                         <Typography.Text strong>
                                             Số lượng công thức
                                         </Typography.Text>
                                     </Col>
-                                    <Col span={2}>
+                                    <Col span={3}>
                                         <Typography.Text strong>
-                                            Thao tác
+                                            Số lượng thực tế
                                         </Typography.Text>
                                     </Col>
                                 </Row>
@@ -89,8 +111,6 @@ const DanhSachSanPham = ({
                                 {fields.map(({ key, name, ...restField }) => {
                                     const sanPhamId =
                                         danhSachSanPham[name]?.san_pham_id;
-
-                                    console.log(sanPhamId);
 
                                     return (
                                         <Row
@@ -118,12 +138,7 @@ const DanhSachSanPham = ({
                                                             API_ROUTE_CONFIG.SAN_PHAM +
                                                             `/options`
                                                         }
-                                                        filter={createFilterQuery(
-                                                            0,
-                                                            "loai_san_pham",
-                                                            "equal",
-                                                            "NGUYEN_LIEU"
-                                                        )}
+                                                        filter={sanPhamFilter}
                                                         placeholder="Chọn sản phẩm"
                                                         showSearch
                                                         onChange={() => {
@@ -131,6 +146,7 @@ const DanhSachSanPham = ({
                                                                 name
                                                             );
                                                         }}
+                                                        disabled={isDetail}
                                                     />
                                                 </Form.Item>
                                             </Col>
@@ -169,7 +185,7 @@ const DanhSachSanPham = ({
                                                     />
                                                 </Form.Item>
                                             </Col>
-                                            <Col span={5}>
+                                            <Col span={3}>
                                                 <Form.Item
                                                     {...restField}
                                                     name={[name, "so_luong"]}
@@ -190,7 +206,7 @@ const DanhSachSanPham = ({
                                                 >
                                                     <InputNumber
                                                         min={1}
-                                                        placeholder="Số lượng cần mua"
+                                                        placeholder="Số lượng công thức"
                                                         style={{
                                                             width: "100%",
                                                         }}
@@ -198,16 +214,36 @@ const DanhSachSanPham = ({
                                                     />
                                                 </Form.Item>
                                             </Col>
-                                            <Col span={2}>
-                                                <Button
-                                                    type="text"
-                                                    danger
-                                                    icon={
-                                                        <MinusCircleOutlined />
-                                                    }
-                                                    onClick={() => remove(name)}
-                                                    disabled={isDetail}
-                                                />
+                                            <Col span={3}>
+                                                <Form.Item
+                                                    {...restField}
+                                                    name={[
+                                                        name,
+                                                        "so_luong_thuc_te",
+                                                    ]}
+                                                    rules={[
+                                                        {
+                                                            required: true,
+                                                            message:
+                                                                "Vui lòng nhập số lượng!",
+                                                        },
+                                                        {
+                                                            type: "number",
+                                                            min: 1,
+                                                            message:
+                                                                "Số lượng phải lớn hơn 0!",
+                                                        },
+                                                    ]}
+                                                >
+                                                    <InputNumber
+                                                        min={1}
+                                                        placeholder="Số lượng thực tế"
+                                                        style={{
+                                                            width: "100%",
+                                                        }}
+                                                        disabled={isDetail}
+                                                    />
+                                                </Form.Item>
                                             </Col>
                                         </Row>
                                     );

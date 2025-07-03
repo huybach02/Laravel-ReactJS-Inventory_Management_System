@@ -22,20 +22,14 @@ export const API_ROUTE_CONFIG = {
     DANH_MUC_SAN_PHAM: "/danh-muc-san-pham",
     DON_VI_TINH: "/don-vi-tinh",
     SAN_PHAM: "/san-pham",
-
     PHIEU_NHAP_KHO: "/phieu-nhap-kho",
-
     QUAN_LY_TON_KHO: "/quan-ly-ton-kho",
-
     PHIEU_CHI: "/phieu-chi",
-
     QUAN_LY_BAN_HANG: "/quan-ly-ban-hang",
-
     PHIEU_XUAT_KHO: "/phieu-xuat-kho",
-
     PHIEU_THU: "/phieu-thu",
-
     CONG_THUC_SAN_XUAT: "/cong-thuc-san-xuat",
+    SAN_XUAT: "/san-xuat",
 };
 export const URL_CONSTANTS = {
     LOGIN: "/admin",
@@ -54,18 +48,12 @@ export const URL_CONSTANTS = {
     DANH_MUC_SAN_PHAM: "/admin/quan-ly-san-pham/danh-muc-san-pham",
     DON_VI_TINH: "/admin/quan-ly-san-pham/don-vi-tinh",
     SAN_PHAM: "/admin/quan-ly-san-pham/san-pham",
-
     PHIEU_NHAP_KHO: "/admin/quan-ly-kho/phieu-nhap-kho",
-
     QUAN_LY_TON_KHO: "/admin/quan-ly-kho/quan-ly-ton-kho",
-
     PHIEU_CHI: "/admin/quan-ly-thu-chi/phieu-chi",
-
     QUAN_LY_BAN_HANG: "/admin/quan-ly-ban-hang",
-
     PHIEU_XUAT_KHO: "/admin/quan-ly-kho/phieu-xuat-kho",
-
     PHIEU_THU: "/admin/quan-ly-thu-chi/phieu-thu",
-
     CONG_THUC_SAN_XUAT: "/admin/quan-ly-san-xuat/cong-thuc-san-xuat",
+    SAN_XUAT: "/admin/quan-ly-san-xuat/san-xuat",
 };

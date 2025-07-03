@@ -245,11 +245,24 @@ Route::group([
     Route::get('/', [\App\Modules\CongThucSanXuat\CongThucSanXuatController::class, 'index']);
     Route::get('/options', [\App\Modules\CongThucSanXuat\CongThucSanXuatController::class, 'getOptions']);
     Route::get('/lich-su-cap-nhat/{id}', [\App\Modules\CongThucSanXuat\CongThucSanXuatController::class, 'getLichSuCapNhat']);
+    Route::get('/get-by-san-pham-id-and-don-vi-tinh-id', [\App\Modules\CongThucSanXuat\CongThucSanXuatController::class, 'getBySanPhamIdAndDonViTinhId']);
     Route::get('/download-template-excel', [\App\Modules\CongThucSanXuat\CongThucSanXuatController::class, 'downloadTemplateExcel']);
     Route::post('/', [\App\Modules\CongThucSanXuat\CongThucSanXuatController::class, 'store']);
     Route::get('/{id}', [\App\Modules\CongThucSanXuat\CongThucSanXuatController::class, 'show']);
     Route::put('/{id}', [\App\Modules\CongThucSanXuat\CongThucSanXuatController::class, 'update']);
     Route::delete('/{id}', [\App\Modules\CongThucSanXuat\CongThucSanXuatController::class, 'destroy']);
     Route::post('/import-excel', [\App\Modules\CongThucSanXuat\CongThucSanXuatController::class, 'importExcel']);
+  });
+
+  // SanXuat
+  Route::prefix('san-xuat')->group(function () {
+    Route::get('/', [\App\Modules\SanXuat\SanXuatController::class, 'index']);
+    Route::get('/options', [\App\Modules\SanXuat\SanXuatController::class, 'getOptions']);
+    Route::get('/download-template-excel', [\App\Modules\SanXuat\SanXuatController::class, 'downloadTemplateExcel']);
+    Route::post('/', [\App\Modules\SanXuat\SanXuatController::class, 'store']);
+    Route::get('/{id}', [\App\Modules\SanXuat\SanXuatController::class, 'show']);
+    Route::put('/{id}', [\App\Modules\SanXuat\SanXuatController::class, 'update']);
+    Route::delete('/{id}', [\App\Modules\SanXuat\SanXuatController::class, 'destroy']);
+    Route::post('/import-excel', [\App\Modules\SanXuat\SanXuatController::class, 'importExcel']);
   });
 });

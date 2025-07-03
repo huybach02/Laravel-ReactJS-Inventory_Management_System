@@ -72,6 +72,33 @@ class CongThucSanXuatService
     return $data;
   }
 
+  public function getBySanPhamIdAndDonViTinhId($sanPhamId, $donViTinhId)
+  {
+    $congThucSanXuat = CongThucSanXuat::where('san_pham_id', $sanPhamId)->where('don_vi_tinh_id', $donViTinhId)->first();
+
+    if (!$congThucSanXuat) {
+      return CustomResponse::error('Dữ liệu không tồn tại');
+    }
+
+    $data = CongThucSanXuat::with([
+      'sanPham',
+      'donViTinh',
+      'chiTietCongThucs' => function ($query) use ($congThucSanXuat) {
+        // Lấy lan_cap_nhat mới nhất
+        $maxLanCapNhat = ChiTietCongThuc::where('cong_thuc_san_xuat_id', $congThucSanXuat->id)
+          ->max('lan_cap_nhat');
+        // Chỉ lấy các chi tiết có lan_cap_nhat = max
+        $query->where('lan_cap_nhat', $maxLanCapNhat)
+          ->with(['sanPham', 'donViTinh']);
+      }
+    ])->find($congThucSanXuat->id);
+
+    if (!$data) {
+      return CustomResponse::error('Dữ liệu không tồn tại');
+    }
+    return $data;
+  }
+
   public function getLichSuCapNhat($id)
   {
     $this->getById($id);
