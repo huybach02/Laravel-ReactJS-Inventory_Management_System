@@ -66,7 +66,7 @@ const DanhSachSanPham = ({
         <>
             <Card>
                 <Typography.Title level={4}>
-                    Danh sách nguyên vật liệu
+                    Danh sách nguyên vật liệu dựa theo công thức sản xuất
                 </Typography.Title>
                 <Divider />
                 <div
@@ -77,7 +77,7 @@ const DanhSachSanPham = ({
                     }}
                 >
                     <Form.List name="chi_tiet_cong_thucs">
-                        {(fields, { add }) => (
+                        {(fields) => (
                             <>
                                 <Row
                                     gutter={[8, 8]}
@@ -146,7 +146,7 @@ const DanhSachSanPham = ({
                                                                 name
                                                             );
                                                         }}
-                                                        disabled={isDetail}
+                                                        disabled
                                                     />
                                                 </Form.Item>
                                             </Col>
@@ -178,10 +178,7 @@ const DanhSachSanPham = ({
                                                         reload={sanPhamId}
                                                         placeholder="Chọn đơn vị tính"
                                                         showSearch
-                                                        disabled={
-                                                            isDetail ||
-                                                            !sanPhamId
-                                                        }
+                                                        disabled
                                                     />
                                                 </Form.Item>
                                             </Col>
@@ -210,7 +207,7 @@ const DanhSachSanPham = ({
                                                         style={{
                                                             width: "100%",
                                                         }}
-                                                        disabled={isDetail}
+                                                        disabled
                                                     />
                                                 </Form.Item>
                                             </Col>
@@ -241,27 +238,13 @@ const DanhSachSanPham = ({
                                                         style={{
                                                             width: "100%",
                                                         }}
-                                                        disabled={isDetail}
+                                                        disabled
                                                     />
                                                 </Form.Item>
                                             </Col>
                                         </Row>
                                     );
                                 })}
-                                {!isDetail && (
-                                    <Row>
-                                        <Col span={24}>
-                                            <Button
-                                                type="dashed"
-                                                onClick={() => add()}
-                                                block
-                                                icon={<PlusOutlined />}
-                                            >
-                                                Thêm nguyên vật liệu
-                                            </Button>
-                                        </Col>
-                                    </Row>
-                                )}
                             </>
                         )}
                     </Form.List>
