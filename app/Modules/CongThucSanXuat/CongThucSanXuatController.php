@@ -129,6 +129,19 @@ class CongThucSanXuatController extends Controller
     return CustomResponse::success($result);
   }
 
+  public function getBySanPhamIdAndDonViTinhId(Request $request)
+  {
+    $params = $request->all();
+
+    $result = $this->congThucSanXuatService->getBySanPhamIdAndDonViTinhId($params['san_pham_id'], $params['don_vi_tinh_id']);
+
+    if ($result instanceof \Illuminate\Http\JsonResponse) {
+      return $result;
+    }
+
+    return CustomResponse::success($result);
+  }
+
   public function downloadTemplateExcel()
   {
     $path = public_path('mau-excel/CongThucSanXuat.xlsx');

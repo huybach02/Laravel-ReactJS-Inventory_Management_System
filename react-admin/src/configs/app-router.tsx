@@ -26,6 +26,7 @@ import QuanLyBanHang from "../pages/quan-ly-ban-hang/QuanLyBanHang";
 import PhieuXuatKho from "../pages/phieu-xuat-kho/PhieuXuatKho";
 import PhieuThu from "../pages/phieu-thu/PhieuThu";
 import CongThucSanXuat from "../pages/cong-thuc-san-xuat/CongThucSanXuat";
+import SanXuat from "../pages/san-xuat/SanXuat";
 
 export const router = createBrowserRouter([
     {
@@ -222,6 +223,11 @@ export const router = createBrowserRouter([
                         children: [
                             { index: true, element: <CongThucSanXuat /> },
                         ],
+                    },
+                    {
+                        path: "san-xuat",
+                        element: <MainLayout />,
+                        children: [{ index: true, element: <SanXuat /> }],
                     },
                 ],
             },

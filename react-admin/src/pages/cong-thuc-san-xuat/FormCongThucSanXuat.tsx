@@ -19,7 +19,7 @@ const FormCongThucSanXuat = ({ form }: { form: FormInstance }) => {
 
     return (
         <Row gutter={[10, 10]}>
-            <Col span={12}>
+            <Col span={12} xs={24} md={12} lg={12}>
                 <SelectFormApi
                     name="san_pham_id"
                     label="Sản phẩm"
@@ -39,7 +39,7 @@ const FormCongThucSanXuat = ({ form }: { form: FormInstance }) => {
                     ]}
                 />
             </Col>
-            <Col span={6}>
+            <Col span={6} xs={24} md={12} lg={6}>
                 <Form.Item
                     name="so_luong"
                     label="Số lượng"
@@ -59,7 +59,7 @@ const FormCongThucSanXuat = ({ form }: { form: FormInstance }) => {
                     />
                 </Form.Item>
             </Col>
-            <Col span={6}>
+            <Col span={6} xs={24} md={12} lg={6}>
                 <SelectFormApi
                     name="don_vi_tinh_id"
                     label="Đơn vị tính"

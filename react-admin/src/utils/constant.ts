@@ -84,3 +84,21 @@ export const OPTIONS_LOAI_SAN_PHAM = [
     { value: "SP_SAN_XUAT", label: "Sản phẩm sản xuất" },
     { value: "NGUYEN_LIEU", label: "Nguyên liệu" },
 ];
+
+export const OPTIONS_TRANG_THAI_SAN_XUAT = [
+    { value: 0, label: "Chưa sản xuất" },
+    { value: 1, label: "Đang sản xuất" },
+    { value: 2, label: "Đã hoàn thành" },
+];
+
+export const OPTIONS_TRANG_THAI_NHAP_KHO = [
+    { value: 0, label: "Chưa nhập kho" },
+    { value: 1, label: "Đã nhập kho một phần" },
+    { value: 2, label: "Đã nhập kho hoàn tất" },
+];
+
+export const OPTIONS_TRANG_THAI_XUAT_KHO_NGUYEN_LIEU = [
+    { value: 0, label: "Chưa xuất kho" },
+    { value: 1, label: "Đã xuất kho một phần" },
+    { value: 2, label: "Đã xuất kho hoàn tất" },
+];
