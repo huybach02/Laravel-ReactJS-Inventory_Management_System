@@ -16,7 +16,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_PORT }}
           script: |
-            cd /services/Laravel-ReactJS-Inventory_Management_System
+            cd ~/services/Laravel-ReactJS-Inventory_Management_System
             git fetch origin
             git checkout main
             git pull
