@@ -12,9 +12,9 @@ jobs:
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOST }}
-          # username: ${{ secrets.USERNAME }}
-          # password: ${{ secrets.PASSWORD }}
-          port: 22
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
           script: |
             cd /services/Laravel-ReactJS-Inventory_Management_System
             git fetch origin
