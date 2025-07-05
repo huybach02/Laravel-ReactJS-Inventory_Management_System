@@ -54,9 +54,11 @@ const DanhSachSanPham = ({
 
     const getDanhSach = async () => {
         setIsLoading(true);
+        const filters = Object.values(query);
         const params = {
             ...filter,
             ...createFilterQueryFromArray([
+                ...filters,
                 {
                     field: "loai_san_pham",
                     operator: "not_equal",

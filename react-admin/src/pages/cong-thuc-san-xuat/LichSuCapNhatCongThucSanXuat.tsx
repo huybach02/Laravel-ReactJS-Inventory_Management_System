@@ -61,7 +61,7 @@ const LichSuCapNhatCongThucSanXuat = ({
     // Columns cho bảng chi tiết
     const columns = [
         {
-            title: "Sản phẩm",
+            title: "Nguyên vật liệu",
             dataIndex: "ten_san_pham",
             key: "ten_san_pham",
             width: "40%",
