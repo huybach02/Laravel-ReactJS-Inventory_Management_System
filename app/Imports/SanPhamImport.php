@@ -43,21 +43,22 @@ class SanPhamImport implements ToCollection, WithMultipleSheets
       try {
         // |--------------------------------------------------------|
         // TODO: THAY ĐỔI CHO PHÙ HỢP VỚI CÁC TRƯỜNG TRONG createRequest VÀ TRONG DATABASE
-        $donViTinhId = !empty($item[4]) ? explode(',', $item[4]) : [];
-        $nhaCungCapId = !empty($item[5]) ? explode(',', $item[5]) : [];
+        $donViTinhId = !empty($item[5]) ? explode(',', $item[5]) : [];
+        $nhaCungCapId = !empty($item[6]) ? explode(',', $item[6]) : [];
 
         $rowData = [
           'ma_san_pham' => $item[1],
           'ten_san_pham' => $item[2],
           'danh_muc_id' => $item[3],
-          'gia_nhap_mac_dinh' => $item[6],
+          'loai_san_pham' => $item[4],
+          'gia_nhap_mac_dinh' => (int) $item[7],
           'don_vi_tinh_id' => $donViTinhId,
           'nha_cung_cap_id' => $nhaCungCapId,
-          'ty_le_chiet_khau' => $item[7],
-          'muc_loi_nhuan' => $item[8],
-          'so_luong_canh_bao' => $item[9],
-          'trang_thai' => $item[10] ?? 1,
-          'ghi_chu' => $item[11] ?? "",
+          'ty_le_chiet_khau' => (int) $item[8],
+          'muc_loi_nhuan' => (int) $item[9],
+          'so_luong_canh_bao' => (int) $item[10],
+          'trang_thai' => (int) $item[11] ?? 1,
+          'ghi_chu' => $item[12] ?? "",
         ];
 
         // |--------------------------------------------------------|

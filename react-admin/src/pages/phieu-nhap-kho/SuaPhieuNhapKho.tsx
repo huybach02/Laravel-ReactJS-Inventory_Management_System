@@ -54,7 +54,7 @@ const SuaPhieuNhapKho = ({
                     ngay_san_xuat: item.ngay_san_xuat
                         ? dayjs(item.ngay_san_xuat, "YYYY-MM-DD")
                         : undefined,
-                    han_su_dung: item.ngay_het_han
+                    ngay_het_han: item.ngay_het_han
                         ? dayjs(item.ngay_het_han, "YYYY-MM-DD")
                         : undefined,
                     so_luong_nhap: item.so_luong_nhap,

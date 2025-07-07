@@ -28,7 +28,7 @@ class CreatePhieuXuatKhoRequest extends FormRequest
       'ngay_xuat_kho' => 'required|date',
       'nguoi_nhan_hang' => 'nullable|string',
       'so_dien_thoai_nguoi_nhan_hang' => 'nullable|string',
-      'don_hang_id' => 'required|exists:don_hangs,id',
+      'don_hang_id' => 'nullable|exists:don_hangs,id',
       'san_xuat_id' => 'nullable|exists:san_xuats,id',
       'ly_do_huy' => 'nullable|string',
       'ghi_chu' => 'nullable|string',
@@ -55,7 +55,6 @@ class CreatePhieuXuatKhoRequest extends FormRequest
       'ngay_xuat_kho.required' => 'Ngày xuất kho là bắt buộc',
       'ngay_xuat_kho.date' => 'Ngày xuất kho không hợp lệ',
       'ghi_chu.string' => 'Ghi chú phải là chuỗi',
-      'don_hang_id.required' => 'Đơn hàng là bắt buộc',
       'don_hang_id.exists' => 'Đơn hàng không tồn tại',
       'san_xuat_id.exists' => 'Sản xuất không tồn tại',
       'ly_do_huy.string' => 'Lý do hủy phải là chuỗi',
@@ -68,9 +67,9 @@ class CreatePhieuXuatKhoRequest extends FormRequest
       'danh_sach_san_pham.*.don_vi_tinh_id.required' => 'Đơn vị tính là bắt buộc',
       'danh_sach_san_pham.*.don_vi_tinh_id.exists' => 'Đơn vị tính không tồn tại',
       'danh_sach_san_pham.*.so_luong.required' => 'Số lượng là bắt buộc',
-      'danh_sach_san_pham.*.ma_lo_san_pham.required' => 'Mã loại sản phẩm là bắt buộc',
-      'danh_sach_san_pham.*.ma_lo_san_pham.string' => 'Mã loại sản phẩm phải là chuỗi',
-      'danh_sach_san_pham.*.ma_lo_san_pham.exists' => 'Mã loại sản phẩm không tồn tại',
+      'danh_sach_san_pham.*.ma_lo_san_pham.required' => 'Mã lô sản phẩm là bắt buộc',
+      'danh_sach_san_pham.*.ma_lo_san_pham.string' => 'Mã lô sản phẩm phải là chuỗi',
+      'danh_sach_san_pham.*.ma_lo_san_pham.exists' => 'Mã lô sản phẩm không tồn tại',
     ];
   }
 }

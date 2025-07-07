@@ -15,7 +15,12 @@ const ThemPhieuXuatKho = ({ path, title }: { path: string; title: string }) => {
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const [form] = Form.useForm();
+
+    // Tạo riêng form instance cho từng tab
+    const [formXuatTheoDonHang] = Form.useForm();
+    const [formXuatHuy] = Form.useForm();
+    const [formXuatNguyenLieu] = Form.useForm();
+
     const [tab, setTab] = useState("1");
 
     const showModal = async () => {
@@ -24,8 +29,12 @@ const ThemPhieuXuatKho = ({ path, title }: { path: string; title: string }) => {
 
     const handleCancel = () => {
         setIsModalOpen(false);
-        form.resetFields();
+        // Reset tất cả các forms
+        formXuatTheoDonHang.resetFields();
+        formXuatHuy.resetFields();
+        formXuatNguyenLieu.resetFields();
         dispatch(clearImageSingle());
+        setTab("1");
     };
 
     const onCreate = async (values: any) => {
@@ -57,26 +66,46 @@ const ThemPhieuXuatKho = ({ path, title }: { path: string; title: string }) => {
             key: "1",
             children: (
                 <Form
-                    id={"formPhieuXuatKho" + tab}
-                    form={form}
+                    id={"formPhieuXuatKho" + "1"}
+                    form={formXuatTheoDonHang}
                     layout="vertical"
                     onFinish={onCreate}
                 >
-                    <FormXuatTheoDonHang form={form} />
+                    <FormXuatTheoDonHang form={formXuatTheoDonHang} />
                 </Form>
             ),
         },
         {
             label: "Xuất hủy",
             key: "2",
-            children: <FormXuatHuy form={form} />,
+            children: (
+                <Form
+                    id={"formPhieuXuatKho" + "2"}
+                    form={formXuatHuy}
+                    layout="vertical"
+                    onFinish={onCreate}
+                >
+                    <FormXuatHuy form={formXuatHuy} />
+                </Form>
+            ),
         },
         {
             label: "Xuất nguyên liệu sản xuất",
             key: "3",
-            children: <FormXuatNguyenLieu form={form} />,
+            children: (
+                <Form
+                    id={"formPhieuXuatKho" + "3"}
+                    form={formXuatNguyenLieu}
+                    layout="vertical"
+                    onFinish={onCreate}
+                >
+                    <FormXuatNguyenLieu form={formXuatNguyenLieu} />
+                </Form>
+            ),
         },
     ];
+
+    console.log(tab);
 
     return (
         <>
@@ -99,7 +128,7 @@ const ThemPhieuXuatKho = ({ path, title }: { path: string; title: string }) => {
                     <Row justify="end" key="footer">
                         <Button
                             key="submit"
-                            form={"formPhieuXuatKho" + tab}
+                            form={`formPhieuXuatKho${tab}`}
                             type="primary"
                             htmlType="submit"
                             size="large"

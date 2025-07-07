@@ -1,13 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { EditOutlined } from "@ant-design/icons";
 import { useState } from "react";
-import { Button, Form, Modal } from "antd";
+import { Button, Form, Modal, Tabs } from "antd";
 import { useDispatch } from "react-redux";
 import { getDataById } from "../../services/getData.api";
 import { setReload } from "../../redux/slices/main.slice";
 import { putData } from "../../services/updateData";
 import FormXuatTheoDonHang from "./FormXuatTheoDonHang";
 import dayjs from "dayjs";
+import FormXuatNguyenLieu from "./FormXuatNguyenLieu";
+import FormXuatHuy from "./FormXuatHuy";
 
 const SuaPhieuXuatKho = ({
     path,
@@ -21,13 +23,19 @@ const SuaPhieuXuatKho = ({
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [form] = Form.useForm();
+    const [tab, setTab] = useState(1);
+
     const dispatch = useDispatch();
+
+    const [formXuatTheoDonHang] = Form.useForm();
+    const [formXuatHuy] = Form.useForm();
+    const [formXuatNguyenLieu] = Form.useForm();
 
     const showModal = async () => {
         setIsModalOpen(true);
         setIsLoading(true);
         const data = await getDataById(id, path);
+        setTab(data.loai_phieu_xuat.toString());
         Object.keys(data).forEach((key) => {
             if (data[key]) {
                 if (
@@ -55,15 +63,32 @@ const SuaPhieuXuatKho = ({
             });
         }
 
-        form.setFieldsValue({
-            ...data,
-            danh_sach_san_pham: danhSachSanPham,
-        });
+        switch (data.loai_phieu_xuat) {
+            case 1:
+                formXuatTheoDonHang.setFieldsValue({
+                    ...data,
+                    danh_sach_san_pham: danhSachSanPham,
+                });
+                break;
+            case 2:
+                formXuatHuy.setFieldsValue({
+                    ...data,
+                });
+                break;
+            case 3:
+                formXuatNguyenLieu.setFieldsValue({
+                    ...data,
+                    danh_sach_san_pham: danhSachSanPham,
+                });
+                break;
+        }
         setIsLoading(false);
     };
 
     const handleCancel = () => {
-        form.resetFields();
+        formXuatTheoDonHang.resetFields();
+        formXuatHuy.resetFields();
+        formXuatNguyenLieu.resetFields();
         setIsModalOpen(false);
     };
 
@@ -79,11 +104,57 @@ const SuaPhieuXuatKho = ({
             {
                 ...values,
                 ngay_xuat_kho: dayjs(values.ngay_xuat_kho).format("YYYY-MM-DD"),
+                loai_phieu_xuat: Number(tab),
             },
             closeModel
         );
         setIsSubmitting(false);
     };
+
+    const items = [
+        {
+            label: "Xuất theo đơn hàng",
+            key: "1",
+            children: (
+                <Form
+                    id={"formPhieuXuatKho" + "1"}
+                    form={formXuatTheoDonHang}
+                    layout="vertical"
+                    onFinish={onUpdate}
+                >
+                    <FormXuatTheoDonHang form={formXuatTheoDonHang} />
+                </Form>
+            ),
+        },
+        {
+            label: "Xuất hủy",
+            key: "2",
+            children: (
+                <Form
+                    id={"formPhieuXuatKho" + "2"}
+                    form={formXuatHuy}
+                    layout="vertical"
+                    onFinish={onUpdate}
+                >
+                    <FormXuatHuy form={formXuatHuy} />
+                </Form>
+            ),
+        },
+        {
+            label: "Xuất nguyên liệu sản xuất",
+            key: "3",
+            children: (
+                <Form
+                    id={"formPhieuXuatKho" + "3"}
+                    form={formXuatNguyenLieu}
+                    layout="vertical"
+                    onFinish={onUpdate}
+                >
+                    <FormXuatNguyenLieu form={formXuatNguyenLieu} />
+                </Form>
+            ),
+        },
+    ];
 
     return (
         <>
@@ -105,7 +176,7 @@ const SuaPhieuXuatKho = ({
                 footer={[
                     <Button
                         key="submit"
-                        form={`formSuaPhieuXuatKho-${id}`}
+                        form={`formPhieuXuatKho${tab}`}
                         type="primary"
                         htmlType="submit"
                         size="large"
@@ -115,14 +186,7 @@ const SuaPhieuXuatKho = ({
                     </Button>,
                 ]}
             >
-                <Form
-                    id={`formSuaPhieuXuatKho-${id}`}
-                    form={form}
-                    layout="vertical"
-                    onFinish={onUpdate}
-                >
-                    <FormXuatTheoDonHang form={form} />
-                </Form>
+                <Tabs type="card" items={items} activeKey={tab.toString()} />
             </Modal>
         </>
     );

@@ -255,7 +255,7 @@ const DanhSachSanPham = ({
                                         <Col span={3}>
                                             <Form.Item
                                                 {...restField}
-                                                name={[name, "han_su_dung"]}
+                                                name={[name, "ngay_het_han"]}
                                             >
                                                 <DatePicker
                                                     placeholder="Hạn sử dụng"

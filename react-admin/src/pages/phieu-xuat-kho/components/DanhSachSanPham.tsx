@@ -114,7 +114,7 @@ const DanhSachSanPham = ({
                                     </Col>
                                     <Col span={2}>
                                         <Typography.Text strong>
-                                            Số lượng cần mua
+                                            Số lượng cần xuất
                                         </Typography.Text>
                                     </Col>
                                     <Col span={10}>

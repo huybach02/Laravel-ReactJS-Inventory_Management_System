@@ -54,7 +54,7 @@ class SanXuatService
    */
   public function getById($id)
   {
-    $data = SanXuat::with('images')->find($id);
+    $data = SanXuat::with('chiTietSanXuat.sanPham', 'chiTietSanXuat.donViTinh')->find($id);
     if (!$data) {
       return CustomResponse::error('Dữ liệu không tồn tại');
     }
@@ -192,7 +192,7 @@ class SanXuatService
     $result = FilterWithPagination::findWithPagination(
       $query,
       $params,
-      ['san_xuats.id as value', 'san_xuats.ten_san_xuat as label']
+      ['san_xuats.id as value', 'san_xuats.ma_lo_san_xuat as label']
     );
 
     return $result['collection'];

@@ -9,25 +9,35 @@ use Illuminate\Database\Eloquent\Model;
 
 class ChiTietSanXuat extends Model
 {
-    //
+  //
 
-    use UserTrackable, UserNameResolver, DateTimeFormatter;
+  use UserTrackable, UserNameResolver, DateTimeFormatter;
 
-    protected $guarded = [];
+  protected $guarded = [];
 
-    protected static function boot()
-    {
-      parent::boot();
+  protected static function boot()
+  {
+    parent::boot();
 
-      static::saving(function ($model) {
-        unset($model->attributes['image']);
-      });
-    }
+    static::saving(function ($model) {
+      unset($model->attributes['image']);
+    });
+  }
 
 
-    // Kết nối sẵn với bảng images để lưu ảnh
-    public function images()
-    {
+  // Kết nối sẵn với bảng images để lưu ảnh
+  public function images()
+  {
     return $this->morphMany(Image::class, 'imageable');
-    }
+  }
+
+  public function sanPham()
+  {
+    return $this->belongsTo(SanPham::class);
+  }
+
+  public function donViTinh()
+  {
+    return $this->belongsTo(DonViTinh::class);
+  }
 }
