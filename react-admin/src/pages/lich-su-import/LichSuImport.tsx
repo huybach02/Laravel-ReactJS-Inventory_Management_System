@@ -9,7 +9,7 @@ import CustomTable from "../../components/CustomTable";
 import type { RootState } from "../../redux/store";
 import { usePagination } from "../../hooks/usePagination";
 import { API_ROUTE_CONFIG } from "../../configs/api-route-config";
-import { DownloadIcon, EyeIcon } from "lucide-react";
+import { DownloadOutlined, EyeOutlined } from "@ant-design/icons";
 import { apiURL } from "../../configs/config";
 
 const path = API_ROUTE_CONFIG.LICH_SU_IMPORT;
@@ -74,7 +74,9 @@ const LichSuImport = () => {
                 return (
                     <Space size={0}>
                         <Button
-                            icon={<EyeIcon size={16} />}
+                            size="small"
+                            type="primary"
+                            icon={<EyeOutlined />}
                             onClick={() => {
                                 handleXemKetQua(id);
                                 setIsOpenModal(true);
@@ -120,7 +122,9 @@ const LichSuImport = () => {
             render: (id: number) => {
                 return (
                     <Button
-                        icon={<DownloadIcon size={16} />}
+                        size="small"
+                        type="default"
+                        icon={<DownloadOutlined />}
                         onClick={() => handleDownloadFile(id)}
                     />
                 );

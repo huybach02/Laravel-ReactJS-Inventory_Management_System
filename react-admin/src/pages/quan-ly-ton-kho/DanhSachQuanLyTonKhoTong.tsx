@@ -106,6 +106,7 @@ const DanhSachQuanLyTonKhoTong = ({
                             <Button
                                 type="primary"
                                 icon={<EyeOutlined />}
+                                size="small"
                                 onClick={() => {
                                     setIsModalOpen(true);
                                     getChiTietLo(id);
@@ -141,6 +142,30 @@ const DanhSachQuanLyTonKhoTong = ({
                 dataIndex: "nha_cung_caps.ten_nha_cung_cap",
                 operator: "contain",
                 nameColumn: "Nhà cung cấp",
+            }),
+        },
+        {
+            title: "Ngày sản xuất",
+            dataIndex: "ngay_san_xuat",
+            render: (record: string): string => {
+                const date = dayjs(record);
+                return date.format("DD/MM/YYYY") || "";
+            },
+            ...dateSearch({
+                dataIndex: "chi_tiet_phieu_nhap_khos.ngay_san_xuat",
+                nameColumn: "Ngày sản xuất",
+            }),
+        },
+        {
+            title: "Ngày hết hạn",
+            dataIndex: "ngay_het_han",
+            render: (record: string): string => {
+                const date = dayjs(record);
+                return date.format("DD/MM/YYYY") || "";
+            },
+            ...dateSearch({
+                dataIndex: "chi_tiet_phieu_nhap_khos.ngay_het_han",
+                nameColumn: "Ngày hết hạn",
             }),
         },
         {
@@ -254,7 +279,13 @@ const DanhSachQuanLyTonKhoTong = ({
                                 size="small"
                             >
                                 <Descriptions
-                                    column={5}
+                                    column={{
+                                        xs: 1,
+                                        sm: 2,
+                                        md: 3,
+                                        lg: 5,
+                                        xl: 5,
+                                    }}
                                     layout="vertical"
                                     bordered
                                 >
@@ -271,16 +302,16 @@ const DanhSachQuanLyTonKhoTong = ({
                                         {chiTietLo.ma_lo_san_pham}
                                     </Descriptions.Item>
                                     <Descriptions.Item
-                                        label="Nhà cung cấp"
-                                        labelStyle={{ fontWeight: "bold" }}
-                                    >
-                                        {chiTietLo.ten_nha_cung_cap}
-                                    </Descriptions.Item>
-                                    <Descriptions.Item
                                         label="Đơn vị tính"
                                         labelStyle={{ fontWeight: "bold" }}
                                     >
                                         {chiTietLo.ten_don_vi}
+                                    </Descriptions.Item>
+                                    <Descriptions.Item
+                                        label="Nhà cung cấp"
+                                        labelStyle={{ fontWeight: "bold" }}
+                                    >
+                                        {chiTietLo.ten_nha_cung_cap}
                                     </Descriptions.Item>
                                     <Descriptions.Item
                                         label="Mức lợi nhuận"
@@ -299,7 +330,7 @@ const DanhSachQuanLyTonKhoTong = ({
                                 size="small"
                             >
                                 <Descriptions
-                                    column={3}
+                                    column={{ xs: 1, sm: 2, md: 3 }}
                                     layout="vertical"
                                     bordered
                                 >
@@ -418,7 +449,7 @@ const DanhSachQuanLyTonKhoTong = ({
                                 size="small"
                             >
                                 <Descriptions
-                                    column={4}
+                                    column={{ xs: 1, sm: 2 }}
                                     layout="vertical"
                                     bordered
                                 >
@@ -441,7 +472,9 @@ const DanhSachQuanLyTonKhoTong = ({
                                                     : "success"
                                             }
                                         >
-                                            {chiTietLo.ngay_het_han}
+                                            {chiTietLo.ngay_het_han}{" "}
+                                            {new Date(chiTietLo.ngay_het_han) <
+                                                new Date() && " (Đã hết hạn)"}
                                         </Typography.Text>
                                     </Descriptions.Item>
                                 </Descriptions>

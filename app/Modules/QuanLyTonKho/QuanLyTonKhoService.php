@@ -39,6 +39,8 @@ class QuanLyTonKhoService
           "san_phams.ten_san_pham",
           "nha_cung_caps.ten_nha_cung_cap",
           "don_vi_tinhs.ten_don_vi",
+          "chi_tiet_phieu_nhap_khos.ngay_san_xuat",
+          "chi_tiet_phieu_nhap_khos.ngay_het_han",
           DB::raw("CASE WHEN kho_tongs.so_luong_ton = 0 THEN 0 ELSE CASE WHEN kho_tongs.so_luong_ton <= san_phams.so_luong_canh_bao THEN 1 ELSE 2 END END as trang_thai"), // 0: hết hàng, 1: sắp hết hàng, 2: còn hàng
         ] : ['kho_ban_les.*'] // Columns cần select với tên bảng rõ ràng
       );

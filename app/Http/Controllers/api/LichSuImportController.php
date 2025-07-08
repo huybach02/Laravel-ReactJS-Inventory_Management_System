@@ -56,7 +56,17 @@ class LichSuImportController extends Controller
   {
     try {
       $lichSuImport = LichSuImport::find($id);
+
+      if (!$lichSuImport) {
+        return CustomResponse::error('Không tìm thấy lịch sử import.', 404);
+      }
+
       $filePath = $lichSuImport->file_path;
+
+      if (!$filePath || !file_exists($filePath)) {
+        return CustomResponse::error('Tệp không tồn tại.', 404);
+      }
+
       return response()->download($filePath);
     } catch (\Exception $e) {
       return CustomResponse::error($e->getMessage(), 500);

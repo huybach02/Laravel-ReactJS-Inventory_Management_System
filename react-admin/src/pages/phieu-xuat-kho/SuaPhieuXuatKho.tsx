@@ -23,7 +23,7 @@ const SuaPhieuXuatKho = ({
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [tab, setTab] = useState(1);
+    const [tab, setTab] = useState("1");
 
     const dispatch = useDispatch();
 
@@ -65,8 +65,6 @@ const SuaPhieuXuatKho = ({
                 };
             });
         }
-
-        console.log(danhSachSanPham);
 
         switch (data.loai_phieu_xuat) {
             case 1:
@@ -123,7 +121,7 @@ const SuaPhieuXuatKho = ({
             key: "1",
             children: (
                 <Form
-                    id={"formPhieuXuatKho" + "1"}
+                    id={"formPhieuXuatKhoUpdate" + "1"}
                     form={formXuatTheoDonHang}
                     layout="vertical"
                     onFinish={onUpdate}
@@ -137,7 +135,7 @@ const SuaPhieuXuatKho = ({
             key: "2",
             children: (
                 <Form
-                    id={"formPhieuXuatKho" + "2"}
+                    id={"formPhieuXuatKhoUpdate" + "2"}
                     form={formXuatHuy}
                     layout="vertical"
                     onFinish={onUpdate}
@@ -151,7 +149,7 @@ const SuaPhieuXuatKho = ({
             key: "3",
             children: (
                 <Form
-                    id={"formPhieuXuatKho" + "3"}
+                    id={"formPhieuXuatKhoUpdate" + "3"}
                     form={formXuatNguyenLieu}
                     layout="vertical"
                     onFinish={onUpdate}
@@ -182,7 +180,7 @@ const SuaPhieuXuatKho = ({
                 footer={[
                     <Button
                         key="submit"
-                        form={`formPhieuXuatKho${tab}`}
+                        form={`formPhieuXuatKhoUpdate${tab}`}
                         type="primary"
                         htmlType="submit"
                         size="large"
