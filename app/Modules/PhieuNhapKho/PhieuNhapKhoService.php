@@ -122,6 +122,7 @@ class PhieuNhapKhoService
           KhoTong::create([
             'ma_lo_san_pham' => $chiTiet['ma_lo_san_pham'],
             'san_pham_id' => $chiTiet['san_pham_id'],
+            'don_vi_tinh_id' => $chiTiet['don_vi_tinh_id'],
             'so_luong_ton' => $chiTiet['so_luong_nhap'],
             'trang_thai' => $sanPham->so_luong_canh_bao > $chiTiet['so_luong_nhap'] ? 1 : 2,
           ]);
@@ -199,6 +200,7 @@ class PhieuNhapKhoService
           KhoTong::create([
             'ma_lo_san_pham' => $chiTiet['ma_lo_san_pham'],
             'san_pham_id' => $chiTiet['san_pham_id'],
+            'don_vi_tinh_id' => $chiTiet['don_vi_tinh_id'],
             'so_luong_ton' => $chiTiet['so_luong_nhap'],
           ]);
         }

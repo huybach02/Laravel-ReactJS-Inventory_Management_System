@@ -137,9 +137,9 @@ class SanPhamController extends Controller
     return CustomResponse::success($result);
   }
 
-  public function getOptionsLoSanPhamBySanPhamId($sanPhamId)
+  public function getOptionsLoSanPhamBySanPhamIdAndDonViTinhId($sanPhamId, $donViTinhId)
   {
-    $result = $this->sanPhamService->getOptionsLoSanPhamBySanPhamId($sanPhamId);
+    $result = $this->sanPhamService->getOptionsLoSanPhamBySanPhamIdAndDonViTinhId($sanPhamId, $donViTinhId);
 
     if ($result instanceof \Illuminate\Http\JsonResponse) {
       return $result;

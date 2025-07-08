@@ -90,8 +90,6 @@ const DanhSachSanPham = ({
                                     const sanPhamId =
                                         danhSachSanPham[name]?.san_pham_id;
 
-                                    console.log(sanPhamId);
-
                                     return (
                                         <Row
                                             key={key}

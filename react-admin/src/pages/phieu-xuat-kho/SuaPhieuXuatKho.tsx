@@ -49,36 +49,42 @@ const SuaPhieuXuatKho = ({
             }
         });
 
-        // Transform chi_tiet_phieu_nhap_khos thành format cho FormList
+        // Transform chi_tiet_phieu_xuat_khos thành format cho FormList
         let danhSachSanPham: any[] = [];
         if (
             data.chi_tiet_phieu_xuat_khos &&
-            Array.isArray(data.chi_tiet_phieu_xuat_khos)
+            Array.isArray(data.chi_tiet_phieu_xuat_khos) &&
+            data.chi_tiet_phieu_xuat_khos.length > 0
         ) {
             danhSachSanPham = data.chi_tiet_phieu_xuat_khos.map((item: any) => {
                 return {
                     so_luong: item.so_luong,
                     ma_lo_san_pham: item.ma_lo_san_pham,
+                    san_pham_id: item.san_pham_id,
+                    don_vi_tinh_id: item.don_vi_tinh_id,
                 };
             });
         }
+
+        console.log(danhSachSanPham);
 
         switch (data.loai_phieu_xuat) {
             case 1:
                 formXuatTheoDonHang.setFieldsValue({
                     ...data,
-                    danh_sach_san_pham: danhSachSanPham,
+                    danh_sach_san_pham: danhSachSanPham || [],
                 });
                 break;
             case 2:
                 formXuatHuy.setFieldsValue({
                     ...data,
+                    danh_sach_san_pham: danhSachSanPham || [],
                 });
                 break;
             case 3:
                 formXuatNguyenLieu.setFieldsValue({
                     ...data,
-                    danh_sach_san_pham: danhSachSanPham,
+                    danh_sach_san_pham: danhSachSanPham || [],
                 });
                 break;
         }

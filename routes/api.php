@@ -139,7 +139,7 @@ Route::group([
     Route::get('/', [\App\Modules\SanPham\SanPhamController::class, 'index']);
     Route::get('/options', [\App\Modules\SanPham\SanPhamController::class, 'getOptions']);
     Route::get('/options-by-nha-cung-cap/{nhaCungCapId}', [\App\Modules\SanPham\SanPhamController::class, 'getOptionsByNhaCungCap']);
-    Route::get('/options-lo-san-pham-by-san-pham/{sanPhamId}', [\App\Modules\SanPham\SanPhamController::class, 'getOptionsLoSanPhamBySanPhamId']);
+    Route::get('/options-lo-san-pham-by-san-pham/{sanPhamId}/{donViTinhId}', [\App\Modules\SanPham\SanPhamController::class, 'getOptionsLoSanPhamBySanPhamIdAndDonViTinhId']);
     Route::get('/download-template-excel', [\App\Modules\SanPham\SanPhamController::class, 'downloadTemplateExcelWithRelations']);
     Route::post('/', [\App\Modules\SanPham\SanPhamController::class, 'store']);
     Route::get('/{id}', [\App\Modules\SanPham\SanPhamController::class, 'show']);

@@ -148,6 +148,7 @@ class PhieuXuatKhoService
             KhoTong::where([
               'ma_lo_san_pham' => $sanPham['ma_lo_san_pham'],
               'san_pham_id' => $sanPham['san_pham_id'],
+              'don_vi_tinh_id' => $sanPham['don_vi_tinh_id'],
             ])->decrement('so_luong_ton', $sanPham['so_luong']);
           }
 
@@ -173,6 +174,62 @@ class PhieuXuatKhoService
 
           break;
         case 2: // Xuất huỷ
+          $tongTien = 0;
+
+          foreach ($data['danh_sach_san_pham'] as $sanPham) {
+            // Kiểm tra lô sản phẩm tồn tại
+            $loSanPham = ChiTietPhieuNhapKho::where([
+              'ma_lo_san_pham' => $sanPham['ma_lo_san_pham'],
+              'san_pham_id' => $sanPham['san_pham_id'],
+              'don_vi_tinh_id' => $sanPham['don_vi_tinh_id'],
+            ])->first();
+
+            if (!$loSanPham) {
+              return CustomResponse::error('Lô nguyên liệu ' . $sanPham['ma_lo_san_pham'] . ' không tồn tại');
+            }
+
+            $tongTien += $sanPham['so_luong'] * $loSanPham->gia_nhap;
+          }
+
+          $data['tong_tien'] = $tongTien;
+
+          $dataSave = $data;
+          unset($dataSave['danh_sach_san_pham']);
+          $result = PhieuXuatKho::create($dataSave);
+
+          foreach ($data['danh_sach_san_pham'] as $sanPham) {
+            $loSanPham = ChiTietPhieuNhapKho::where([
+              'ma_lo_san_pham' => $sanPham['ma_lo_san_pham'],
+              'san_pham_id' => $sanPham['san_pham_id'],
+              'don_vi_tinh_id' => $sanPham['don_vi_tinh_id'],
+            ])->first();
+
+            $soLuongTonTrongKho = KhoTong::where([
+              'ma_lo_san_pham' => $sanPham['ma_lo_san_pham'],
+              'san_pham_id' => $sanPham['san_pham_id'],
+            ])->first()->so_luong_ton;
+
+            if ($sanPham['so_luong'] > $soLuongTonTrongKho) {
+              return CustomResponse::error('Số lượng xuất kho không được lớn hơn số lượng tồn trong kho');
+            }
+
+            // Tạo chi tiết phiếu xuất kho
+            ChiTietPhieuXuatKho::create([
+              'phieu_xuat_kho_id' => $result->id,
+              'san_pham_id' => $sanPham['san_pham_id'],
+              'don_vi_tinh_id' => $sanPham['don_vi_tinh_id'],
+              'so_luong' => $sanPham['so_luong'],
+              'don_gia' => $loSanPham->gia_ban_le_don_vi,
+              'ma_lo_san_pham' => $sanPham['ma_lo_san_pham'],
+              'tong_tien' => $sanPham['so_luong'] * $loSanPham->gia_ban_le_don_vi
+            ]);
+
+            KhoTong::where([
+              'ma_lo_san_pham' => $sanPham['ma_lo_san_pham'],
+              'san_pham_id' => $sanPham['san_pham_id'],
+              'don_vi_tinh_id' => $sanPham['don_vi_tinh_id'],
+            ])->decrement('so_luong_ton', $sanPham['so_luong']);
+          }
           break;
         case 3: // Xuất nguyên liệu sản xuất
           $tongTien = 0;
@@ -248,6 +305,7 @@ class PhieuXuatKhoService
             KhoTong::where([
               'ma_lo_san_pham' => $nguyenLieu['ma_lo_san_pham'],
               'san_pham_id' => $nguyenLieu['san_pham_id'],
+              'don_vi_tinh_id' => $nguyenLieu['don_vi_tinh_id'],
             ])->decrement('so_luong_ton', $nguyenLieu['so_luong']);
           }
 
@@ -334,6 +392,7 @@ class PhieuXuatKhoService
             KhoTong::where([
               'ma_lo_san_pham' => $chiTietPhieuXuatKho->ma_lo_san_pham,
               'san_pham_id' => $chiTietPhieuXuatKho->san_pham_id,
+              'don_vi_tinh_id' => $chiTietPhieuXuatKho->don_vi_tinh_id,
             ])->increment('so_luong_ton', $chiTietPhieuXuatKho->so_luong);
 
             $chiTietDonHang->update([
@@ -393,6 +452,7 @@ class PhieuXuatKhoService
             KhoTong::where([
               'ma_lo_san_pham' => $sanPham['ma_lo_san_pham'],
               'san_pham_id' => $sanPham['san_pham_id'],
+              'don_vi_tinh_id' => $sanPham['don_vi_tinh_id'],
             ])->decrement('so_luong_ton', $sanPham['so_luong']);
           }
 
@@ -418,6 +478,68 @@ class PhieuXuatKhoService
 
           break;
         case 2: // Xuất huỷ
+          $tongTien = 0;
+
+          foreach ($data['danh_sach_san_pham'] as $sanPham) {
+            // Kiểm tra lô sản phẩm tồn tại
+            $loSanPham = ChiTietPhieuNhapKho::where([
+              'ma_lo_san_pham' => $sanPham['ma_lo_san_pham'],
+              'san_pham_id' => $sanPham['san_pham_id'],
+              'don_vi_tinh_id' => $sanPham['don_vi_tinh_id'],
+            ])->first();
+
+            if (!$loSanPham) {
+              return CustomResponse::error('Lô nguyên liệu ' . $sanPham['ma_lo_san_pham'] . ' không tồn tại');
+            }
+
+            $tongTien += $sanPham['so_luong'] * $loSanPham->gia_nhap;
+          }
+
+          $data['tong_tien'] = $tongTien;
+
+          $dataSave = $data;
+          unset($dataSave['danh_sach_san_pham']);
+          $result = PhieuXuatKho::find($id)->update($dataSave);
+
+          $chiTietPhieuXuatKhos = ChiTietPhieuXuatKho::where('phieu_xuat_kho_id', $id)->get();
+
+          foreach ($chiTietPhieuXuatKhos as $chiTietPhieuXuatKho) {
+            $chiTietPhieuXuatKho->delete();
+          }
+
+          foreach ($data['danh_sach_san_pham'] as $sanPham) {
+            $loSanPham = ChiTietPhieuNhapKho::where([
+              'ma_lo_san_pham' => $sanPham['ma_lo_san_pham'],
+              'san_pham_id' => $sanPham['san_pham_id'],
+              'don_vi_tinh_id' => $sanPham['don_vi_tinh_id'],
+            ])->first();
+
+            $soLuongTonTrongKho = KhoTong::where([
+              'ma_lo_san_pham' => $sanPham['ma_lo_san_pham'],
+              'san_pham_id' => $sanPham['san_pham_id'],
+            ])->first()->so_luong_ton;
+
+            if ($sanPham['so_luong'] > $soLuongTonTrongKho) {
+              return CustomResponse::error('Số lượng xuất kho không được lớn hơn số lượng tồn trong kho');
+            }
+
+            // Tạo chi tiết phiếu xuất kho
+            ChiTietPhieuXuatKho::create([
+              'phieu_xuat_kho_id' => $result->id,
+              'san_pham_id' => $sanPham['san_pham_id'],
+              'don_vi_tinh_id' => $sanPham['don_vi_tinh_id'],
+              'so_luong' => $sanPham['so_luong'],
+              'don_gia' => $loSanPham->gia_ban_le_don_vi,
+              'ma_lo_san_pham' => $sanPham['ma_lo_san_pham'],
+              'tong_tien' => $sanPham['so_luong'] * $loSanPham->gia_ban_le_don_vi
+            ]);
+
+            KhoTong::where([
+              'ma_lo_san_pham' => $sanPham['ma_lo_san_pham'],
+              'san_pham_id' => $sanPham['san_pham_id'],
+              'don_vi_tinh_id' => $sanPham['don_vi_tinh_id'],
+            ])->decrement('so_luong_ton', $sanPham['so_luong']);
+          }
           break;
         case 3: // Xuất nguyên liệu sản xuất
           $tongTien = 0;
@@ -457,6 +579,7 @@ class PhieuXuatKhoService
             KhoTong::where([
               'ma_lo_san_pham' => $chiTietPhieuXuatKho->ma_lo_san_pham,
               'san_pham_id' => $chiTietPhieuXuatKho->san_pham_id,
+              'don_vi_tinh_id' => $chiTietPhieuXuatKho->don_vi_tinh_id,
             ])->increment('so_luong_ton', $chiTietPhieuXuatKho->so_luong);
 
             $chiTietSanXuat->update([
@@ -516,6 +639,7 @@ class PhieuXuatKhoService
             KhoTong::where([
               'ma_lo_san_pham' => $nguyenLieu['ma_lo_san_pham'],
               'san_pham_id' => $nguyenLieu['san_pham_id'],
+              'don_vi_tinh_id' => $nguyenLieu['don_vi_tinh_id'],
             ])->decrement('so_luong_ton', $nguyenLieu['so_luong']);
           }
 
@@ -558,14 +682,140 @@ class PhieuXuatKhoService
   public function delete($id)
   {
     try {
-      $model = PhieuXuatKho::findOrFail($id);
+      $phieuXuatKho = PhieuXuatKho::find($id);
 
-      // TODO: Xóa ảnh vào bảng images (nếu có)
-      // $model->images()->get()->each(function ($image) {
-      //   $image->delete();
-      // });
+      if (!$phieuXuatKho) {
+        return CustomResponse::error('Phiếu xuất kho không tồn tại');
+      }
 
-      return $model->delete();
+      switch ($phieuXuatKho->loai_phieu_xuat) {
+        case 1: // Xuất theo đơn hàng
+          $donHang = DonHang::find($phieuXuatKho->don_hang_id);
+
+          if (!$donHang) {
+            return CustomResponse::error('Đơn hàng không tồn tại');
+          }
+
+          $chiTietPhieuXuatKhos = ChiTietPhieuXuatKho::where('phieu_xuat_kho_id', $id)->get();
+
+          foreach ($chiTietPhieuXuatKhos as $chiTietPhieuXuatKho) {
+            $chiTietDonHang = ChiTietDonHang::where([
+              'don_hang_id' => $donHang->id,
+              'san_pham_id' => $chiTietPhieuXuatKho->san_pham_id,
+              'don_vi_tinh_id' => $chiTietPhieuXuatKho->don_vi_tinh_id,
+            ])->first();
+
+            if (!$chiTietDonHang) {
+              return CustomResponse::error('Sản phẩm không tồn tại trong đơn hàng');
+            }
+
+            KhoTong::where([
+              'ma_lo_san_pham' => $chiTietPhieuXuatKho->ma_lo_san_pham,
+              'san_pham_id' => $chiTietPhieuXuatKho->san_pham_id,
+              'don_vi_tinh_id' => $chiTietPhieuXuatKho->don_vi_tinh_id,
+            ])->increment('so_luong_ton', $chiTietPhieuXuatKho->so_luong);
+
+            $chiTietDonHang->update([
+              'so_luong_da_xuat_kho' => $chiTietDonHang->so_luong_da_xuat_kho - $chiTietPhieuXuatKho->so_luong,
+            ]);
+
+            $chiTietPhieuXuatKho->delete();
+          }
+
+          $phieuXuatKho->delete();
+
+          $donHang->refresh();
+
+          $sanPhamConCoTheXuatKho = [];
+
+          foreach ($donHang->chiTietDonHangs as $chiTietDonHang) {
+            if ($chiTietDonHang->so_luong_da_xuat_kho < $chiTietDonHang->so_luong) {
+              $sanPhamConCoTheXuatKho[] = $chiTietDonHang;
+            }
+          }
+
+          if (count($sanPhamConCoTheXuatKho) === 0) {
+            $donHang->update([
+              'trang_thai_xuat_kho' => 2,
+            ]);
+          } else {
+            $donHang->update([
+              'trang_thai_xuat_kho' => 1,
+            ]);
+          }
+          break;
+        case 2: // Xuất hủy
+          $chiTietPhieuXuatKhos = ChiTietPhieuXuatKho::where('phieu_xuat_kho_id', $id)->get();
+
+          foreach ($chiTietPhieuXuatKhos as $chiTietPhieuXuatKho) {
+            KhoTong::where([
+              'ma_lo_san_pham' => $chiTietPhieuXuatKho->ma_lo_san_pham,
+              'san_pham_id' => $chiTietPhieuXuatKho->san_pham_id,
+              'don_vi_tinh_id' => $chiTietPhieuXuatKho->don_vi_tinh_id,
+            ])->increment('so_luong_ton', $chiTietPhieuXuatKho->so_luong);
+
+            $chiTietPhieuXuatKho->delete();
+          }
+
+          $phieuXuatKho->delete();
+          break;
+        case 3: // Xuất nguyên liệu sản xuất
+          $sanXuat = SanXuat::find($phieuXuatKho->san_xuat_id);
+
+          if (!$sanXuat) {
+            return CustomResponse::error('Sản xuất không tồn tại');
+          }
+
+          $chiTietPhieuXuatKhos = ChiTietPhieuXuatKho::where('phieu_xuat_kho_id', $id)->get();
+
+          foreach ($chiTietPhieuXuatKhos as $chiTietPhieuXuatKho) {
+            $chiTietSanXuat = ChiTietSanXuat::where([
+              'san_xuat_id' => $sanXuat->id,
+              'san_pham_id' => $chiTietPhieuXuatKho->san_pham_id,
+              'don_vi_tinh_id' => $chiTietPhieuXuatKho->don_vi_tinh_id,
+            ])->first();
+
+            KhoTong::where([
+              'ma_lo_san_pham' => $chiTietPhieuXuatKho->ma_lo_san_pham,
+              'san_pham_id' => $chiTietPhieuXuatKho->san_pham_id,
+              'don_vi_tinh_id' => $chiTietPhieuXuatKho->don_vi_tinh_id,
+            ])->increment('so_luong_ton', $chiTietPhieuXuatKho->so_luong);
+
+            $chiTietSanXuat->update([
+              'so_luong_xuat_kho' => $chiTietSanXuat->so_luong_xuat_kho - $chiTietPhieuXuatKho->so_luong,
+            ]);
+
+            $chiTietPhieuXuatKho->delete();
+          }
+
+          $phieuXuatKho->delete();
+
+          $sanXuat->refresh();
+
+          $nguyenLieuConCoTheXuatKho = [];
+
+          foreach ($sanXuat->chiTietSanXuat as $chiTietSanXuat) {
+            if ($chiTietSanXuat->so_luong_xuat_kho < $chiTietSanXuat->so_luong_thuc_te) {
+              $nguyenLieuConCoTheXuatKho[] = $chiTietSanXuat;
+            }
+          }
+
+          if (count($nguyenLieuConCoTheXuatKho) === 0) {
+            $sanXuat->update([
+              'trang_thai_xuat_kho' => 2,
+            ]);
+          } else {
+            $sanXuat->update([
+              'trang_thai_xuat_kho' => 1,
+            ]);
+          }
+
+          break;
+        default:
+          return CustomResponse::error('Loại phiếu xuất kho không hợp lệ');
+      }
+
+      return $phieuXuatKho;
     } catch (Exception $e) {
       return CustomResponse::error($e->getMessage());
     }
@@ -576,6 +826,6 @@ class PhieuXuatKhoService
    */
   public function getOptions()
   {
-    return PhieuXuatKho::select('id as value', 'ten_phieu_xuat_kho as label')->get();
+    return PhieuXuatKho::select('id as value', 'ma_phieu_xuat_kho as label')->get();
   }
 }

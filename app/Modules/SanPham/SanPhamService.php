@@ -224,9 +224,10 @@ class SanPhamService
   /**
    * Lấy danh sách LoSanPham dạng option theo SanPham
    */
-  public function getOptionsLoSanPhamBySanPhamId($sanPhamId)
+  public function getOptionsLoSanPhamBySanPhamIdAndDonViTinhId($sanPhamId, $donViTinhId)
   {
     $loSanPham = KhoTong::where('kho_tongs.san_pham_id', $sanPhamId)
+      ->where('kho_tongs.don_vi_tinh_id', $donViTinhId)
       ->leftJoin('chi_tiet_phieu_nhap_khos', 'kho_tongs.ma_lo_san_pham', '=', 'chi_tiet_phieu_nhap_khos.ma_lo_san_pham')
       ->withoutGlobalScope('withUserNames')
       ->select(

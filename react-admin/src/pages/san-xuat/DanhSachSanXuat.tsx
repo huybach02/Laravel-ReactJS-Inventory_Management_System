@@ -147,7 +147,15 @@ const DanhSachSanXuat = ({
             dataIndex: "trang_thai_hoan_thanh",
             render: (trang_thai_hoan_thanh: number) => {
                 return (
-                    <Tag color={trang_thai_hoan_thanh === 1 ? "green" : "red"}>
+                    <Tag
+                        color={
+                            trang_thai_hoan_thanh === 0
+                                ? "red"
+                                : trang_thai_hoan_thanh === 1
+                                ? "blue"
+                                : "green"
+                        }
+                    >
                         {trang_thai_hoan_thanh === 0
                             ? "Chưa sản xuất"
                             : trang_thai_hoan_thanh === 1
@@ -168,7 +176,15 @@ const DanhSachSanXuat = ({
             dataIndex: "trang_thai_nhap_kho",
             render: (trang_thai_nhap_kho: number) => {
                 return (
-                    <Tag color={trang_thai_nhap_kho === 1 ? "green" : "red"}>
+                    <Tag
+                        color={
+                            trang_thai_nhap_kho === 0
+                                ? "red"
+                                : trang_thai_nhap_kho === 1
+                                ? "blue"
+                                : "green"
+                        }
+                    >
                         {trang_thai_nhap_kho === 0
                             ? "Chưa nhập kho"
                             : trang_thai_nhap_kho === 1
@@ -189,7 +205,15 @@ const DanhSachSanXuat = ({
             dataIndex: "trang_thai_xuat_kho",
             render: (trang_thai_xuat_kho: number) => {
                 return (
-                    <Tag color={trang_thai_xuat_kho === 1 ? "green" : "red"}>
+                    <Tag
+                        color={
+                            trang_thai_xuat_kho === 0
+                                ? "red"
+                                : trang_thai_xuat_kho === 1
+                                ? "blue"
+                                : "green"
+                        }
+                    >
                         {trang_thai_xuat_kho === 0
                             ? "Chưa xuất kho"
                             : trang_thai_xuat_kho === 1
