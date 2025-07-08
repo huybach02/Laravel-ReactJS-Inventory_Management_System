@@ -6,6 +6,7 @@ use App\Traits\DateTimeFormatter;
 use App\Traits\UserNameResolver;
 use App\Traits\UserTrackable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class ChiTietDonHang extends Model
 {
@@ -24,6 +25,17 @@ class ChiTietDonHang extends Model
     });
   }
 
+  /**
+   * Tính số lượng còn lại có thể xuất kho cho chi tiết đơn hàng này.
+   *
+   * @return \Illuminate\Database\Eloquent\Casts\Attribute
+   */
+  protected function soLuongConLaiXuatKho(): Attribute
+  {
+    return Attribute::make(
+      get: fn() => $this->so_luong - $this->so_luong_da_xuat_kho,
+    );
+  }
 
   // Kết nối sẵn với bảng images để lưu ảnh
   public function images()

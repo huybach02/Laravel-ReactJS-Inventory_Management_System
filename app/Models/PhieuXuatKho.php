@@ -26,7 +26,6 @@ class PhieuXuatKho extends Model
     });
   }
 
-
   // Kết nối sẵn với bảng images để lưu ảnh
   public function images()
   {
@@ -34,9 +33,14 @@ class PhieuXuatKho extends Model
   }
 
   // Quan hệ với đơn hàng
-  public function donHang(): BelongsTo
+  public function donHang()
   {
     return $this->belongsTo(DonHang::class, 'don_hang_id');
+  }
+
+  public function sanXuat()
+  {
+    return $this->belongsTo(SanXuat::class, 'san_xuat_id');
   }
 
   // Quan hệ với chi tiết phiếu xuất kho

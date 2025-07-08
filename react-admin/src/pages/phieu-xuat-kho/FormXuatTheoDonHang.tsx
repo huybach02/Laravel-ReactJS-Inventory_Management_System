@@ -64,7 +64,8 @@ const FormXuatTheoDonHang = ({
                             gia_nhap: item.gia_ban,
                             chiet_khau: item.chiet_khau || 0,
                             tong_tien: item.tong_tien,
-                            so_luong_can_mua: item.so_luong,
+                            so_luong_can_mua:
+                                item.so_luong - item.so_luong_da_xuat_kho || 0,
                             ma_lo_san_pham: currentItem.ma_lo_san_pham,
                             so_luong: currentItem.so_luong,
                         };
