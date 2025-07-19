@@ -1,13 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { EditOutlined } from "@ant-design/icons";
 import { useState } from "react";
-import { Button, Form, Modal } from "antd";
+import { Button, Form, Modal, Tabs } from "antd";
 import { useDispatch } from "react-redux";
 import { getDataById } from "../../services/getData.api";
 import { setReload } from "../../redux/slices/main.slice";
 import { putData } from "../../services/updateData";
 import dayjs from "dayjs";
 import FormNhapTuNhaCungCap from "./FormNhapTuNhaCungCap";
+import FormNhapSanXuat from "./FormNhapSanXuat";
 
 const SuaPhieuNhapKho = ({
     path,
@@ -21,13 +22,16 @@ const SuaPhieuNhapKho = ({
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [form] = Form.useForm();
+    const [tab, setTab] = useState("1");
+    const [formNhapTuNhaCungCap] = Form.useForm();
+    const [formNhapSanXuat] = Form.useForm();
     const dispatch = useDispatch();
 
     const showModal = async () => {
         setIsModalOpen(true);
         setIsLoading(true);
         const data = await getDataById(id, path);
+        setTab(data.loai_phieu_nhap.toString());
         Object.keys(data).forEach((key) => {
             if (data[key]) {
                 if (
@@ -69,15 +73,26 @@ const SuaPhieuNhapKho = ({
             });
         }
 
-        form.setFieldsValue({
-            ...data,
-            danh_sach_san_pham: danhSachSanPham,
-        });
+        switch (data.loai_phieu_nhap) {
+            case 1:
+                formNhapTuNhaCungCap.setFieldsValue({
+                    ...data,
+                    danh_sach_san_pham: danhSachSanPham || [],
+                });
+                break;
+            case 2:
+                formNhapSanXuat.setFieldsValue({
+                    ...data,
+                    danh_sach_san_pham: danhSachSanPham || [],
+                });
+                break;
+        }
         setIsLoading(false);
     };
 
     const handleCancel = () => {
-        form.resetFields();
+        formNhapSanXuat.resetFields();
+        formNhapTuNhaCungCap.resetFields();
         setIsModalOpen(false);
     };
 
@@ -87,7 +102,6 @@ const SuaPhieuNhapKho = ({
             handleCancel();
             dispatch(setReload());
         };
-        console.log(values);
         await putData(
             path,
             id,
@@ -106,11 +120,46 @@ const SuaPhieuNhapKho = ({
                         chiet_khau: Number(item.chiet_khau),
                     })
                 ),
+                loai_phieu_nhap: Number(tab),
             },
             closeModel
         );
         setIsSubmitting(false);
     };
+
+    const items = [
+        {
+            label: "Nhập từ nhà cung cấp",
+            key: "1",
+            children: (
+                <Form
+                    id={`formSuaPhieuNhapKho` + "1"}
+                    form={formNhapTuNhaCungCap}
+                    layout="vertical"
+                    onFinish={onUpdate}
+                >
+                    <FormNhapTuNhaCungCap
+                        form={formNhapTuNhaCungCap}
+                        isEditing={true}
+                    />
+                </Form>
+            ),
+        },
+        {
+            label: "Nhập từ sản xuất",
+            key: "2",
+            children: (
+                <Form
+                    id={`formSuaPhieuNhapKho` + "2"}
+                    form={formNhapSanXuat}
+                    layout="vertical"
+                    onFinish={onUpdate}
+                >
+                    <FormNhapSanXuat form={formNhapSanXuat} isEditing={true} />
+                </Form>
+            ),
+        },
+    ];
 
     return (
         <>
@@ -132,7 +181,7 @@ const SuaPhieuNhapKho = ({
                 footer={[
                     <Button
                         key="submit"
-                        form={`formSuaPhieuNhapKho-${id}`}
+                        form={`formSuaPhieuNhapKho` + tab}
                         type="primary"
                         htmlType="submit"
                         size="large"
@@ -142,14 +191,12 @@ const SuaPhieuNhapKho = ({
                     </Button>,
                 ]}
             >
-                <Form
-                    id={`formSuaPhieuNhapKho-${id}`}
-                    form={form}
-                    layout="vertical"
-                    onFinish={onUpdate}
-                >
-                    <FormNhapTuNhaCungCap form={form} isEditing={true} />
-                </Form>
+                <Tabs
+                    type="card"
+                    items={items}
+                    activeKey={tab.toString()}
+                    onChange={() => {}}
+                />
             </Modal>
         </>
     );

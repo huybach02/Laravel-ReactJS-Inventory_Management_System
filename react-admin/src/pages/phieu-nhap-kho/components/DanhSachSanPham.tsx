@@ -11,7 +11,7 @@ import {
     Typography,
     type FormInstance,
 } from "antd";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import SelectFormApi from "../../../components/select/SelectFormApi";
 import { API_ROUTE_CONFIG } from "../../../configs/api-route-config";
 import { formatter, parser } from "../../../utils/utils";
@@ -21,10 +21,46 @@ import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 const DanhSachSanPham = ({
     form,
     isDetail,
+    isNhapSanXuat = false,
+    isEditing = false,
 }: {
     form: FormInstance;
     isDetail: boolean;
+    isNhapSanXuat?: boolean;
+    isEditing?: boolean;
 }) => {
+    const danhSachSanPham = Form.useWatch("danh_sach_san_pham", form);
+
+    useEffect(() => {
+        if (danhSachSanPham) {
+            const newDanhSachSanPham = [...danhSachSanPham];
+            let changed = false;
+
+            newDanhSachSanPham.forEach((item, index) => {
+                if (item) {
+                    const soLuong = item.so_luong_nhap || 0;
+                    const giaNhap = item.gia_nhap || 0;
+                    const chietKhau = item.chiet_khau || 0;
+                    const tongTien = soLuong * giaNhap * (1 - chietKhau / 100);
+
+                    if (item.tong_tien !== tongTien) {
+                        newDanhSachSanPham[index] = {
+                            ...item,
+                            tong_tien: tongTien,
+                        };
+                        changed = true;
+                    }
+                }
+            });
+
+            if (changed) {
+                form.setFieldsValue({
+                    danh_sach_san_pham: newDanhSachSanPham,
+                });
+            }
+        }
+    }, [danhSachSanPham, form]);
+
     const fetchProductDetail = useCallback(
         async (productId: string, rowIndex: number) => {
             try {
@@ -106,7 +142,7 @@ const DanhSachSanPham = ({
                                         marginBottom: 16,
                                     }}
                                 >
-                                    <Col span={4}>
+                                    <Col span={isNhapSanXuat ? 6 : 4}>
                                         <Typography.Text strong>
                                             Tên SP/NVL
                                         </Typography.Text>
@@ -126,6 +162,15 @@ const DanhSachSanPham = ({
                                             Hạn sử dụng
                                         </Typography.Text>
                                     </Col>
+                                    {isNhapSanXuat &&
+                                        !isDetail &&
+                                        !isEditing && (
+                                            <Col span={2}>
+                                                <Typography.Text strong>
+                                                    Số lượng cần nhập
+                                                </Typography.Text>
+                                            </Col>
+                                        )}
                                     <Col span={2}>
                                         <Typography.Text strong>
                                             Số lượng nhập
@@ -136,21 +181,25 @@ const DanhSachSanPham = ({
                                             Giá nhập
                                         </Typography.Text>
                                     </Col>
-                                    <Col span={2}>
-                                        <Typography.Text strong>
-                                            Chiết khấu
-                                        </Typography.Text>
-                                    </Col>
+                                    {!isNhapSanXuat && (
+                                        <Col span={2}>
+                                            <Typography.Text strong>
+                                                Chiết khấu
+                                            </Typography.Text>
+                                        </Col>
+                                    )}
                                     <Col span={3}>
                                         <Typography.Text strong>
                                             Tổng tiền
                                         </Typography.Text>
                                     </Col>
-                                    <Col span={2}>
-                                        <Typography.Text strong>
-                                            Thao tác
-                                        </Typography.Text>
-                                    </Col>
+                                    {!isNhapSanXuat && (
+                                        <Col span={2}>
+                                            <Typography.Text strong>
+                                                Thao tác
+                                            </Typography.Text>
+                                        </Col>
+                                    )}
                                 </Row>
 
                                 {fields.map(({ key, name, ...restField }) => (
@@ -162,7 +211,7 @@ const DanhSachSanPham = ({
                                             marginBottom: 8,
                                         }}
                                     >
-                                        <Col span={4}>
+                                        <Col span={isNhapSanXuat ? 6 : 4}>
                                             <Form.Item
                                                 {...restField}
                                                 name={[name, "san_pham_id"]}
@@ -174,32 +223,45 @@ const DanhSachSanPham = ({
                                                     },
                                                 ]}
                                             >
-                                                <SelectFormApi
-                                                    path={
-                                                        API_ROUTE_CONFIG.SAN_PHAM +
-                                                        `/options-by-nha-cung-cap/${form.getFieldValue(
+                                                {!isNhapSanXuat && (
+                                                    <SelectFormApi
+                                                        path={
+                                                            API_ROUTE_CONFIG.SAN_PHAM +
+                                                            `/options-by-nha-cung-cap/${form.getFieldValue(
+                                                                "nha_cung_cap_id"
+                                                            )}`
+                                                        }
+                                                        placeholder="Chọn sản phẩm"
+                                                        showSearch
+                                                        reload={form.getFieldValue(
                                                             "nha_cung_cap_id"
-                                                        )}`
-                                                    }
-                                                    placeholder="Chọn sản phẩm"
-                                                    showSearch
-                                                    reload={form.getFieldValue(
-                                                        "nha_cung_cap_id"
-                                                    )}
-                                                    onChange={(value) => {
-                                                        handleChangeSanPham(
-                                                            name
-                                                        );
-                                                        // Gọi API để lấy thông tin chi tiết sản phẩm
-                                                        if (value) {
-                                                            fetchProductDetail(
-                                                                value,
+                                                        )}
+                                                        onChange={(value) => {
+                                                            handleChangeSanPham(
                                                                 name
                                                             );
+                                                            // Gọi API để lấy thông tin chi tiết sản phẩm
+                                                            if (value) {
+                                                                fetchProductDetail(
+                                                                    value,
+                                                                    name
+                                                                );
+                                                            }
+                                                        }}
+                                                        disabled={isDetail}
+                                                    />
+                                                )}
+                                                {isNhapSanXuat && (
+                                                    <SelectFormApi
+                                                        path={
+                                                            API_ROUTE_CONFIG.SAN_PHAM +
+                                                            `/options`
                                                         }
-                                                    }}
-                                                    disabled={isDetail}
-                                                />
+                                                        placeholder="Chọn sản phẩm"
+                                                        showSearch
+                                                        disabled
+                                                    />
+                                                )}
                                             </Form.Item>
                                         </Col>
                                         <Col span={2}>
@@ -233,7 +295,10 @@ const DanhSachSanPham = ({
                                                     ])}
                                                     placeholder="Chọn đơn vị tính"
                                                     showSearch
-                                                    disabled={isDetail}
+                                                    disabled={
+                                                        isDetail ||
+                                                        isNhapSanXuat
+                                                    }
                                                 />
                                             </Form.Item>
                                         </Col>
@@ -267,6 +332,28 @@ const DanhSachSanPham = ({
                                                 />
                                             </Form.Item>
                                         </Col>
+                                        {isNhapSanXuat &&
+                                            !isDetail &&
+                                            !isEditing && (
+                                                <Col span={2}>
+                                                    <Form.Item
+                                                        {...restField}
+                                                        name={[
+                                                            name,
+                                                            "so_luong_can_nhap",
+                                                        ]}
+                                                    >
+                                                        <InputNumber
+                                                            min={1}
+                                                            placeholder="Số lượng"
+                                                            style={{
+                                                                width: "100%",
+                                                            }}
+                                                            disabled
+                                                        />
+                                                    </Form.Item>
+                                                </Col>
+                                            )}
                                         <Col span={2}>
                                             <Form.Item
                                                 {...restField}
@@ -314,26 +401,28 @@ const DanhSachSanPham = ({
                                                 />
                                             </Form.Item>
                                         </Col>
-                                        <Col span={2}>
-                                            <Form.Item
-                                                {...restField}
-                                                name={[name, "chiet_khau"]}
-                                                initialValue={0}
-                                            >
-                                                <InputNumber
-                                                    min={0}
-                                                    placeholder="Chiết khấu"
-                                                    style={{
-                                                        width: "100%",
-                                                    }}
-                                                    formatter={formatter}
-                                                    parser={parser}
-                                                    max={100}
-                                                    addonAfter="%"
-                                                    disabled={isDetail}
-                                                />
-                                            </Form.Item>
-                                        </Col>
+                                        {!isNhapSanXuat && (
+                                            <Col span={2}>
+                                                <Form.Item
+                                                    {...restField}
+                                                    name={[name, "chiet_khau"]}
+                                                    initialValue={0}
+                                                >
+                                                    <InputNumber
+                                                        min={0}
+                                                        placeholder="Chiết khấu"
+                                                        style={{
+                                                            width: "100%",
+                                                        }}
+                                                        formatter={formatter}
+                                                        parser={parser}
+                                                        max={100}
+                                                        addonAfter="%"
+                                                        disabled={isDetail}
+                                                    />
+                                                </Form.Item>
+                                            </Col>
+                                        )}
                                         <Col span={3}>
                                             <Form.Item
                                                 {...restField}
@@ -356,19 +445,23 @@ const DanhSachSanPham = ({
                                                 />
                                             </Form.Item>
                                         </Col>
-                                        <Col span={2}>
-                                            <Button
-                                                type="text"
-                                                danger
-                                                icon={<MinusCircleOutlined />}
-                                                onClick={() => remove(name)}
-                                                disabled={isDetail}
-                                            />
-                                        </Col>
+                                        {!isNhapSanXuat && (
+                                            <Col span={2}>
+                                                <Button
+                                                    type="text"
+                                                    danger
+                                                    icon={
+                                                        <MinusCircleOutlined />
+                                                    }
+                                                    onClick={() => remove(name)}
+                                                    disabled={isDetail}
+                                                />
+                                            </Col>
+                                        )}
                                     </Row>
                                 ))}
 
-                                {!isDetail && (
+                                {!isDetail && !isNhapSanXuat && (
                                     <Row>
                                         <Col span={24}>
                                             <Button

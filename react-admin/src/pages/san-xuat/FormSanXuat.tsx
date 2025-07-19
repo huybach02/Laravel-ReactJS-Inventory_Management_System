@@ -148,6 +148,14 @@ const FormSanXuat = ({
                         },
                     ]}
                     disabled={isDetail}
+                    onChange={(value) => {
+                        if (value) {
+                            form.setFieldsValue({
+                                don_vi_tinh_id: undefined,
+                                chi_tiet_cong_thucs: [],
+                            });
+                        }
+                    }}
                 />
             </Col>
             <Col span={8} xs={24} md={24} lg={8}>

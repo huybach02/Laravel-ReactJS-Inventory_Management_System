@@ -14,7 +14,6 @@ import { useCallback, useEffect, useMemo } from "react";
 import SelectFormApi from "../../../components/select/SelectFormApi";
 import { API_ROUTE_CONFIG } from "../../../configs/api-route-config";
 import { createFilterQuery } from "../../../utils/utils";
-import { PlusOutlined } from "@ant-design/icons";
 
 const DanhSachSanPham = ({
     form,

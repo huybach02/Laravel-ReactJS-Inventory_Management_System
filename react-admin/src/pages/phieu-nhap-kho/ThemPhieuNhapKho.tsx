@@ -6,7 +6,6 @@ import { Button, Form, Modal, Row, Tabs } from "antd";
 import { useDispatch } from "react-redux";
 import { clearImageSingle, setReload } from "../../redux/slices/main.slice";
 import FormNhapTuNhaCungCap from "./FormNhapTuNhaCungCap";
-import FormNhapDoiHang from "./FormNhapDoiHang";
 import FormNhapSanXuat from "./FormNhapSanXuat";
 import dayjs from "dayjs";
 
@@ -15,7 +14,8 @@ const ThemPhieuNhapKho = ({ path, title }: { path: string; title: string }) => {
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const [form] = Form.useForm();
+    const [formNhapTuNhaCungCap] = Form.useForm();
+    const [formNhapSanXuat] = Form.useForm();
     const [tab, setTab] = useState("1");
 
     const showModal = async () => {
@@ -24,11 +24,14 @@ const ThemPhieuNhapKho = ({ path, title }: { path: string; title: string }) => {
 
     const handleCancel = () => {
         setIsModalOpen(false);
-        form.resetFields();
+        formNhapTuNhaCungCap.resetFields();
+        formNhapSanXuat.resetFields();
         dispatch(clearImageSingle());
+        setTab("1");
     };
 
     const onCreate = async (values: any) => {
+        console.log(values);
         setIsLoading(true);
         const closeModel = () => {
             handleCancel();
@@ -49,7 +52,7 @@ const ThemPhieuNhapKho = ({ path, title }: { path: string; title: string }) => {
                         ngay_het_han: dayjs(item.ngay_het_han).format(
                             "YYYY-MM-DD"
                         ),
-                        chiet_khau: Number(item.chiet_khau),
+                        chiet_khau: Number(item.chiet_khau) || 0,
                     })
                 ),
                 loai_phieu_nhap: Number(tab),
@@ -61,6 +64,12 @@ const ThemPhieuNhapKho = ({ path, title }: { path: string; title: string }) => {
 
     const onChange = (key: string) => {
         setTab(key);
+        formNhapTuNhaCungCap.setFieldsValue({
+            danh_sach_san_pham: [],
+        });
+        formNhapSanXuat.setFieldsValue({
+            danh_sach_san_pham: [],
+        });
     };
 
     const items = [
@@ -69,24 +78,28 @@ const ThemPhieuNhapKho = ({ path, title }: { path: string; title: string }) => {
             key: "1",
             children: (
                 <Form
-                    id="formPhieuNhapKhoTuNhaCungCap"
-                    form={form}
+                    id={"formPhieuNhapKho" + "1"}
+                    form={formNhapTuNhaCungCap}
                     layout="vertical"
                     onFinish={onCreate}
                 >
-                    <FormNhapTuNhaCungCap form={form} />
+                    <FormNhapTuNhaCungCap form={formNhapTuNhaCungCap} />
                 </Form>
             ),
         },
         {
-            label: "Nhập đổi hàng",
+            label: "Nhập từ sản xuất",
             key: "2",
-            children: <FormNhapDoiHang form={form} />,
-        },
-        {
-            label: "Nhập sản xuất",
-            key: "3",
-            children: <FormNhapSanXuat form={form} />,
+            children: (
+                <Form
+                    id={"formPhieuNhapKho" + "2"}
+                    form={formNhapSanXuat}
+                    layout="vertical"
+                    onFinish={onCreate}
+                >
+                    <FormNhapSanXuat form={formNhapSanXuat} />
+                </Form>
+            ),
         },
     ];
 
@@ -111,7 +124,7 @@ const ThemPhieuNhapKho = ({ path, title }: { path: string; title: string }) => {
                     <Row justify="end" key="footer">
                         <Button
                             key="submit"
-                            form="formPhieuNhapKhoTuNhaCungCap"
+                            form={`formPhieuNhapKho${tab}`}
                             type="primary"
                             htmlType="submit"
                             size="large"

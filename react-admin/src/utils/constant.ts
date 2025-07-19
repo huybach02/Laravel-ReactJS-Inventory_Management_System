@@ -28,8 +28,7 @@ export const OPTIONS_GIOI_TINH = [
 
 export const OPTIONS_LOAI_PHIEU_NHAP = [
     { value: 1, label: "Nhập từ nhà cung cấp" },
-    { value: 2, label: "Nhập đổi hàng" },
-    { value: 3, label: "Nhập từ sản xuất" },
+    { value: 2, label: "Nhập từ sản xuất" },
 ];
 
 export const OPTIONS_LOAI_PHIEU_XUAT = [

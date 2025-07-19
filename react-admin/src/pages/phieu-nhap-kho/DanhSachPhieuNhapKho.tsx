@@ -144,7 +144,12 @@ const DanhSachPhieuNhapKho = ({
                 operator: "contain",
                 nameColumn: "Nhà cung cấp",
             }),
-            render: (ten_nha_cung_cap: any) => {
+            render: (ten_nha_cung_cap: any, record: any) => {
+                if (
+                    record.loai_phieu_nhap === OPTIONS_LOAI_PHIEU_NHAP[1].value
+                ) {
+                    return "-";
+                }
                 return ten_nha_cung_cap;
             },
         },
@@ -158,13 +163,23 @@ const DanhSachPhieuNhapKho = ({
         {
             title: "Đã thanh toán",
             dataIndex: "da_thanh_toan",
-            render: (da_thanh_toan: number) => {
+            render: (da_thanh_toan: number, record: any) => {
+                if (
+                    record.loai_phieu_nhap === OPTIONS_LOAI_PHIEU_NHAP[1].value
+                ) {
+                    return "-";
+                }
                 return formatVietnameseCurrency(da_thanh_toan);
             },
         },
         {
             title: "Số tiền còn lại",
             render: (record: any) => {
+                if (
+                    record.loai_phieu_nhap === OPTIONS_LOAI_PHIEU_NHAP[1].value
+                ) {
+                    return "-";
+                }
                 return formatVietnameseCurrency(
                     record.tong_tien - record.da_thanh_toan
                 );
@@ -173,7 +188,12 @@ const DanhSachPhieuNhapKho = ({
         {
             title: "Trạng thái",
             dataIndex: "trang_thai",
-            render: (trang_thai: number) => {
+            render: (trang_thai: number, record: any) => {
+                if (
+                    record.loai_phieu_nhap === OPTIONS_LOAI_PHIEU_NHAP[1].value
+                ) {
+                    return "-";
+                }
                 return (
                     <Tag
                         color={

@@ -38,7 +38,6 @@ const ThemPhieuXuatKho = ({ path, title }: { path: string; title: string }) => {
     };
 
     const onCreate = async (values: any) => {
-        console.log(values);
         setIsLoading(true);
         const closeModel = () => {
             handleCancel();
