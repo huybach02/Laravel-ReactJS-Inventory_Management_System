@@ -9,40 +9,49 @@ use Illuminate\Database\Eloquent\Model;
 
 class DonHang extends Model
 {
-  //
+    //
 
-  use UserTrackable, UserNameResolver, DateTimeFormatter;
+    use DateTimeFormatter, UserNameResolver, UserTrackable;
 
-  protected $guarded = [];
+    protected $guarded = [];
 
-  protected static function boot()
-  {
-    parent::boot();
+    protected static function boot()
+    {
+        parent::boot();
 
-    static::saving(function ($model) {
-      unset($model->attributes['image']);
-    });
-  }
+        static::saving(function ($model) {
+            unset($model->attributes['image']);
+        });
+    }
 
+    // Kết nối sẵn với bảng images để lưu ảnh
+    public function images()
+    {
+        return $this->morphMany(Image::class, 'imageable');
+    }
 
-  // Kết nối sẵn với bảng images để lưu ảnh
-  public function images()
-  {
-    return $this->morphMany(Image::class, 'imageable');
-  }
+    public function khachHang()
+    {
+        return $this->belongsTo(KhachHang::class);
+    }
 
-  public function khachHang()
-  {
-    return $this->belongsTo(KhachHang::class);
-  }
+    public function chiTietDonHangs()
+    {
+        return $this->hasMany(ChiTietDonHang::class);
+    }
 
-  public function chiTietDonHangs()
-  {
-    return $this->hasMany(ChiTietDonHang::class);
-  }
+    public function nguoiTao()
+    {
+        return $this->belongsTo(User::class, 'nguoi_tao');
+    }
 
-  public function nguoiTao()
-  {
-    return $this->belongsTo(User::class, 'nguoi_tao');
-  }
+    public function phieuThu()
+    {
+        return $this->hasMany(PhieuThu::class);
+    }
+
+    public function chiTietPhieuThu()
+    {
+        return $this->hasMany(ChiTietPhieuThu::class);
+    }
 }

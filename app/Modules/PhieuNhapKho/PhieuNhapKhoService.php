@@ -75,131 +75,14 @@ class PhieuNhapKhoService
     public function create(array $data)
     {
         try {
-            DB::beginTransaction();
+            $result = DB::transaction(function () use (&$data) {
+                $phieuNhapKho = new PhieuNhapKho;
 
-            switch ($data['loai_phieu_nhap']) {
-                case 1: // Nhập từ nhà cung cấp
-                    $tongTienHang = 0;
-                    $tongChietKhau = 0;
-
-                    $checkNgayNhapKho = $data['ngay_nhap_kho'] <= date('Y-m-d');
-
-                    foreach ($data['danh_sach_san_pham'] as $key => $chiTiet) {
-                        $sanPham = SanPham::find($chiTiet['san_pham_id']);
-
-                        $tongTienNhap = $chiTiet['gia_nhap'] * $chiTiet['so_luong_nhap'];
-                        $tongChietKhau = $tongTienNhap * $chiTiet['chiet_khau'] / 100;
-                        $thanhTienSauChietKhau = $tongTienNhap - $tongChietKhau;
-                        $giaVonDonVi = $thanhTienSauChietKhau / $chiTiet['so_luong_nhap'];
-                        $giaBanLeDonVi = $giaVonDonVi * (1 + $sanPham->muc_loi_nhuan / 100);
-                        $loiNhuanBanLe = $giaBanLeDonVi - $giaVonDonVi;
-
-                        $tongTienHang += $thanhTienSauChietKhau;
-                        $tongChietKhau += $tongChietKhau;
-
-                        $data['danh_sach_san_pham'][$key]['nha_cung_cap_id'] = $data['nha_cung_cap_id'];
-                        $data['danh_sach_san_pham'][$key]['tong_tien_nhap'] = $tongTienNhap;
-                        $data['danh_sach_san_pham'][$key]['gia_von_don_vi'] = $giaVonDonVi;
-                        $data['danh_sach_san_pham'][$key]['gia_ban_le_don_vi'] = $giaBanLeDonVi;
-                        $data['danh_sach_san_pham'][$key]['loi_nhuan_ban_le'] = $loiNhuanBanLe;
-                    }
-
-                    $tongTienTruocThueVAT = $tongTienHang + ($data['chi_phi_nhap_hang'] ?? 0) - ($data['giam_gia_nhap_hang'] ?? 0);
-                    $tongThueVat = $tongTienTruocThueVAT * ($data['thue_vat'] ?? 0) / 100;
-                    $tongTien = $tongTienTruocThueVAT + $tongThueVat;
-
-                    $data['tong_tien_hang'] = $tongTienHang;
-                    $data['tong_chiet_khau'] = $tongChietKhau;
-                    $data['tong_tien'] = $tongTien;
-
-                    $dataCreate = $data;
-                    unset($dataCreate['danh_sach_san_pham']);
-                    $result = PhieuNhapKho::create($dataCreate);
-
-                    foreach ($data['danh_sach_san_pham'] as $chiTiet) {
-                        $sanPham = SanPham::find($chiTiet['san_pham_id']);
-                        $chiTiet['phieu_nhap_kho_id'] = $result->id;
-                        $chiTiet['ma_lo_san_pham'] = Helper::generateMaLoSanPham();
-                        ChiTietPhieuNhapKho::create($chiTiet);
-                        if ($checkNgayNhapKho) {
-                            KhoTong::create([
-                                'ma_lo_san_pham' => $chiTiet['ma_lo_san_pham'],
-                                'san_pham_id' => $chiTiet['san_pham_id'],
-                                'don_vi_tinh_id' => $chiTiet['don_vi_tinh_id'],
-                                'so_luong_ton' => $chiTiet['so_luong_nhap'],
-                                'trang_thai' => $sanPham->so_luong_canh_bao > $chiTiet['so_luong_nhap'] ? 1 : 2,
-                            ]);
-                        }
-                    }
-                    break;
-                case 2: // Nhập từ sản xuất
-                    $tongTienHang = 0;
-
-                    $checkNgayNhapKho = $data['ngay_nhap_kho'] <= date('Y-m-d');
-
-                    $sanXuat = SanXuat::find($data['san_xuat_id']);
-
-                    if ($sanXuat) {
-                        if ($sanXuat->so_luong_nhap_kho + $data['danh_sach_san_pham'][0]['so_luong_nhap'] > $sanXuat->so_luong) {
-                            return CustomResponse::error('Số lượng nhập kho vượt quá số lượng sản xuất');
-                        }
-                    }
-
-                    foreach ($data['danh_sach_san_pham'] as $key => $chiTiet) {
-                        $sanPham = SanPham::find($chiTiet['san_pham_id']);
-
-                        $tongTienNhap = $chiTiet['gia_nhap'] * $chiTiet['so_luong_nhap'];
-                        $giaVonDonVi = $chiTiet['gia_nhap'];
-                        $giaBanLeDonVi = $giaVonDonVi * (1 + $sanPham->muc_loi_nhuan / 100);
-                        $loiNhuanBanLe = $giaBanLeDonVi - $giaVonDonVi;
-
-                        $tongTienHang += $tongTienNhap;
-
-                        $data['danh_sach_san_pham'][$key]['tong_tien_nhap'] = $tongTienNhap;
-                        $data['danh_sach_san_pham'][$key]['chiet_khau'] = 0;
-                        $data['danh_sach_san_pham'][$key]['gia_von_don_vi'] = $giaVonDonVi;
-                        $data['danh_sach_san_pham'][$key]['gia_ban_le_don_vi'] = $giaBanLeDonVi;
-                        $data['danh_sach_san_pham'][$key]['loi_nhuan_ban_le'] = $loiNhuanBanLe;
-                    }
-
-                    $data['tong_tien_hang'] = $tongTienHang;
-                    $data['tong_chiet_khau'] = 0;
-                    $data['tong_tien'] = $tongTienHang;
-
-                    $dataCreate = $data;
-                    unset($dataCreate['danh_sach_san_pham']);
-                    $result = PhieuNhapKho::create($dataCreate);
-
-                    foreach ($data['danh_sach_san_pham'] as $chiTiet) {
-                        $sanPham = SanPham::find($chiTiet['san_pham_id']);
-                        $chiTiet['phieu_nhap_kho_id'] = $result->id;
-                        $chiTiet['ma_lo_san_pham'] = Helper::generateMaLoSanPham();
-                        ChiTietPhieuNhapKho::create($chiTiet);
-                        if ($checkNgayNhapKho) {
-                            KhoTong::create([
-                                'ma_lo_san_pham' => $chiTiet['ma_lo_san_pham'],
-                                'san_pham_id' => $chiTiet['san_pham_id'],
-                                'don_vi_tinh_id' => $chiTiet['don_vi_tinh_id'],
-                                'so_luong_ton' => $chiTiet['so_luong_nhap'],
-                                'trang_thai' => $sanPham->so_luong_canh_bao > $chiTiet['so_luong_nhap'] ? 1 : 2,
-                            ]);
-                        }
-                    }
-
-                    $sanXuat->update([
-                        'so_luong_nhap_kho' => $sanXuat->so_luong_nhap_kho + $data['danh_sach_san_pham'][0]['so_luong_nhap'],
-                    ]);
-                    break;
-                default:
-                    return CustomResponse::error('Loại phiếu nhập không hợp lệ');
-            }
-
-            DB::commit();
+                return $this->xuLyChiTietPhieuNhap($phieuNhapKho, $data, 'create');
+            });
 
             return $result;
         } catch (Exception $e) {
-            DB::rollBack();
-
             return CustomResponse::error($e->getMessage());
         }
     }
@@ -209,155 +92,27 @@ class PhieuNhapKhoService
      */
     public function update($id, array $data)
     {
+        $phieuNhapKho = PhieuNhapKho::find($id);
+
+        if (! $phieuNhapKho) {
+            return CustomResponse::error('Phiếu nhập kho không tồn tại');
+        }
+
+        if ($phieuNhapKho->phieuChi()->exists() || $phieuNhapKho->chiTietPhieuChi()->exists()) {
+            throw new Exception('Phiếu nhập kho đã có phiếu chi, không thể cập nhật');
+        }
+
         try {
-            $model = $this->getById($id);
+            DB::transaction(function () use ($phieuNhapKho, &$data) {
+                // Hoàn tác các thay đổi từ phiếu nhập kho cũ
+                $this->hoanTacChiTietPhieuNhap($phieuNhapKho);
 
-            DB::beginTransaction();
+                // Xử lý và cập nhật với dữ liệu mới
+                $this->xuLyChiTietPhieuNhap($phieuNhapKho, $data, 'update');
+            });
 
-            switch ($data['loai_phieu_nhap']) {
-                case 1: // Nhập từ nhà cung cấp
-                    $tongTienHang = 0;
-                    $tongChietKhau = 0;
-
-                    $checkNgayNhapKho = $data['ngay_nhap_kho'] <= date('Y-m-d');
-
-                    foreach ($data['danh_sach_san_pham'] as $key => $chiTiet) {
-                        $sanPham = SanPham::find($chiTiet['san_pham_id']);
-
-                        $tongTienNhap = $chiTiet['gia_nhap'] * $chiTiet['so_luong_nhap'];
-                        $tongChietKhau = $tongTienNhap * $chiTiet['chiet_khau'] / 100;
-                        $thanhTienSauChietKhau = $tongTienNhap - $tongChietKhau;
-                        $giaVonDonVi = $thanhTienSauChietKhau / $chiTiet['so_luong_nhap'];
-                        $giaBanLeDonVi = $giaVonDonVi * (1 + $sanPham->muc_loi_nhuan / 100);
-                        $loiNhuanBanLe = $giaBanLeDonVi - $giaVonDonVi;
-
-                        $tongTienHang += $thanhTienSauChietKhau;
-                        $tongChietKhau += $tongChietKhau;
-
-                        $data['danh_sach_san_pham'][$key]['nha_cung_cap_id'] = $data['nha_cung_cap_id'];
-                        $data['danh_sach_san_pham'][$key]['tong_tien_nhap'] = $tongTienNhap;
-                        $data['danh_sach_san_pham'][$key]['gia_von_don_vi'] = $giaVonDonVi;
-                        $data['danh_sach_san_pham'][$key]['gia_ban_le_don_vi'] = $giaBanLeDonVi;
-                        $data['danh_sach_san_pham'][$key]['loi_nhuan_ban_le'] = $loiNhuanBanLe;
-                    }
-
-                    $tongTienTruocThueVAT = $tongTienHang + ($data['chi_phi_nhap_hang'] ?? 0) - ($data['giam_gia_nhap_hang'] ?? 0);
-                    $tongThueVat = $tongTienTruocThueVAT * ($data['thue_vat'] ?? 0) / 100;
-                    $tongTien = $tongTienTruocThueVAT + $tongThueVat;
-
-                    $data['tong_tien_hang'] = $tongTienHang;
-                    $data['tong_chiet_khau'] = $tongChietKhau;
-                    $data['tong_tien'] = $tongTien;
-
-                    $dataUpdate = $data;
-                    unset($dataUpdate['danh_sach_san_pham']);
-                    $model->update($dataUpdate);
-
-                    $maLoSanPham = $model->chiTietPhieuNhapKhos->pluck('ma_lo_san_pham')->toArray();
-
-                    foreach ($maLoSanPham as $maLoSanPham) {
-                        KhoTong::where('ma_lo_san_pham', $maLoSanPham)->delete();
-                    }
-
-                    ChiTietPhieuNhapKho::where('phieu_nhap_kho_id', $id)->delete();
-
-                    foreach ($data['danh_sach_san_pham'] as $chiTiet) {
-                        $chiTiet['phieu_nhap_kho_id'] = $model->id;
-                        $chiTiet['ma_lo_san_pham'] = Helper::generateMaLoSanPham();
-                        ChiTietPhieuNhapKho::create($chiTiet);
-                        if ($checkNgayNhapKho) {
-                            KhoTong::create([
-                                'ma_lo_san_pham' => $chiTiet['ma_lo_san_pham'],
-                                'san_pham_id' => $chiTiet['san_pham_id'],
-                                'don_vi_tinh_id' => $chiTiet['don_vi_tinh_id'],
-                                'so_luong_ton' => $chiTiet['so_luong_nhap'],
-                            ]);
-                        }
-                    }
-                    break;
-                case 2: // Nhập từ sản xuất
-                    $tongTienHang = 0;
-
-                    $checkNgayNhapKho = $data['ngay_nhap_kho'] <= date('Y-m-d');
-
-                    foreach ($data['danh_sach_san_pham'] as $key => $chiTiet) {
-                        $sanPham = SanPham::find($chiTiet['san_pham_id']);
-
-                        $tongTienNhap = $chiTiet['gia_nhap'] * $chiTiet['so_luong_nhap'];
-                        $giaVonDonVi = $chiTiet['gia_nhap'];
-                        $giaBanLeDonVi = $giaVonDonVi * (1 + $sanPham->muc_loi_nhuan / 100);
-                        $loiNhuanBanLe = $giaBanLeDonVi - $giaVonDonVi;
-
-                        $tongTienHang += $tongTienNhap;
-
-                        $data['danh_sach_san_pham'][$key]['tong_tien_nhap'] = $tongTienNhap;
-                        $data['danh_sach_san_pham'][$key]['chiet_khau'] = 0;
-                        $data['danh_sach_san_pham'][$key]['gia_von_don_vi'] = $giaVonDonVi;
-                        $data['danh_sach_san_pham'][$key]['gia_ban_le_don_vi'] = $giaBanLeDonVi;
-                        $data['danh_sach_san_pham'][$key]['loi_nhuan_ban_le'] = $loiNhuanBanLe;
-                    }
-
-                    $data['tong_tien_hang'] = $tongTienHang;
-                    $data['tong_chiet_khau'] = 0;
-                    $data['tong_tien'] = $tongTienHang;
-
-                    $dataUpdate = $data;
-                    unset($dataUpdate['danh_sach_san_pham']);
-                    $model->update($dataUpdate);
-
-                    $maLoSanPham = $model->chiTietPhieuNhapKhos->pluck('ma_lo_san_pham')->toArray();
-
-                    foreach ($maLoSanPham as $maLoSanPham) {
-                        KhoTong::where('ma_lo_san_pham', $maLoSanPham)->delete();
-                    }
-
-                    $chiTietPhieuNhapKho = ChiTietPhieuNhapKho::where('phieu_nhap_kho_id', $id)->get();
-
-                    foreach ($chiTietPhieuNhapKho as $chiTiet) {
-                        $sanXuatOld = SanXuat::find($model->san_xuat_id);
-                        $sanXuatOld->update([
-                            'so_luong_nhap_kho' => $sanXuatOld->so_luong_nhap_kho - $chiTiet->so_luong_nhap,
-                        ]);
-                        $chiTiet->delete();
-                    }
-
-                    foreach ($data['danh_sach_san_pham'] as $chiTiet) {
-                        $sanPham = SanPham::find($chiTiet['san_pham_id']);
-                        $chiTiet['phieu_nhap_kho_id'] = $model->id;
-                        $chiTiet['ma_lo_san_pham'] = Helper::generateMaLoSanPham();
-                        ChiTietPhieuNhapKho::create($chiTiet);
-                        if ($checkNgayNhapKho) {
-                            KhoTong::create([
-                                'ma_lo_san_pham' => $chiTiet['ma_lo_san_pham'],
-                                'san_pham_id' => $chiTiet['san_pham_id'],
-                                'don_vi_tinh_id' => $chiTiet['don_vi_tinh_id'],
-                                'so_luong_ton' => $chiTiet['so_luong_nhap'],
-                                'trang_thai' => $sanPham->so_luong_canh_bao > $chiTiet['so_luong_nhap'] ? 1 : 2,
-                            ]);
-                        }
-                    }
-                    $sanXuat = SanXuat::find($data['san_xuat_id']);
-
-                    if ($sanXuat) {
-                        if ($sanXuat->so_luong_nhap_kho + $data['danh_sach_san_pham'][0]['so_luong_nhap'] > $sanXuat->so_luong) {
-                            return CustomResponse::error('Số lượng nhập kho vượt quá số lượng sản xuất');
-                        }
-                    }
-
-                    $sanXuat->update([
-                        'so_luong_nhap_kho' => $sanXuat->so_luong_nhap_kho + $data['danh_sach_san_pham'][0]['so_luong_nhap'],
-                    ]);
-                    break;
-                default:
-                    return CustomResponse::error('Loại phiếu nhập không hợp lệ');
-            }
-
-            DB::commit();
-
-            return $model->fresh();
+            return $phieuNhapKho->fresh();
         } catch (Exception $e) {
-            DB::rollBack();
-
             return CustomResponse::error($e->getMessage());
         }
     }
@@ -367,36 +122,217 @@ class PhieuNhapKhoService
      */
     public function delete($id)
     {
+        $phieuNhapKho = PhieuNhapKho::find($id);
+
+        if ($phieuNhapKho->phieuChi()->exists() || $phieuNhapKho->chiTietPhieuChi()->exists()) {
+            throw new Exception('Phiếu nhập kho đã có phiếu chi, không thể xóa');
+        }
+
+        if (! $phieuNhapKho) {
+            return CustomResponse::error('Phiếu nhập kho không tồn tại');
+        }
+
         try {
-            $model = $this->getById($id);
+            DB::transaction(function () use ($phieuNhapKho) {
+                $this->hoanTacChiTietPhieuNhap($phieuNhapKho);
+                $phieuNhapKho->delete();
+            });
 
-            DB::beginTransaction();
-
-            $maLoSanPham = $model->chiTietPhieuNhapKhos->pluck('ma_lo_san_pham')->toArray();
-
-            foreach ($maLoSanPham as $maLoSanPham) {
-                KhoTong::where('ma_lo_san_pham', $maLoSanPham)->delete();
-            }
-
-            $chiTietPhieuNhapKho = ChiTietPhieuNhapKho::where('phieu_nhap_kho_id', $id)->get();
-
-            foreach ($chiTietPhieuNhapKho as $chiTiet) {
-                $sanXuatOld = SanXuat::find($model->san_xuat_id);
-                $sanXuatOld->update([
-                    'so_luong_nhap_kho' => $sanXuatOld->so_luong_nhap_kho - $chiTiet->so_luong_nhap,
-                ]);
-                $chiTiet->delete();
-            }
-
-            $model->delete();
-
-            DB::commit();
-
-            return $model;
+            return $phieuNhapKho;
         } catch (Exception $e) {
             DB::rollBack();
 
             return CustomResponse::error($e->getMessage());
+        }
+    }
+
+    private function xuLyChiTietPhieuNhap(PhieuNhapKho $phieuNhapKho, array &$data, string $mode)
+    {
+        // 1. Validate và chuẩn bị dữ liệu cho danh sách sản phẩm
+        $this->xacThucVaChuanBiDuLieuChiTiet($data, $phieuNhapKho, $mode);
+
+        // 2. Lưu thông tin phiếu nhập kho và các chi tiết của nó
+        $this->luuPhieuNhapKhoVaChiTiet($phieuNhapKho, $data, $mode);
+
+        // 3. Cập nhật số lượng tồn kho và các bảng liên quan
+        $this->capNhatSoLieuSauKhiNhap($phieuNhapKho, $data);
+
+        return $phieuNhapKho;
+    }
+
+    /**
+     * Hoàn tác lại các thay đổi của phiếu nhập kho.
+     * Được sử dụng khi cập nhật hoặc xóa phiếu nhập kho.
+     */
+    private function hoanTacChiTietPhieuNhap(PhieuNhapKho $phieuNhapKho): void
+    {
+        $chiTietPhieuNhapKho = $phieuNhapKho->chiTietPhieuNhapKhos;
+        if ($chiTietPhieuNhapKho->isEmpty()) {
+            return;
+        }
+
+        // Xóa các bản ghi tồn kho tương ứng
+        $maLoSanPham = $chiTietPhieuNhapKho->pluck('ma_lo_san_pham')->all();
+        KhoTong::whereIn('ma_lo_san_pham', $maLoSanPham)->delete();
+
+        // Hoàn tác số lượng đã nhập kho từ sản xuất
+        if ($phieuNhapKho->loai_phieu_nhap == 2 && $phieuNhapKho->san_xuat_id) {
+            $sanXuat = SanXuat::find($phieuNhapKho->san_xuat_id);
+            if ($sanXuat) {
+                $soLuongNhap = $chiTietPhieuNhapKho->sum('so_luong_nhap');
+                $sanXuat->decrement('so_luong_nhap_kho', $soLuongNhap);
+            }
+        }
+
+        // Xóa chi tiết phiếu nhập kho
+        ChiTietPhieuNhapKho::where('phieu_nhap_kho_id', $phieuNhapKho->id)->delete();
+    }
+
+    private function xacThucVaChuanBiDuLieuChiTiet(array &$data, PhieuNhapKho $phieuNhapKho, string $mode)
+    {
+        $danhSachSanPham = collect($data['danh_sach_san_pham']);
+        $sanPhamIds = $danhSachSanPham->pluck('san_pham_id')->unique()->all();
+        $sanPhams = SanPham::whereIn('id', $sanPhamIds)->get()->keyBy('id');
+        $tongTienHang = 0;
+        $tongChietKhau = 0;
+
+        // Xử lý logic dựa trên loại phiếu nhập
+        switch ($data['loai_phieu_nhap']) {
+            case 1: // Nhập từ nhà cung cấp
+                foreach ($data['danh_sach_san_pham'] as &$chiTiet) {
+                    $sanPham = $sanPhams[$chiTiet['san_pham_id']] ?? null;
+                    if (! $sanPham) {
+                        throw new Exception('Sản phẩm với ID '.$chiTiet['san_pham_id'].' không tồn tại.');
+                    }
+
+                    $tongTienNhap = $chiTiet['gia_nhap'] * $chiTiet['so_luong_nhap'];
+                    $tienChietKhau = $tongTienNhap * ($chiTiet['chiet_khau'] ?? 0) / 100;
+                    $thanhTienSauChietKhau = $tongTienNhap - $tienChietKhau;
+                    $giaVonDonVi = $chiTiet['so_luong_nhap'] > 0 ? $thanhTienSauChietKhau / $chiTiet['so_luong_nhap'] : 0;
+                    $giaBanLeDonVi = $giaVonDonVi * (1 + ($sanPham->muc_loi_nhuan ?? 0) / 100);
+
+                    $tongTienHang += $thanhTienSauChietKhau;
+                    $tongChietKhau += $tienChietKhau;
+
+                    $chiTiet['nha_cung_cap_id'] = $data['nha_cung_cap_id'];
+                    $chiTiet['tong_tien_nhap'] = $tongTienNhap;
+                    $chiTiet['gia_von_don_vi'] = $giaVonDonVi;
+                    $chiTiet['gia_ban_le_don_vi'] = $giaBanLeDonVi;
+                    $chiTiet['loi_nhuan_ban_le'] = $giaBanLeDonVi - $giaVonDonVi;
+                }
+                unset($chiTiet); // Hủy tham chiếu
+
+                $tongTienTruocThueVAT = $tongTienHang + ($data['chi_phi_nhap_hang'] ?? 0) - ($data['giam_gia_nhap_hang'] ?? 0);
+                $tongThueVat = $tongTienTruocThueVAT * ($data['thue_vat'] ?? 0) / 100;
+
+                $data['tong_tien_hang'] = $tongTienHang;
+                $data['tong_chiet_khau'] = $tongChietKhau;
+                $data['tong_tien'] = $tongTienTruocThueVAT + $tongThueVat;
+                break;
+
+            case 2: // Nhập từ sản xuất
+                $sanXuatId = $data['san_xuat_id'] ?? null;
+                $sanXuat = $sanXuatId ? SanXuat::find($sanXuatId) : null;
+                if (! $sanXuat) {
+                    throw new Exception('Phiếu sản xuất không tồn tại.');
+                }
+
+                $soLuongNhapMoi = $danhSachSanPham->sum('so_luong_nhap');
+                $soLuongDaNhap = ($mode === 'update') ? ($phieuNhapKho->san_xuat_id == $sanXuatId ? 0 : $sanXuat->so_luong_nhap_kho) : $sanXuat->so_luong_nhap_kho;
+
+                if ($soLuongDaNhap + $soLuongNhapMoi > $sanXuat->so_luong) {
+                    throw new Exception('Số lượng nhập kho vượt quá số lượng sản xuất.');
+                }
+
+                foreach ($data['danh_sach_san_pham'] as &$chiTiet) {
+                    $sanPham = $sanPhams[$chiTiet['san_pham_id']] ?? null;
+                    if (! $sanPham) {
+                        throw new Exception('Sản phẩm với ID '.$chiTiet['san_pham_id'].' không tồn tại.');
+                    }
+
+                    $tongTienNhap = $chiTiet['gia_nhap'] * $chiTiet['so_luong_nhap'];
+                    $giaVonDonVi = $chiTiet['gia_nhap'];
+                    $giaBanLeDonVi = $giaVonDonVi * (1 + ($sanPham->muc_loi_nhuan ?? 0) / 100);
+
+                    $tongTienHang += $tongTienNhap;
+
+                    $chiTiet['tong_tien_nhap'] = $tongTienNhap;
+                    $chiTiet['chiet_khau'] = 0;
+                    $chiTiet['gia_von_don_vi'] = $giaVonDonVi;
+                    $chiTiet['gia_ban_le_don_vi'] = $giaBanLeDonVi;
+                    $chiTiet['loi_nhuan_ban_le'] = $giaBanLeDonVi - $giaVonDonVi;
+                }
+                unset($chiTiet); // Hủy tham chiếu
+
+                $data['tong_tien_hang'] = $tongTienHang;
+                $data['tong_chiet_khau'] = 0;
+                $data['tong_tien'] = $tongTienHang;
+                break;
+
+            default:
+                throw new Exception('Loại phiếu nhập không hợp lệ');
+        }
+    }
+
+    private function luuPhieuNhapKhoVaChiTiet(PhieuNhapKho $phieuNhapKho, array $data, string $mode): void
+    {
+        $phieuNhapKhoData = $data;
+        unset($phieuNhapKhoData['danh_sach_san_pham']);
+
+        if ($mode === 'create') {
+            $phieuNhapKho->fill($phieuNhapKhoData)->save();
+        } else {
+            $phieuNhapKho->update($phieuNhapKhoData);
+        }
+        $phieuNhapKho->refresh();
+
+        $chiTietToInsert = [];
+        foreach ($data['danh_sach_san_pham'] as $chiTiet) {
+            $chiTiet['ma_lo_san_pham'] = Helper::generateMaLoSanPham();
+            $chiTietToInsert[] = $chiTiet;
+        }
+
+        $phieuNhapKho->chiTietPhieuNhapKhos()->createMany($chiTietToInsert);
+    }
+
+    /**
+     * Cập nhật số lượng tồn kho và số liệu các bảng liên quan sau khi nhập.
+     */
+    private function capNhatSoLieuSauKhiNhap(PhieuNhapKho $phieuNhapKho, array $data): void
+    {
+        $checkNgayNhapKho = ($data['ngay_nhap_kho'] ?? $phieuNhapKho->ngay_nhap_kho) <= date('Y-m-d');
+        if (! $checkNgayNhapKho) {
+            return;
+        }
+
+        // Lấy lại các chi tiết vừa tạo để có mã lô
+        $chiTietPhieuNhapKhos = $phieuNhapKho->chiTietPhieuNhapKhos()->get();
+        $sanPhamIds = $chiTietPhieuNhapKhos->pluck('san_pham_id')->unique()->all();
+        $sanPhams = SanPham::whereIn('id', $sanPhamIds)->get()->keyBy('id');
+
+        $khoTongToInsert = [];
+        foreach ($chiTietPhieuNhapKhos as $chiTiet) {
+            $sanPham = $sanPhams[$chiTiet->san_pham_id] ?? null;
+            $khoTongToInsert[] = [
+                'ma_lo_san_pham' => $chiTiet->ma_lo_san_pham,
+                'san_pham_id' => $chiTiet->san_pham_id,
+                'don_vi_tinh_id' => $chiTiet->don_vi_tinh_id,
+                'so_luong_ton' => $chiTiet->so_luong_nhap,
+                'trang_thai' => ($sanPham && $sanPham->so_luong_canh_bao > $chiTiet->so_luong_nhap) ? 1 : 2,
+                'created_at' => now(),
+                'updated_at' => now(),
+                'nguoi_tao' => auth()->user()->id,
+                'nguoi_cap_nhat' => auth()->user()->id,
+            ];
+        }
+        KhoTong::insert($khoTongToInsert);
+
+        if ($phieuNhapKho->loai_phieu_nhap == 2) {
+            $sanXuat = SanXuat::find($phieuNhapKho->san_xuat_id);
+            if ($sanXuat) {
+                $soLuongNhap = $chiTietPhieuNhapKhos->sum('so_luong_nhap');
+                $sanXuat->increment('so_luong_nhap_kho', $soLuongNhap);
+            }
         }
     }
 

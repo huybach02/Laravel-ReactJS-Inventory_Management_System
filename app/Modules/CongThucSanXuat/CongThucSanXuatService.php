@@ -136,7 +136,7 @@ class CongThucSanXuatService
             ])->first();
 
             if ($congThucSanXuat) {
-                return CustomResponse::error('Công thức sản xuất của sản phẩm với đơn vị tính này đã tồn tại');
+                throw new Exception('Công thức sản xuất của sản phẩm với đơn vị tính này đã tồn tại');
             }
 
             $dataCreate = $data;
