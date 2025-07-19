@@ -131,6 +131,7 @@ const SuaPhieuNhapKho = ({
         {
             label: "Nhập từ nhà cung cấp",
             key: "1",
+            disabled: tab === "2",
             children: (
                 <Form
                     id={`formSuaPhieuNhapKho` + "1"}
@@ -148,6 +149,7 @@ const SuaPhieuNhapKho = ({
         {
             label: "Nhập từ sản xuất",
             key: "2",
+            disabled: tab === "1",
             children: (
                 <Form
                     id={`formSuaPhieuNhapKho` + "2"}

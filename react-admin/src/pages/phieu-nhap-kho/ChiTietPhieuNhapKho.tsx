@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { EyeOutlined } from "@ant-design/icons";
 import { useState } from "react";
-import { Button, Form, Modal } from "antd";
+import { Button, Form, Modal, Tabs } from "antd";
 import { getDataById } from "../../services/getData.api";
 import dayjs from "dayjs";
 import FormNhapTuNhaCungCap from "./FormNhapTuNhaCungCap";
+import FormNhapSanXuat from "./FormNhapSanXuat";
 
 const ChiTietPhieuNhapKho = ({
     path,
@@ -17,12 +18,15 @@ const ChiTietPhieuNhapKho = ({
 }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const [form] = Form.useForm();
+    const [tab, setTab] = useState("1");
+    const [formNhapTuNhaCungCap] = Form.useForm();
+    const [formNhapSanXuat] = Form.useForm();
 
     const showModal = async () => {
         setIsModalOpen(true);
         setIsLoading(true);
         const data = await getDataById(id, path);
+        setTab(data.loai_phieu_nhap.toString());
         Object.keys(data).forEach((key) => {
             if (data[key]) {
                 if (
@@ -64,17 +68,62 @@ const ChiTietPhieuNhapKho = ({
             });
         }
 
-        form.setFieldsValue({
-            ...data,
-            danh_sach_san_pham: danhSachSanPham,
-        });
+        switch (data.loai_phieu_nhap) {
+            case 1:
+                formNhapTuNhaCungCap.setFieldsValue({
+                    ...data,
+                    danh_sach_san_pham: danhSachSanPham || [],
+                });
+                break;
+            case 2:
+                formNhapSanXuat.setFieldsValue({
+                    ...data,
+                    danh_sach_san_pham: danhSachSanPham || [],
+                });
+                break;
+        }
         setIsLoading(false);
     };
 
     const handleCancel = () => {
-        form.resetFields();
+        formNhapSanXuat.resetFields();
+        formNhapTuNhaCungCap.resetFields();
         setIsModalOpen(false);
     };
+
+    const items = [
+        {
+            label: "Nhập từ nhà cung cấp",
+            key: "1",
+            disabled: tab === "2",
+            children: (
+                <Form
+                    id={`formSuaPhieuNhapKho` + "1"}
+                    form={formNhapTuNhaCungCap}
+                    layout="vertical"
+                >
+                    <FormNhapTuNhaCungCap
+                        form={formNhapTuNhaCungCap}
+                        isDetail
+                    />
+                </Form>
+            ),
+        },
+        {
+            label: "Nhập từ sản xuất",
+            key: "2",
+            disabled: tab === "1",
+            children: (
+                <Form
+                    id={`formSuaPhieuNhapKho` + "2"}
+                    form={formNhapSanXuat}
+                    layout="vertical"
+                >
+                    <FormNhapSanXuat form={formNhapSanXuat} isDetail />
+                </Form>
+            ),
+        },
+    ];
 
     return (
         <>
@@ -84,9 +133,7 @@ const ChiTietPhieuNhapKho = ({
                 size="small"
                 title={`Chi tiết ${title}`}
                 icon={<EyeOutlined />}
-                style={{
-                    marginRight: 5,
-                }}
+                style={{ marginRight: 5 }}
             />
             <Modal
                 title={`Chi tiết ${title}`}
@@ -98,13 +145,12 @@ const ChiTietPhieuNhapKho = ({
                 width={1800}
                 footer={null}
             >
-                <Form
-                    id={`formChiTietPhieuNhapKho-${id}`}
-                    form={form}
-                    layout="vertical"
-                >
-                    <FormNhapTuNhaCungCap form={form} isDetail={true} />
-                </Form>
+                <Tabs
+                    type="card"
+                    items={items}
+                    activeKey={tab.toString()}
+                    onChange={() => {}}
+                />
             </Modal>
         </>
     );

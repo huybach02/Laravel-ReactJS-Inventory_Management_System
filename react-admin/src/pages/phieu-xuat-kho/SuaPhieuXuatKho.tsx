@@ -119,6 +119,7 @@ const SuaPhieuXuatKho = ({
         {
             label: "Xuất theo đơn hàng",
             key: "1",
+            disabled: Number(tab) === 2 || Number(tab) === 3,
             children: (
                 <Form
                     id={"formPhieuXuatKhoUpdate" + "1"}
@@ -133,6 +134,7 @@ const SuaPhieuXuatKho = ({
         {
             label: "Xuất hủy",
             key: "2",
+            disabled: Number(tab) === 1 || Number(tab) === 3,
             children: (
                 <Form
                     id={"formPhieuXuatKhoUpdate" + "2"}
@@ -147,6 +149,7 @@ const SuaPhieuXuatKho = ({
         {
             label: "Xuất nguyên liệu sản xuất",
             key: "3",
+            disabled: Number(tab) === 1 || Number(tab) === 2,
             children: (
                 <Form
                     id={"formPhieuXuatKhoUpdate" + "3"}
