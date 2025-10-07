@@ -3,6 +3,7 @@
 use App\Class\CustomResponse;
 use App\Http\Controllers\api\AuthController;
 use App\Http\Controllers\api\CauHinhChungController;
+use App\Http\Controllers\api\DashboardController;
 use App\Http\Controllers\api\LichSuImportController;
 use App\Http\Controllers\api\ThoiGianLamViecController;
 use App\Http\Controllers\api\UploadController;
@@ -32,6 +33,9 @@ Route::group([
     Route::post('me', [AuthController::class, 'me']);
     Route::post('profile', [AuthController::class, 'updateProfile']);
   });
+
+  // Dashboard
+  Route::get('dashboard', [DashboardController::class, 'index']);
 
   // Lấy danh sách phân quyền
   Route::get('danh-sach-phan-quyen', function () {

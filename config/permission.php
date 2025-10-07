@@ -1,6 +1,13 @@
 <?php
 
 return [
+  [
+    "name" => "dashboard",
+    "actions" => [
+      "index" => true,
+      "showMenu" => true
+    ]
+  ],
           [
     "name" => "san-xuat",
     "actions" => [

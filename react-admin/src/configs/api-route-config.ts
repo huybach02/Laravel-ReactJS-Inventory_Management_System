@@ -1,4 +1,5 @@
 export const API_ROUTE_CONFIG = {
+    DASHBOARD: "/dashboard",
     UPLOAD_SINGLE: "/upload/single",
     UPLOAD_MULTIPLE: "/upload/multiple",
     LOGIN: "/auth/login",

@@ -35,7 +35,7 @@ export const sidebarConfig = (navigate: NavigateFunction) => {
     return [
         {
             key: "dashboard",
-            label: "Thống kê",
+            label: "Tổng quan",
             icon: React.createElement(LayoutDashboard, { style: iconStyle }),
             onClick: () => navigate(URL_CONSTANTS.DASHBOARD),
         },
