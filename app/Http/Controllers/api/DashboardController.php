@@ -72,10 +72,18 @@ class DashboardController extends Controller
 
         SELECT
             'Sản phẩm sắp hết hàng',
-            COUNT(*),
+            COUNT(DISTINCT sp.id),
             'sản phẩm'
-        FROM san_phams
-        WHERE tong_so_luong_thuc_te <= so_luong_canh_bao AND trang_thai = 1
+        FROM san_phams sp
+        LEFT JOIN (
+            SELECT
+                san_pham_id,
+                SUM(so_luong_ton) as tong_so_luong_thuc_te
+                FROM kho_tongs
+                GROUP BY san_pham_id
+        ) kt ON sp.id = kt.san_pham_id
+        WHERE COALESCE(kt.tong_so_luong_thuc_te, 0) <= sp.so_luong_canh_bao
+          AND sp.trang_thai = 1
 
         UNION ALL
 

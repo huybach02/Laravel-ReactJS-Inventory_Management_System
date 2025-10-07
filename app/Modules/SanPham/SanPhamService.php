@@ -18,15 +18,20 @@ class SanPhamService
   public function getAll(array $params = [])
   {
     try {
-      // Tạo query cơ bản với JOIN và GROUP BY
+      // Tạo query cơ bản với subquery để tránh duplicate data
       $query = SanPham::query()
         ->withoutGlobalScopes(['withUserNames'])
         ->with('images', 'danhMuc:id,ten_danh_muc')
         ->leftJoin('users as nguoi_tao', 'san_phams.nguoi_tao', '=', 'nguoi_tao.id')
         ->leftJoin('users as nguoi_cap_nhat', 'san_phams.nguoi_cap_nhat', '=', 'nguoi_cap_nhat.id')
-        ->leftJoin('chi_tiet_phieu_nhap_khos', 'san_phams.id', '=', 'chi_tiet_phieu_nhap_khos.san_pham_id')
-        ->leftJoin('kho_tongs', 'san_phams.id', '=', 'kho_tongs.san_pham_id')
-        ->groupBy('san_phams.id');
+        ->leftJoin(
+          DB::raw('(SELECT san_pham_id, SUM(so_luong_nhap) as tong_nhap FROM chi_tiet_phieu_nhap_khos GROUP BY san_pham_id) as nhap_kho_summary'),
+          'san_phams.id', '=', 'nhap_kho_summary.san_pham_id'
+        )
+        ->leftJoin(
+          DB::raw('(SELECT san_pham_id, SUM(so_luong_ton) as tong_ton FROM kho_tongs GROUP BY san_pham_id) as kho_ton_summary'),
+          'san_phams.id', '=', 'kho_ton_summary.san_pham_id'
+        );
 
       // Sử dụng FilterWithPagination để xử lý filter và pagination
       $result = FilterWithPagination::findWithPagination(
@@ -36,8 +41,8 @@ class SanPhamService
           'san_phams.*',
           'nguoi_tao.name as ten_nguoi_tao',
           'nguoi_cap_nhat.name as ten_nguoi_cap_nhat',
-          DB::raw('COALESCE(SUM(chi_tiet_phieu_nhap_khos.so_luong_nhap), 0) as tong_so_luong_nhap'),
-          DB::raw('COALESCE(SUM(kho_tongs.so_luong_ton), 0) as tong_so_luong_thuc_te')
+          DB::raw('COALESCE(nhap_kho_summary.tong_nhap, 0) as tong_so_luong_nhap'),
+          DB::raw('COALESCE(kho_ton_summary.tong_ton, 0) as tong_so_luong_thuc_te')
         ]
       );
 

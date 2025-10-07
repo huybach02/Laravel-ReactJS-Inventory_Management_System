@@ -284,7 +284,7 @@ const DashboardPage = () => {
                 </Col>
                 <Col span={6}>
                     <Card
-                        title="Sản phẩm sắp hết hàng"
+                        title="Sản phẩm/nguyên liệu sắp hết hàng"
                         variant="borderless"
                         style={cardStyles[5]}
                         headStyle={{
@@ -305,8 +305,8 @@ const DashboardPage = () => {
                         </div>
                         <div style={{ fontSize: "14px", color: "#718096" }}>
                             {data["Sản phẩm sắp hết hàng"]?.don_vi ||
-                                "sản phẩm"}{" "}
-                            cần nhập thêm
+                                "sản phẩm"}
+                            /nguyên liệu cần nhập thêm
                         </div>
                     </Card>
                 </Col>
