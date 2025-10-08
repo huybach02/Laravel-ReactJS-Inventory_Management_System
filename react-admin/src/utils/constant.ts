@@ -2,7 +2,7 @@ export const KEY_URL_VALID = ["dashboard", "profile", "lich-su-import"];
 
 export const DATA_CONSTANTS = {
     WEBSITE_NAME: "IMS",
-    PANEL_NAME: "Trang quản trị",
+    PANEL_NAME: "Quản lý kho hàng",
 };
 
 export const OPTIONS_STATUS = [

@@ -50,7 +50,7 @@ const AuthLayout = ({
                             padding: "6px 15px",
                         }}
                     >
-                        TRANG QUẢN TRỊ
+                        QUẢN LÝ KHO HÀNG
                     </Tag>
                     <Typography.Title level={4} style={{ margin: 0 }}>
                         {title}

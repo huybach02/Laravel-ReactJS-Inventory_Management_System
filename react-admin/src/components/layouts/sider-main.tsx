@@ -88,7 +88,7 @@ const SiderMain = ({
                         whiteSpace: "nowrap",
                     }}
                 >
-                    TRANG QUẢN TRỊ
+                    QUẢN LÝ KHO HÀNG
                 </Tag>
             </Flex>
             <Menu

@@ -1,6 +1,6 @@
 import { Outlet } from "react-router-dom";
 import AuthMiddleware from "../../middlewares/AuthMiddleware";
-import { Layout, theme, type MenuProps, Row, Col } from "antd";
+import { Layout, theme, type MenuProps, Row, Col, Typography } from "antd";
 
 import { useState } from "react";
 import { useResponsive } from "../../hooks/useReponsive";
@@ -130,6 +130,26 @@ const MainLayout = () => {
                                 </Row>
                             </div>
                         </Content>
+                        <div
+                            className="version"
+                            style={{
+                                width: "100%",
+                                textAlign: "center",
+                                padding: "20px",
+                                boxShadow: "0 1px 4px rgba(0,21,41,.08)",
+                            }}
+                        >
+                            <Typography.Text
+                                style={{
+                                    fontWeight: 500,
+                                    padding: "10px 20px",
+                                    border: "1px solid #001529",
+                                    borderRadius: "8px",
+                                }}
+                            >
+                                Version 1.0.0 | Made by Huy Bách
+                            </Typography.Text>
+                        </div>
                     </Layout>
                 </Layout>
             </PermissionMiddleware>
