@@ -122,7 +122,7 @@ export const revenueProductColumns = [
     },
 ];
 
-export const chartDataConfig = (chartData: any) => {
+export const chartDataConfig = (chartData: any, isMobile: boolean = false) => {
     return {
         labels: chartData.labels,
         datasets: [
@@ -131,39 +131,57 @@ export const chartDataConfig = (chartData: any) => {
                 data: chartData.doanhThu,
                 backgroundColor: "rgba(59, 130, 246, 0.6)",
                 borderColor: "rgba(59, 130, 246, 1)",
-                borderWidth: 2,
+                borderWidth: isMobile ? 1 : 2,
                 yAxisID: "y",
-                barThickness: 30,
+                barThickness: isMobile ? 15 : 30,
+                maxBarThickness: isMobile ? 20 : 40,
             },
             {
                 label: "Số lượng đơn hàng",
                 data: chartData.donHang,
                 backgroundColor: "rgba(34, 197, 94, 0.6)",
                 borderColor: "rgba(34, 197, 94, 1)",
-                borderWidth: 2,
+                borderWidth: isMobile ? 1 : 2,
                 yAxisID: "y1",
-                barThickness: 30,
+                barThickness: isMobile ? 15 : 30,
+                maxBarThickness: isMobile ? 20 : 40,
             },
         ],
     };
 };
 
-export const chartOptions = (selectedYear: number) => {
+export const chartOptions = (
+    selectedYear: number,
+    isMobile: boolean = false
+) => {
     return {
         responsive: true,
+        maintainAspectRatio: false,
         plugins: {
             legend: {
                 position: "top" as const,
+                labels: {
+                    font: {
+                        size: isMobile ? 10 : 12,
+                    },
+                    padding: isMobile ? 10 : 20,
+                },
             },
             title: {
-                display: true,
+                display: !isMobile, // Ẩn title trên mobile để tiết kiệm không gian
                 text: `Biểu đồ Doanh thu và Số lượng đơn hàng theo tháng (${selectedYear})`,
                 font: {
-                    size: 16,
+                    size: isMobile ? 12 : 16,
                     weight: "bold" as const,
                 },
             },
             tooltip: {
+                titleFont: {
+                    size: isMobile ? 10 : 12,
+                },
+                bodyFont: {
+                    size: isMobile ? 9 : 11,
+                },
                 callbacks: {
                     label: function (context: any) {
                         const label = context.dataset.label || "";
@@ -180,8 +198,18 @@ export const chartOptions = (selectedYear: number) => {
         scales: {
             x: {
                 title: {
-                    display: true,
+                    display: !isMobile, // Ẩn title trên mobile
                     text: "Tháng",
+                    font: {
+                        size: isMobile ? 9 : 12,
+                    },
+                },
+                ticks: {
+                    font: {
+                        size: isMobile ? 8 : 10,
+                    },
+                    maxRotation: isMobile ? 45 : 0,
+                    minRotation: isMobile ? 45 : 0,
                 },
             },
             y: {
@@ -189,11 +217,26 @@ export const chartOptions = (selectedYear: number) => {
                 display: true,
                 position: "left" as const,
                 title: {
-                    display: true,
-                    text: "Doanh thu (VNĐ)",
+                    display: !isMobile,
+                    text: isMobile ? "VNĐ" : "Doanh thu (VNĐ)",
+                    font: {
+                        size: isMobile ? 8 : 12,
+                    },
                 },
                 ticks: {
+                    font: {
+                        size: isMobile ? 7 : 9,
+                    },
                     callback: function (value: any) {
+                        if (isMobile) {
+                            // Rút gọn format cho mobile
+                            if (value >= 1000000) {
+                                return (value / 1000000).toFixed(1) + "M";
+                            } else if (value >= 1000) {
+                                return (value / 1000).toFixed(0) + "K";
+                            }
+                            return value;
+                        }
                         return formatter(value) + " đ";
                     },
                 },
@@ -203,14 +246,23 @@ export const chartOptions = (selectedYear: number) => {
                 display: true,
                 position: "right" as const,
                 title: {
-                    display: true,
-                    text: "Số lượng đơn hàng",
+                    display: !isMobile,
+                    text: isMobile ? "Đơn" : "Số lượng đơn hàng",
+                    font: {
+                        size: isMobile ? 8 : 12,
+                    },
                 },
                 grid: {
                     drawOnChartArea: false,
                 },
                 ticks: {
+                    font: {
+                        size: isMobile ? 7 : 9,
+                    },
                     callback: function (value: any) {
+                        if (isMobile) {
+                            return value;
+                        }
                         return formatter(value) + " đơn";
                     },
                 },

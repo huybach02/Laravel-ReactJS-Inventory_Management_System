@@ -5,7 +5,7 @@ import { Row } from "antd";
 import Heading from "../components/heading";
 import { API_ROUTE_CONFIG } from "../configs/api-route-config";
 import { getListData } from "../services/getData.api";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -23,6 +23,7 @@ import {
     revenueProductColumns,
     sellingProductColumns,
 } from "../utils/dashboard";
+import { useResponsive } from "../hooks/useReponsive";
 
 ChartJS.register(
     CategoryScale,
@@ -50,19 +51,14 @@ const DashboardPage = () => {
     const [selectedYear, setSelectedYear] = useState<number>(
         new Date().getFullYear()
     );
+    const { isMobile } = useResponsive();
 
-    const getConfigData = async (year?: number) => {
+    // Lấy dữ liệu ban đầu (cards và bảng - không phụ thuộc năm)
+    const getInitialData = useCallback(async () => {
         try {
-            // Nếu có year parameter, chỉ loading cho chart
-            if (year) {
-                setChartLoading(true);
-            } else {
-                // Lần đầu load, loading cho cả trang
-                setLoading(true);
-            }
-
-            const yearParam = year || selectedYear;
-            const url = `${path}?year=${yearParam}`;
+            setLoading(true);
+            const currentYear = new Date().getFullYear();
+            const url = `${path}?year=${currentYear}`;
             const res: any = await getListData(url);
             if (res) {
                 setData(res.statistics || {});
@@ -71,7 +67,7 @@ const DashboardPage = () => {
                         labels: [],
                         doanhThu: [],
                         donHang: [],
-                        year: yearParam,
+                        year: currentYear,
                     }
                 );
                 setTopSellingProducts(res.topSellingProducts || []);
@@ -80,23 +76,43 @@ const DashboardPage = () => {
         } catch (error) {
             console.error("Lỗi khi lấy dữ liệu dashboard:", error);
         } finally {
-            if (year) {
-                setChartLoading(false);
-            } else {
-                setLoading(false);
-            }
+            setLoading(false);
         }
-    };
+    }, []); // Không có dependency để tránh chạy lại khi selectedYear thay đổi
 
-    // Khởi tạo giá trị mặc định cho form
-    useEffect(() => {
-        getConfigData();
+    // Lấy dữ liệu biểu đồ theo năm (chỉ chart data)
+    const getChartData = useCallback(async (year: number) => {
+        try {
+            setChartLoading(true);
+            const url = `${path}?year=${year}`;
+            const res: any = await getListData(url);
+            if (res) {
+                // Chỉ cập nhật dữ liệu biểu đồ
+                setChartData(
+                    res.chartData || {
+                        labels: [],
+                        doanhThu: [],
+                        donHang: [],
+                        year: year,
+                    }
+                );
+            }
+        } catch (error) {
+            console.error("Lỗi khi lấy dữ liệu biểu đồ:", error);
+        } finally {
+            setChartLoading(false);
+        }
     }, []);
 
-    // Xử lý thay đổi năm
+    // Khởi tạo dữ liệu ban đầu
+    useEffect(() => {
+        getInitialData();
+    }, [getInitialData]);
+
+    // Xử lý thay đổi năm - chỉ cập nhật biểu đồ
     const handleYearChange = (year: number) => {
         setSelectedYear(year);
-        getConfigData(year);
+        getChartData(year);
     };
 
     // Tạo danh sách các năm (từ 2020 đến năm hiện tại + 1)
@@ -129,7 +145,7 @@ const DashboardPage = () => {
         <>
             <Heading title="Tổng quan" />
             <Row gutter={[16, 16]}>
-                <Col span={6}>
+                <Col xs={24} sm={24} md={6} lg={6} xl={6}>
                     <Card
                         title="Đơn hàng hôm nay"
                         variant="borderless"
@@ -137,23 +153,23 @@ const DashboardPage = () => {
                         headStyle={{
                             color: "#2d3748",
                             borderBottom: "none",
-                            fontSize: "18px",
+                            fontSize: "16px",
                             fontWeight: "600",
                         }}
                         bodyStyle={{ color: "#4a5568" }}
                         loading={loading}
                     >
-                        <div style={{ fontSize: "24px", fontWeight: "bold" }}>
+                        <div style={{ fontSize: "20px", fontWeight: "bold" }}>
                             {data["Đơn hàng hôm nay"]
                                 ? formatNumber(data["Đơn hàng hôm nay"].gia_tri)
                                 : "0"}
                         </div>
-                        <div style={{ fontSize: "14px", color: "#718096" }}>
+                        <div style={{ fontSize: "12px", color: "#718096" }}>
                             {data["Đơn hàng hôm nay"]?.don_vi || "đơn"}
                         </div>
                     </Card>
                 </Col>
-                <Col span={6}>
+                <Col xs={24} sm={24} md={6} lg={6} xl={6}>
                     <Card
                         title="Doanh thu hôm nay"
                         variant="borderless"
@@ -161,25 +177,25 @@ const DashboardPage = () => {
                         headStyle={{
                             color: "#2d3748",
                             borderBottom: "none",
-                            fontSize: "18px",
+                            fontSize: "16px",
                             fontWeight: "600",
                         }}
                         bodyStyle={{ color: "#4a5568" }}
                         loading={loading}
                     >
-                        <div style={{ fontSize: "24px", fontWeight: "bold" }}>
+                        <div style={{ fontSize: "20px", fontWeight: "bold" }}>
                             {data["Doanh thu hôm nay"]
                                 ? formatCurrency(
                                       data["Doanh thu hôm nay"].gia_tri
                                   )
                                 : "₫0"}
                         </div>
-                        <div style={{ fontSize: "14px", color: "#718096" }}>
+                        <div style={{ fontSize: "12px", color: "#718096" }}>
                             hôm nay
                         </div>
                     </Card>
                 </Col>
-                <Col span={6}>
+                <Col xs={24} sm={24} md={6} lg={6} xl={6}>
                     <Card
                         title="Tổng số khách hàng"
                         variant="borderless"
@@ -187,25 +203,25 @@ const DashboardPage = () => {
                         headStyle={{
                             color: "#2d3748",
                             borderBottom: "none",
-                            fontSize: "18px",
+                            fontSize: "16px",
                             fontWeight: "600",
                         }}
                         bodyStyle={{ color: "#4a5568" }}
                         loading={loading}
                     >
-                        <div style={{ fontSize: "24px", fontWeight: "bold" }}>
+                        <div style={{ fontSize: "20px", fontWeight: "bold" }}>
                             {data["Tổng số khách hàng"]
                                 ? formatNumber(
                                       data["Tổng số khách hàng"].gia_tri
                                   )
                                 : "0"}
                         </div>
-                        <div style={{ fontSize: "14px", color: "#718096" }}>
+                        <div style={{ fontSize: "12px", color: "#718096" }}>
                             {data["Tổng số khách hàng"]?.don_vi || "khách"}
                         </div>
                     </Card>
                 </Col>
-                <Col span={6}>
+                <Col xs={24} sm={24} md={6} lg={6} xl={6}>
                     <Card
                         title="Khách hàng mới hôm nay"
                         variant="borderless"
@@ -213,28 +229,31 @@ const DashboardPage = () => {
                         headStyle={{
                             color: "#2d3748",
                             borderBottom: "none",
-                            fontSize: "18px",
+                            fontSize: "16px",
                             fontWeight: "600",
                         }}
                         bodyStyle={{ color: "#4a5568" }}
                         loading={loading}
                     >
-                        <div style={{ fontSize: "24px", fontWeight: "bold" }}>
+                        <div style={{ fontSize: "20px", fontWeight: "bold" }}>
                             {data["Khách hàng mới hôm nay"]
                                 ? formatNumber(
                                       data["Khách hàng mới hôm nay"].gia_tri
                                   )
                                 : "0"}
                         </div>
-                        <div style={{ fontSize: "14px", color: "#718096" }}>
+                        <div style={{ fontSize: "12px", color: "#718096" }}>
                             {data["Khách hàng mới hôm nay"]?.don_vi || "khách"}{" "}
                             mới
                         </div>
                     </Card>
                 </Col>
             </Row>
-            <Row gutter={[16, 16]} style={{ marginTop: "16px" }}>
-                <Col span={6}>
+            <Row
+                gutter={[16, 16]}
+                style={{ marginTop: isMobile ? "12px" : "16px" }}
+            >
+                <Col xs={24} sm={24} md={6} lg={6} xl={6}>
                     <Card
                         title="Số nhà cung cấp"
                         variant="borderless"
@@ -242,23 +261,23 @@ const DashboardPage = () => {
                         headStyle={{
                             color: "#2d3748",
                             borderBottom: "none",
-                            fontSize: "18px",
+                            fontSize: "16px",
                             fontWeight: "600",
                         }}
                         bodyStyle={{ color: "#4a5568" }}
                         loading={loading}
                     >
-                        <div style={{ fontSize: "24px", fontWeight: "bold" }}>
+                        <div style={{ fontSize: "20px", fontWeight: "bold" }}>
                             {data["Số nhà cung cấp"]
                                 ? formatNumber(data["Số nhà cung cấp"].gia_tri)
                                 : "0"}
                         </div>
-                        <div style={{ fontSize: "14px", color: "#718096" }}>
+                        <div style={{ fontSize: "12px", color: "#718096" }}>
                             {data["Số nhà cung cấp"]?.don_vi || "nhà cung cấp"}
                         </div>
                     </Card>
                 </Col>
-                <Col span={6}>
+                <Col xs={24} sm={24} md={6} lg={6} xl={6}>
                     <Card
                         title="Tổng số sản phẩm"
                         variant="borderless"
@@ -266,23 +285,23 @@ const DashboardPage = () => {
                         headStyle={{
                             color: "#2d3748",
                             borderBottom: "none",
-                            fontSize: "18px",
+                            fontSize: "16px",
                             fontWeight: "600",
                         }}
                         bodyStyle={{ color: "#4a5568" }}
                         loading={loading}
                     >
-                        <div style={{ fontSize: "24px", fontWeight: "bold" }}>
+                        <div style={{ fontSize: "20px", fontWeight: "bold" }}>
                             {data["Tổng số sản phẩm"]
                                 ? formatNumber(data["Tổng số sản phẩm"].gia_tri)
                                 : "0"}
                         </div>
-                        <div style={{ fontSize: "14px", color: "#718096" }}>
+                        <div style={{ fontSize: "12px", color: "#718096" }}>
                             {data["Tổng số sản phẩm"]?.don_vi || "sản phẩm"}
                         </div>
                     </Card>
                 </Col>
-                <Col span={6}>
+                <Col xs={24} sm={24} md={6} lg={6} xl={6}>
                     <Card
                         title="Sản phẩm/nguyên liệu sắp hết hàng"
                         variant="borderless"
@@ -290,27 +309,27 @@ const DashboardPage = () => {
                         headStyle={{
                             color: "#2d3748",
                             borderBottom: "none",
-                            fontSize: "18px",
+                            fontSize: "16px",
                             fontWeight: "600",
                         }}
                         bodyStyle={{ color: "#4a5568" }}
                         loading={loading}
                     >
-                        <div style={{ fontSize: "24px", fontWeight: "bold" }}>
+                        <div style={{ fontSize: "20px", fontWeight: "bold" }}>
                             {data["Sản phẩm sắp hết hàng"]
                                 ? formatNumber(
                                       data["Sản phẩm sắp hết hàng"].gia_tri
                                   )
                                 : "0"}
                         </div>
-                        <div style={{ fontSize: "14px", color: "#718096" }}>
+                        <div style={{ fontSize: "12px", color: "#718096" }}>
                             {data["Sản phẩm sắp hết hàng"]?.don_vi ||
                                 "sản phẩm"}
                             /nguyên liệu cần nhập thêm
                         </div>
                     </Card>
                 </Col>
-                <Col span={6}>
+                <Col xs={24} sm={24} md={6} lg={6} xl={6}>
                     <Card
                         title="Số công thức sản xuất"
                         variant="borderless"
@@ -318,20 +337,20 @@ const DashboardPage = () => {
                         headStyle={{
                             color: "#2d3748",
                             borderBottom: "none",
-                            fontSize: "18px",
+                            fontSize: "16px",
                             fontWeight: "600",
                         }}
                         bodyStyle={{ color: "#4a5568" }}
                         loading={loading}
                     >
-                        <div style={{ fontSize: "24px", fontWeight: "bold" }}>
+                        <div style={{ fontSize: "20px", fontWeight: "bold" }}>
                             {data["Số công thức sản xuất"]
                                 ? formatNumber(
                                       data["Số công thức sản xuất"].gia_tri
                                   )
                                 : "0"}
                         </div>
-                        <div style={{ fontSize: "14px", color: "#718096" }}>
+                        <div style={{ fontSize: "12px", color: "#718096" }}>
                             {data["Số công thức sản xuất"]?.don_vi ||
                                 "công thức"}
                         </div>
@@ -340,20 +359,22 @@ const DashboardPage = () => {
             </Row>
 
             {/* Biểu đồ */}
-            <Row style={{ marginTop: "24px" }}>
+            <Row style={{ marginTop: isMobile ? "16px" : "24px" }}>
                 <Col span={24}>
                     <div
                         style={{
                             display: "flex",
+                            flexDirection: isMobile ? "column" : "row",
                             justifyContent: "space-between",
-                            alignItems: "center",
+                            alignItems: isMobile ? "flex-start" : "center",
                             marginBottom: "16px",
+                            gap: isMobile ? "12px" : "0",
                         }}
                     >
                         <h3
                             style={{
                                 margin: 0,
-                                fontSize: "18px",
+                                fontSize: isMobile ? "16px" : "18px",
                                 fontWeight: "600",
                                 color: "#2d3748",
                             }}
@@ -364,7 +385,7 @@ const DashboardPage = () => {
                             value={selectedYear}
                             onChange={handleYearChange}
                             options={generateYearOptions()}
-                            style={{ width: 150 }}
+                            style={{ width: isMobile ? "100%" : 150 }}
                             placeholder="Chọn năm"
                             disabled={chartLoading}
                         />
@@ -386,18 +407,29 @@ const DashboardPage = () => {
                             fontWeight: "600",
                         }}
                         bodyStyle={{
-                            padding: "24px",
-                            minHeight: "400px",
+                            padding: isMobile ? "12px" : "24px",
+                            minHeight: isMobile ? "300px" : "400px",
                         }}
                         loading={chartLoading}
                     >
                         {!chartLoading &&
                         !loading &&
                         chartData.labels.length > 0 ? (
-                            <Bar
-                                data={chartDataConfig(chartData)}
-                                options={chartOptions(selectedYear)}
-                            />
+                            <div
+                                style={{
+                                    position: "relative",
+                                    height: isMobile ? "250px" : "350px",
+                                    width: "100%",
+                                }}
+                            >
+                                <Bar
+                                    data={chartDataConfig(chartData, isMobile)}
+                                    options={chartOptions(
+                                        selectedYear,
+                                        isMobile
+                                    )}
+                                />
+                            </div>
                         ) : !chartLoading && !loading ? (
                             <div
                                 style={{
@@ -415,8 +447,11 @@ const DashboardPage = () => {
             </Row>
 
             {/* Bảng thống kê sản phẩm */}
-            <Row gutter={[16, 16]} style={{ marginTop: "24px" }}>
-                <Col span={12}>
+            <Row
+                gutter={[16, 16]}
+                style={{ marginTop: isMobile ? "16px" : "24px" }}
+            >
+                <Col xs={24} sm={24} md={12} lg={12} xl={12}>
                     <Card
                         title="Top 10 sản phẩm bán chạy nhất"
                         variant="borderless"
@@ -430,11 +465,11 @@ const DashboardPage = () => {
                         headStyle={{
                             color: "#2d3748",
                             borderBottom: "1px solid #bae6fd",
-                            fontSize: "16px",
+                            fontSize: "14px",
                             fontWeight: "600",
                         }}
                         bodyStyle={{
-                            padding: "16px",
+                            padding: isMobile ? "12px" : "16px",
                         }}
                         loading={loading}
                     >
@@ -444,12 +479,15 @@ const DashboardPage = () => {
                             pagination={false}
                             size="small"
                             rowKey="ma_san_pham"
-                            scroll={{ y: 400 }}
+                            scroll={{
+                                y: isMobile ? 300 : 400,
+                                x: isMobile ? 300 : undefined,
+                            }}
                             loading={loading}
                         />
                     </Card>
                 </Col>
-                <Col span={12}>
+                <Col xs={24} sm={24} md={12} lg={12} xl={12}>
                     <Card
                         title="Top 10 sản phẩm có doanh thu cao nhất"
                         variant="borderless"
@@ -463,11 +501,11 @@ const DashboardPage = () => {
                         headStyle={{
                             color: "#2d3748",
                             borderBottom: "1px solid #86efac",
-                            fontSize: "16px",
+                            fontSize: "14px",
                             fontWeight: "600",
                         }}
                         bodyStyle={{
-                            padding: "16px",
+                            padding: isMobile ? "12px" : "16px",
                         }}
                         loading={loading}
                     >
@@ -477,7 +515,10 @@ const DashboardPage = () => {
                             pagination={false}
                             size="small"
                             rowKey="ma_san_pham"
-                            scroll={{ y: 400 }}
+                            scroll={{
+                                y: isMobile ? 300 : 400,
+                                x: isMobile ? 300 : undefined,
+                            }}
                             loading={loading}
                         />
                     </Card>
