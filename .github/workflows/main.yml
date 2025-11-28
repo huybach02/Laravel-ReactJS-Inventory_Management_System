@@ -22,7 +22,7 @@ jobs:
             # 2. Fix lỗi ownership
             sudo git config --global --add safe.directory /www/wwwroot/ims-api.huybach02.io.vn
 
-            # 3. Kéo code
+            # 3. Kéo code từ github
             sudo git pull origin main
 
             # 4. Cài đặt thư viện (Dùng user hiện tại hoặc sudo nếu cần)
