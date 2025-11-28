@@ -1,8 +1,8 @@
-name: Next Deployment
+name: Deploy to aaPanel
 
 on:
   push:
-    branches: [main]
+    branches: [ "main" ]
 
 jobs:
   deploy:
@@ -12,15 +12,33 @@ jobs:
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOST }}
-          username: ${{ secrets.SSH_USERNAME }}
+          username: ${{ secrets.SSH_USERNAME }} # Thường là root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_PORT }}
           script: |
-            cd ~/services/Laravel-ReactJS-Inventory_Management_System
-            git fetch origin
-            git checkout main
-            git pull
-            sudo docker rm -f ims-service || true
-            sudo docker image rm ims-service || true
-            sudo docker build -t ims-service .
-            sudo docker run -d --name ims-service -p 8080:80 ims-service
+            # 1. Đi vào thư mục dự án
+            cd /www/wwwroot/ims-api.huybach02.io.vn
+
+            # 2. Fix lỗi ownership
+            sudo git config --global --add safe.directory /www/wwwroot/ims-api.huybach02.io.vn
+
+            # 3. Kéo code
+            sudo git pull origin main
+
+            # 4. Cài đặt thư viện (Dùng user hiện tại hoặc sudo nếu cần)
+            export COMPOSER_ALLOW_SUPERUSER=1
+            sudo composer install --no-dev --optimize-autoloader
+
+            # 5. Migration (Thêm sudo để ghi file log nếu cần)
+            sudo php artisan migrate --force
+
+            # 6. Clear cache
+            sudo php artisan optimize:clear
+            sudo php artisan config:cache
+            sudo php artisan route:cache
+
+            # 7. Phân quyền lại (QUAN TRỌNG: Cần sudo vì user ubuntu không có quyền đổi chủ)
+            sudo chown -R www:www /www/wwwroot/ims-api.huybach02.io.vn
+            sudo chmod -R 755 /www/wwwroot/ims-api.huybach02.io.vn
+            sudo chmod -R 775 /www/wwwroot/ims-api.huybach02.io.vn/storage
+            sudo chmod -R 775 /www/wwwroot/ims-api.huybach02.io.vn/bootstrap/cache
